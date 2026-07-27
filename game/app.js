@@ -15131,6 +15131,36 @@ let Z = (e, t) => Math.floor(Math.random() * (t - e + 1)) + e,
       emoji: "🤝",
     },
     {
+      id: 0,
+      world: 0,
+      name: "Sumas con decenas",
+      kind: "sumas2d1d",
+      tables: [],
+      questions: 10,
+      passAt: 7,
+      emoji: "🔢",
+    },
+    {
+      id: 0,
+      world: 0,
+      name: "Llevando una",
+      kind: "sumas2d1dC",
+      tables: [],
+      questions: 10,
+      passAt: 7,
+      emoji: "🎒",
+    },
+    {
+      id: 0,
+      world: 0,
+      name: "Dos cifras sin llevar",
+      kind: "sumas2dNC",
+      tables: [],
+      questions: 10,
+      passAt: 7,
+      emoji: "🧮",
+    },
+    {
       id: 3,
       world: 0,
       name: "Sumas de 2 dígitos",
@@ -15149,6 +15179,16 @@ let Z = (e, t) => Math.floor(Math.random() * (t - e + 1)) + e,
       questions: 10,
       passAt: 7,
       emoji: "🎭",
+    },
+    {
+      id: 0,
+      world: 0,
+      name: "Dobles hasta 20",
+      kind: "doblesFacil",
+      tables: [],
+      questions: 10,
+      passAt: 7,
+      emoji: "✌️",
     },
     {
       id: 5,
@@ -16164,7 +16204,7 @@ let Z = (e, t) => Math.floor(Math.random() * (t - e + 1)) + e,
   ],
   el = { potion: 0, shield: 0, lens: 0 };
 function es(e, t) {
-  return 1 === e || !!t[e - 1]?.done;
+  return 1 === e || !!t[e]?.done || !!t[e - 1]?.done;
 }
 let ei = [
     { id: "playa", name: "Playa soleada", emoji: "🏖️" },
@@ -16862,6 +16902,89 @@ function ey(e, t) {
     hint: ep(s, r, l),
   };
 }
+/* Renumera los niveles del aventurero por posición (ids contiguos 1..N),
+   tras insertar los niveles preparatorios del Mundo 1. */
+en.forEach((l, i) => (l.id = i + 1));
+/* Mapa id→nombre de la versión v2 (93 niveles), para migrar el progreso
+   por NOMBRE cuando cambian los ids. No perder el avance de los niños. */
+const MG_V2_NAMES = {
+  1: "Sumas rápidas", 2: "Parejas del 10", 3: "Sumas de 2 dígitos", 4: "Par o impar",
+  5: "Dobles y mitades", 6: "Jefe: Robotnik", 7: "Restas sencillas", 8: "Restas veloces",
+  9: "Restas de 2 dígitos", 10: "Parejas del 20", 11: "Secuencias misteriosas", 12: "Jefe: Caballero resta",
+  13: "Reglas del 1 y el 0", 14: "Salta de 2 en 2", 15: "Tabla del 2, primera parte", 16: "Tabla del 2 completa",
+  17: "Salta de 5 en 5", 18: "Tabla del 5, primera parte", 19: "Tabla del 5 completa", 20: "Repaso: tablas 2 y 5",
+  21: "Salta de 10 en 10", 22: "Tabla del 10", 23: "Jefe: Dragón Ender", 24: "Salta de 3 en 3",
+  25: "Tabla del 3, primera parte", 26: "Tabla del 3 completa", 27: "Repaso: tablas 2 y 3", 28: "Salta de 4 en 4",
+  29: "Tabla del 4, primera parte", 30: "Tabla del 4 completa", 31: "Repaso: tablas 3 y 4", 32: "Número escondido",
+  33: "Jefe: Darth Vader", 34: "Salta de 6 en 6", 35: "Tabla del 6, primera parte", 36: "Tabla del 6 completa",
+  37: "Repaso: tablas 4, 5 y 6", 38: "Salta de 7 en 7", 39: "Tabla del 7, primera parte", 40: "Tabla del 7 completa",
+  41: "Repaso: tablas 6 y 7", 42: "Número escondido 2", 43: "Cadena mental", 44: "Jefe: Metal Sonic",
+  45: "Salta de 8 en 8", 46: "Tabla del 8, primera parte", 47: "Tabla del 8 completa", 48: "Repaso: tablas 7 y 8",
+  49: "Salta de 9 en 9", 50: "Tabla del 9, primera parte", 51: "Tabla del 9 completa", 52: "Repaso: tablas 8 y 9",
+  53: "Número escondido 3", 54: "Cadena avanzada", 55: "Jefe: Dr. Eggman", 56: "Dividir entre 2",
+  57: "Dividir entre 5", 58: "Repaso: dividir entre 2 y 5", 59: "Dividir entre 10", 60: "División sorpresa",
+  61: "Multiplica y divide", 62: "Las tablas no se olvidan: 8 y 9", 63: "Jefe: Wither", 64: "Dividir entre 3",
+  65: "Dividir entre 4", 66: "Repaso: dividir entre 3 y 4", 67: "Dividir entre 6", 68: "Dividir entre 7",
+  69: "Repaso: dividir entre 6 y 7", 70: "Multiplica y divide 2", 71: "Las tablas no se olvidan: 6 y 7", 72: "Jefe: Kylo Ren",
+  73: "Dividir entre 8", 74: "Dividir entre 9", 75: "Repaso: dividir entre 8 y 9", 76: "Gran división",
+  77: "División sorpresa 2", 78: "Cadena con división", 79: "Todas las tablas juntas", 80: "Jefe: Emperador",
+  81: "Multiplica y divide total", 82: "Secuencias misteriosas 2", 83: "Par o impar veloz", 84: "Número escondido 4",
+  85: "Cadena maestra", 86: "Jefe supremo: Maestro del tiempo", 87: "Multiplica en grande", 88: "Por 10 y por 100",
+  89: "División con resto", 90: "Fracciones de un número", 91: "Redondea a la decena", 92: "El reloj",
+  93: "Jefe: Sabio galáctico",
+};
+/* Generadores de la rampa suave de sumas (Mundo 1). */
+function exDec() {
+  let d = 10 * Z(1, 8),
+    u = Z(0, 8),
+    n = Z(1, 9 - u),
+    t = d + u;
+  return {
+    kind: "addition",
+    prompt: `${t} + ${n}`,
+    answer: t + n,
+    factKey: "add",
+    hint: `Suma solo las unidades: ${u} + ${n} = ${u + n}. Las decenas no cambian, da ${t + n}.`,
+  };
+}
+function exDecC() {
+  let u = Z(2, 9),
+    d = 10 * Z(1, 8),
+    t = d + u,
+    n = Z(11 - u, 9);
+  return {
+    kind: "addition",
+    prompt: `${t} + ${n}`,
+    answer: t + n,
+    factKey: "add",
+    hint: `${u} + ${n} se pasa de 10, así que llevas 1 a las decenas. Da ${t + n}.`,
+  };
+}
+function exNC() {
+  let da = Z(1, 4),
+    db = Z(1, 9 - da),
+    ua = Z(0, 8),
+    ub = Z(0, 9 - ua),
+    ta = 10 * da + ua,
+    tb = 10 * db + ub;
+  return {
+    kind: "addition",
+    prompt: `${ta} + ${tb}`,
+    answer: ta + tb,
+    factKey: "add",
+    hint: `Suma decenas con decenas y unidades con unidades: ${ta} + ${tb} = ${ta + tb}.`,
+  };
+}
+function exDobleFacil() {
+  let e = Z(2, 10);
+  return {
+    kind: "double",
+    prompt: `El doble de ${e}`,
+    answer: 2 * e,
+    factKey: "add",
+    hint: `Doblar es sumar el número consigo mismo: ${e} + ${e} = ${2 * e}.`,
+  };
+}
 function ex(e) {
   let t = e ? Z(11, 89) : Z(2, 9),
     n = e ? Z(11, 89) : Z(2, 9);
@@ -16939,7 +17062,7 @@ function eN() {
 }
 function eS() {
   if (Math.random() > 0.5) {
-    let e = Z(6, 35);
+    let e = Z(4, 25);
     return {
       kind: "double",
       prompt: `El doble de ${e}`,
@@ -16948,7 +17071,7 @@ function eS() {
       hint: `Doblar es sumar el n\xfamero consigo mismo: ${e} + ${e} = ${2 * e}.`,
     };
   }
-  let e = Z(4, 30),
+  let e = Z(3, 20),
     t = 2 * e;
   return {
     kind: "double",
@@ -17047,6 +17170,14 @@ function e_(e, t, n) {
       return eb(e.tables, t, e.factRange);
     case "sumas1":
       return ex(!1);
+    case "sumas2d1d":
+      return exDec();
+    case "sumas2d1dC":
+      return exDecC();
+    case "sumas2dNC":
+      return exNC();
+    case "doblesFacil":
+      return exDobleFacil();
     case "salto":
       var a;
       let r, l, s, i;
@@ -20799,19 +20930,28 @@ function tc({ facts: e, onBack: t, onReset: n }) {
             l(await eH("mg_daily", { date: "", streak: 0, bestScore: 0 })),
             d(await eH("mg_little_path", {})));
           {
-            let e = await eH("mg_path", {});
-            if (
-              (await eH("mg_pathver", { v: 1 })).v < 2 &&
-              Object.keys(e).length > 0
-            ) {
+            let ver = (await eH("mg_pathver", { v: 1 })).v,
+              path = await eH("mg_path", {});
+            if (ver < 2 && Object.keys(path).length > 0) {
               let t = {};
-              for (let [n, a] of Object.entries(e)) {
-                let e = ea[Number(n)];
-                e && !t[e] && (t[e] = a);
+              for (let [n, a] of Object.entries(path)) {
+                let k = ea[Number(n)];
+                k && !t[k] && (t[k] = a);
               }
-              (x(t), eQ("mg_path", t));
-            } else x(e);
-            eQ("mg_pathver", { v: 2 });
+              path = t;
+            }
+            if (ver < 3 && Object.keys(path).length > 0) {
+              let nameToNew = {};
+              en.forEach((l) => (nameToNew[l.name] = l.id));
+              let t = {};
+              for (let [n, a] of Object.entries(path)) {
+                let nm = MG_V2_NAMES[Number(n)],
+                  nid = nm ? nameToNew[nm] : null;
+                nid && (t[nid] = a);
+              }
+              path = t;
+            }
+            (x(path), eQ("mg_path", path), eQ("mg_pathver", { v: 3 }));
           }
           (j(await eH("mg_coins", 0)),
             N({ ...el, ...(await eH("mg_inv", { ...el })) }),
