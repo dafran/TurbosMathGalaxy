@@ -17470,6 +17470,22 @@ function MgProfileEditor({ initial: e, onSave: t, onCancel: n, onDelete: a }) {
         MG_H("button", { className: "btn-ghost", onClick: n }, "Cancelar"),
         e && a ? MG_H("button", { className: "btn-danger", onClick: () => a(e) }, "🗑️ Borrar") : null)));
 }
+function MgHub({ kind: k, name: nm, coins: c, streak: st, onBack: bk, items: it }) {
+  return MG_H("div", { className: "screen world-starwars hub-screen" },
+    s.jsx(eX, {}),
+    MG_H("div", { className: "hub-top" },
+      MG_H("button", { className: "link-back", onClick: bk }, "◀"),
+      MG_H("span", { className: "hub-name" }, (k === "little" ? "🧒 " : "🧑‍🚀 ") + (nm || "")),
+      k === "big" ? MG_H("span", { className: "coin-pill" }, "🪙 " + c) : null,
+      k === "big" ? MG_H("span", { className: "fire-pill" }, "🔥 " + st) : null),
+    s.jsx(f, { mood: "excited", text: nm ? "¡Hola, " + nm + "! ¿Qué jugamos?" : "¿Qué jugamos hoy?", size: 64 }),
+    MG_H("div", { className: "hub-grid" },
+      it.map((item) =>
+        MG_H("button", { key: item.title, className: "hub-card " + (item.cls || ""), onClick: item.onClick },
+          MG_H("span", { className: "hub-card-emoji" }, item.emoji),
+          MG_H("span", { className: "hub-card-title" }, item.title),
+          item.sub ? MG_H("span", { className: "hub-card-sub" }, item.sub) : null))));
+}
 function eJ({ soundOn: e, onToggleSound: t, onParents: n, onPick: a }) {
   return (0, s.jsxs)("div", {
     className: "screen world-starwars",
@@ -17582,11 +17598,6 @@ function eZ({ progress: e, onLevel: t, onStickers: n, onBrain: a, onBack: r }) {
             className: "coin-pill sticker-pill",
             children: ["🎨 ", l, "/", eo.length],
           }),
-          (0, s.jsx)("button", {
-            className: "top-btn",
-            onClick: n,
-            children: "📖 Mi álbum",
-          }),
         ],
       }),
       (0, s.jsxs)("div", {
@@ -17602,30 +17613,6 @@ function eZ({ progress: e, onLevel: t, onStickers: n, onBrain: a, onBack: r }) {
               (0, s.jsx)("div", {
                 className: "path-sub",
                 children: "¡Gana una calcomanía en cada nivel!",
-              }),
-            ],
-          }),
-          (0, s.jsxs)("button", {
-            className: "brain-banner kid-brain-banner",
-            onClick: a,
-            children: [
-              (0, s.jsx)("span", { className: "rb-bolt", children: "🧩" }),
-              (0, s.jsxs)("span", {
-                className: "rb-body",
-                children: [
-                  (0, s.jsx)("span", {
-                    className: "rb-title brain-btitle",
-                    children: "Juegos de lógica",
-                  }),
-                  (0, s.jsx)("span", {
-                    className: "rb-sub",
-                    children: "memoria · parejas · tren · sombras y más",
-                  }),
-                ],
-              }),
-              (0, s.jsx)("span", {
-                className: "rb-go brain-bgo",
-                children: "▶",
               }),
             ],
           }),
@@ -18352,16 +18339,6 @@ function e3({
             className: "fire-pill",
             children: ["🔥 ", n.streak],
           }),
-          (0, s.jsx)("button", {
-            className: "top-btn",
-            onClick: c,
-            children: "🏪 Tienda",
-          }),
-          (0, s.jsx)("button", {
-            className: "top-btn",
-            onClick: u,
-            children: "🗺️",
-          }),
         ],
       }),
       (0, s.jsxs)("div", {
@@ -18418,102 +18395,6 @@ function e3({
                   className: "gc-bonus",
                   children: ["premio: 🪙 +", 15],
                 }),
-            ],
-          }),
-          (0, s.jsxs)("button", {
-            className: "reto-banner",
-            onClick: d,
-            children: [
-              (0, s.jsx)("span", { className: "rb-bolt", children: "⚡" }),
-              (0, s.jsxs)("span", {
-                className: "rb-body",
-                children: [
-                  (0, s.jsx)("span", {
-                    className: "rb-title",
-                    children: "Reto relámpago",
-                  }),
-                  (0, s.jsxs)("span", {
-                    className: "rb-sub",
-                    children: ["60 segundos · ¿cuántas logras? · récord: ", a],
-                  }),
-                ],
-              }),
-              (0, s.jsx)("span", { className: "rb-go", children: "▶" }),
-            ],
-          }),
-          (0, s.jsxs)("button", {
-            className: "practice-banner",
-            onClick: p,
-            children: [
-              (0, s.jsx)("span", { className: "rb-bolt", children: "🧠" }),
-              (0, s.jsxs)("span", {
-                className: "rb-body",
-                children: [
-                  (0, s.jsx)("span", {
-                    className: "rb-title practice-title",
-                    children: "Repaso inteligente",
-                  }),
-                  (0, s.jsx)("span", {
-                    className: "rb-sub",
-                    children: r
-                      ? "practica tus operaciones más difíciles · 🪙 bono diario"
-                      : "ya hiciste el repaso de hoy · puedes repetirlo",
-                  }),
-                ],
-              }),
-              (0, s.jsx)("span", {
-                className: "rb-go practice-go",
-                children: "▶",
-              }),
-            ],
-          }),
-          (0, s.jsxs)("button", {
-            className: "brain-banner",
-            onClick: h,
-            children: [
-              (0, s.jsx)("span", { className: "rb-bolt", children: "🧩" }),
-              (0, s.jsxs)("span", {
-                className: "rb-body",
-                children: [
-                  (0, s.jsx)("span", {
-                    className: "rb-title brain-btitle",
-                    children: "Poder cerebral",
-                  }),
-                  (0, s.jsx)("span", {
-                    className: "rb-sub",
-                    children: "sudoku · reloj cucú · memoria · ordenar",
-                  }),
-                ],
-              }),
-              (0, s.jsx)("span", {
-                className: "rb-go brain-bgo",
-                children: "▶",
-              }),
-            ],
-          }),
-          (0, s.jsxs)("button", {
-            className: "libre-banner",
-            onClick: g,
-            children: [
-              (0, s.jsx)("span", { className: "rb-bolt", children: "🎯" }),
-              (0, s.jsxs)("span", {
-                className: "rb-body",
-                children: [
-                  (0, s.jsx)("span", {
-                    className: "rb-title libre-btitle",
-                    children: "Práctica libre",
-                  }),
-                  (0, s.jsx)("span", {
-                    className: "rb-sub",
-                    children:
-                      "elige tú: sumas · restas · multiplicación · división",
-                  }),
-                ],
-              }),
-              (0, s.jsx)("span", {
-                className: "rb-go libre-bgo",
-                children: "▶",
-              }),
             ],
           }),
           et.map((t, n) => {
@@ -20991,7 +20872,7 @@ function tc({ facts: e, onBack: t, onReset: n }) {
               onPick: (pf) => {
                 (mgSetActive(pf.id),
                   mgSetA(pf.id),
-                  t(mgRouteForAge(pf.age) === "pequeno" ? "little-path" : "path"));
+                  t(mgRouteForAge(pf.age) === "pequeno" ? "little-hub" : "hub"));
               },
               onAdd: () => {
                 (mgSetEd(null), t("edit-profile"));
@@ -21027,9 +20908,37 @@ function tc({ facts: e, onBack: t, onReset: n }) {
                     mgSetP(n),
                     mgSetActive(a),
                     mgSetA(a),
-                    t(mgRouteForAge(l.age) === "pequeno" ? "little-path" : "path"));
+                    t(mgRouteForAge(l.age) === "pequeno" ? "little-hub" : "hub"));
                 }
               },
+            }),
+          "hub" === e &&
+            (0, s.jsx)(MgHub, {
+              kind: "big",
+              name: (mgP.find((p) => p.id === mgA) || {}).name,
+              coins: k,
+              streak: r.streak,
+              onBack: () => t("profile"),
+              items: [
+                { emoji: "🗺️", title: "Camino", sub: "tu aventura de niveles", cls: "wide", onClick: () => t("path") },
+                { emoji: "🧩", title: "Poder cerebral", sub: "sudoku · memoria · lógica", onClick: () => t("brain") },
+                { emoji: "🎯", title: "Práctica libre", sub: "elige la operación", onClick: () => t("libre") },
+                { emoji: "⚡", title: "Reto relámpago", sub: "60 segundos", onClick: () => t("reto") },
+                { emoji: "🧠", title: "Repaso inteligente", sub: "tus datos difíciles", onClick: () => t("practice") },
+                { emoji: "🏆", title: "Colección", sub: "mapa de dominio", onClick: () => t("mastery") },
+                { emoji: "🏪", title: "Tienda", sub: "gorros para Turbo", onClick: () => t("shop") },
+              ],
+            }),
+          "little-hub" === e &&
+            (0, s.jsx)(MgHub, {
+              kind: "little",
+              name: (mgP.find((p) => p.id === mgA) || {}).name,
+              onBack: () => t("profile"),
+              items: [
+                { emoji: "🗺️", title: "Mi aventura", sub: "niveles con calcomanías", cls: "wide", onClick: () => t("little-path") },
+                { emoji: "🧩", title: "Juegos de lógica", sub: "memoria · parejas · tren", onClick: () => t("little-brain") },
+                { emoji: "📖", title: "Mi álbum", sub: "tus calcomanías", onClick: () => t("stickers") },
+              ],
             }),
           "little-path" === e &&
             (0, s.jsx)(eZ, {
@@ -21039,7 +20948,7 @@ function tc({ facts: e, onBack: t, onReset: n }) {
               },
               onStickers: () => t("stickers"),
               onBrain: () => t("little-brain"),
-              onBack: () => t("profile"),
+              onBack: () => t("little-hub"),
             }),
           "little-brain" === e &&
             (0, s.jsx)(X, {
@@ -21050,10 +20959,10 @@ function tc({ facts: e, onBack: t, onReset: n }) {
                   return (eQ("mg_lbrain", n), n);
                 });
               },
-              onBack: () => t("little-path"),
+              onBack: () => t("little-hub"),
             }),
           "stickers" === e &&
-            (0, s.jsx)(e0, { progress: o, onBack: () => t("little-path") }),
+            (0, s.jsx)(e0, { progress: o, onBack: () => t("little-hub") }),
           "little-play" === e &&
             (0, s.jsx)(e1, {
               level: f,
@@ -21097,7 +21006,7 @@ function tc({ facts: e, onBack: t, onReset: n }) {
               onPractice: () => t("practice"),
               onBrain: () => t("brain"),
               onLibre: () => t("libre"),
-              onBack: () => t("profile"),
+              onBack: () => t("hub"),
             }),
           "prelevel" === e &&
             (0, s.jsx)(e5, {
@@ -21240,13 +21149,13 @@ function tc({ facts: e, onBack: t, onReset: n }) {
                   O({ score: e, best: i.best, isRecord: a, coins: s }),
                   t("reto-result"));
               },
-              onQuit: () => t("path"),
+              onQuit: () => t("hub"),
             }),
           "reto-result" === e &&
             (0, s.jsx)(tt, {
               run: F,
               onAgain: () => t("reto"),
-              onPath: () => t("path"),
+              onPath: () => t("hub"),
             }),
           "practice" === e &&
             (0, s.jsx)(tn, {
@@ -21271,20 +21180,20 @@ function tc({ facts: e, onBack: t, onReset: n }) {
                   Q({ correct: e, coins: s, firstToday: a }),
                   t("practice-result"));
               },
-              onQuit: () => t("path"),
+              onQuit: () => t("hub"),
             }),
           "practice-result" === e &&
             (0, s.jsx)(ta, {
               run: B,
               onAgain: () => t("practice"),
-              onPath: () => t("path"),
+              onPath: () => t("hub"),
             }),
           "libre" === e &&
             (0, s.jsx)(ts, {
               onStart: (e, n) => {
                 (ei({ op: e, diff: n }), t("libre-play"));
               },
-              onBack: () => t("path"),
+              onBack: () => t("hub"),
             }),
           "libre-play" === e &&
             (0, s.jsx)(ti, {
@@ -21344,7 +21253,7 @@ function tc({ facts: e, onBack: t, onReset: n }) {
                 let n = eK(r, t);
                 (l(n), eQ("mg_daily", n));
               },
-              onBack: () => t("path"),
+              onBack: () => t("hub"),
             }),
           "shop" === e &&
             (0, s.jsx)(to, {
@@ -21384,12 +21293,12 @@ function tc({ facts: e, onBack: t, onReset: n }) {
                   return (eQ("mg_outfit", n), (u = e), n);
                 });
               },
-              onBack: () => t("path"),
+              onBack: () => t("hub"),
             }),
           "mastery" === e &&
             (0, s.jsx)(tc, {
               facts: n,
-              onBack: () => t("path"),
+              onBack: () => t("hub"),
               onReset: () => {
                 for (let e of eW) {
                   delete eB[e];
