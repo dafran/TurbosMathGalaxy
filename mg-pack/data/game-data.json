@@ -1,0 +1,276 @@
+{
+  "adventure_levels_raw": [
+    "{id:1,world:0,name:\"Sumas rápidas\",kind:\"sumas1\",tables:[],questions:10,passAt:7,emoji:\"➕\"}",
+    "{id:2,world:0,name:\"Parejas del 10\",kind:\"bonds10\",tables:[],questions:10,passAt:7,emoji:\"🤝\"}",
+    "{id:3,world:0,name:\"Sumas de 2 dígitos\",kind:\"sumas2\",tables:[],questions:10,passAt:7,emoji:\"💎\"}",
+    "{id:4,world:0,name:\"Par o impar\",kind:\"parimpar\",tables:[],questions:10,passAt:7,emoji:\"🎭\"}",
+    "{id:5,world:0,name:\"Dobles y mitades\",kind:\"dobles\",tables:[],questions:10,passAt:7,emoji:\"🪞\"}",
+    "{id:6,world:0,name:\"Jefe: Robotnik\",kind:\"boss\",tables:[],questions:12,passAt:9,emoji:\"🤖\"}",
+    "{id:7,world:1,name:\"Restas sencillas\",kind:\"restas1\",tables:[],questions:10,passAt:7,emoji:\"➖\"}",
+    "{id:8,world:1,name:\"Restas veloces\",kind:\"restas1\",tables:[],questions:10,passAt:7,emoji:\"💨\"}",
+    "{id:9,world:1,name:\"Restas de 2 dígitos\",kind:\"restas2\",tables:[],questions:10,passAt:7,emoji:\"🏗️\"}",
+    "{id:10,world:1,name:\"Parejas del 20\",kind:\"bonds20\",tables:[],questions:10,passAt:7,emoji:\"🤝\"}",
+    "{id:11,world:1,name:\"Secuencias misteriosas\",kind:\"secuencia\",tables:[],questions:8,passAt:6,emoji:\"🔍\"}",
+    "{id:12,world:1,name:\"Jefe: Caballero resta\",kind:\"boss\",tables:[],questions:12,passAt:9,emoji:\"🛡️\"}",
+    "{id:13,world:2,name:\"Reglas del 1 y el 0\",kind:\"tabla\",tables:[0,1],questions:10,passAt:7,emoji:\"✨\"}",
+    "{id:14,world:2,name:\"Salta de 2 en 2\",kind:\"salto\",tables:[2],questions:8,passAt:6,emoji:\"🐰\"}",
+    "{id:15,world:2,name:\"Tabla del 2, primera parte\",kind:\"tabla\",tables:[2],questions:10,passAt:7,emoji:\"💍\",factRange:[1,5]}",
+    "{id:16,world:2,name:\"Tabla del 2 completa\",kind:\"tabla\",tables:[2],questions:10,passAt:7,emoji:\"💎\"}",
+    "{id:17,world:2,name:\"Salta de 5 en 5\",kind:\"salto\",tables:[5],questions:8,passAt:6,emoji:\"🦘\"}",
+    "{id:18,world:2,name:\"Tabla del 5, primera parte\",kind:\"tabla\",tables:[5],questions:10,passAt:7,emoji:\"🖐️\",factRange:[1,5]}",
+    "{id:19,world:2,name:\"Tabla del 5 completa\",kind:\"tabla\",tables:[5],questions:10,passAt:7,emoji:\"🌀\"}",
+    "{id:20,world:2,name:\"Repaso: tablas 2 y 5\",kind:\"tabla\",tables:[2,5],questions:10,passAt:7,emoji:\"🔁\"}",
+    "{id:21,world:2,name:\"Salta de 10 en 10\",kind:\"salto\",tables:[10],questions:8,passAt:6,emoji:\"🚀\"}",
+    "{id:22,world:2,name:\"Tabla del 10\",kind:\"tabla\",tables:[10],questions:10,passAt:7,emoji:\"⚡\"}",
+    "{id:23,world:2,name:\"Jefe: Dragón Ender\",kind:\"boss\",tables:[1,2,5,10],questions:12,passAt:9,emoji:\"🐉\"}",
+    "{id:24,world:3,name:\"Salta de 3 en 3\",kind:\"salto\",tables:[3],questions:8,passAt:6,emoji:\"🐸\"}",
+    "{id:25,world:3,name:\"Tabla del 3, primera parte\",kind:\"tabla\",tables:[3],questions:10,passAt:7,emoji:\"🟩\",factRange:[1,5]}",
+    "{id:26,world:3,name:\"Tabla del 3 completa\",kind:\"tabla\",tables:[3],questions:10,passAt:7,emoji:\"🌿\"}",
+    "{id:27,world:3,name:\"Repaso: tablas 2 y 3\",kind:\"tabla\",tables:[2,3],questions:10,passAt:7,emoji:\"🔁\"}",
+    "{id:28,world:3,name:\"Salta de 4 en 4\",kind:\"salto\",tables:[4],questions:8,passAt:6,emoji:\"🦗\"}",
+    "{id:29,world:3,name:\"Tabla del 4, primera parte\",kind:\"tabla\",tables:[4],questions:10,passAt:7,emoji:\"⛏️\",factRange:[1,5]}",
+    "{id:30,world:3,name:\"Tabla del 4 completa\",kind:\"tabla\",tables:[4],questions:10,passAt:7,emoji:\"🧱\"}",
+    "{id:31,world:3,name:\"Repaso: tablas 3 y 4\",kind:\"tabla\",tables:[3,4],questions:10,passAt:7,emoji:\"🔁\"}",
+    "{id:32,world:3,name:\"Número escondido\",kind:\"factor\",tables:[2,3,4,5],questions:10,passAt:7,emoji:\"❓\"}",
+    "{id:33,world:3,name:\"Jefe: Darth Vader\",kind:\"boss\",tables:[2,3,4,5,10],questions:12,passAt:9,emoji:\"🌑\"}",
+    "{id:34,world:4,name:\"Salta de 6 en 6\",kind:\"salto\",tables:[6],questions:8,passAt:6,emoji:\"🛸\"}",
+    "{id:35,world:4,name:\"Tabla del 6, primera parte\",kind:\"tabla\",tables:[6],questions:10,passAt:7,emoji:\"🪐\",factRange:[1,5]}",
+    "{id:36,world:4,name:\"Tabla del 6 completa\",kind:\"tabla\",tables:[6],questions:10,passAt:7,emoji:\"🌌\"}",
+    "{id:37,world:4,name:\"Repaso: tablas 4, 5 y 6\",kind:\"tabla\",tables:[4,5,6],questions:10,passAt:7,emoji:\"🔁\"}",
+    "{id:38,world:4,name:\"Salta de 7 en 7\",kind:\"salto\",tables:[7],questions:8,passAt:6,emoji:\"⚔️\"}",
+    "{id:39,world:4,name:\"Tabla del 7, primera parte\",kind:\"tabla\",tables:[7],questions:10,passAt:7,emoji:\"🗡️\",factRange:[1,5]}",
+    "{id:40,world:4,name:\"Tabla del 7 completa\",kind:\"tabla\",tables:[7],questions:10,passAt:7,emoji:\"🌟\"}",
+    "{id:41,world:4,name:\"Repaso: tablas 6 y 7\",kind:\"tabla\",tables:[6,7],questions:10,passAt:7,emoji:\"🔁\"}",
+    "{id:42,world:4,name:\"Número escondido 2\",kind:\"factor\",tables:[6,7],questions:10,passAt:7,emoji:\"🔮\"}",
+    "{id:43,world:4,name:\"Cadena mental\",kind:\"cadena\",tables:[],questions:8,passAt:6,emoji:\"🔗\"}",
+    "{id:44,world:4,name:\"Jefe: Metal Sonic\",kind:\"boss\",tables:[6,7],questions:12,passAt:9,emoji:\"🦾\"}",
+    "{id:45,world:5,name:\"Salta de 8 en 8\",kind:\"salto\",tables:[8],questions:8,passAt:6,emoji:\"🐙\"}",
+    "{id:46,world:5,name:\"Tabla del 8, primera parte\",kind:\"tabla\",tables:[8],questions:10,passAt:7,emoji:\"🕷️\",factRange:[1,5]}",
+    "{id:47,world:5,name:\"Tabla del 8 completa\",kind:\"tabla\",tables:[8],questions:10,passAt:7,emoji:\"🕸️\"}",
+    "{id:48,world:5,name:\"Repaso: tablas 7 y 8\",kind:\"tabla\",tables:[7,8],questions:10,passAt:7,emoji:\"🔁\"}",
+    "{id:49,world:5,name:\"Salta de 9 en 9\",kind:\"salto\",tables:[9],questions:8,passAt:6,emoji:\"☄️\"}",
+    "{id:50,world:5,name:\"Tabla del 9, primera parte\",kind:\"tabla\",tables:[9],questions:10,passAt:7,emoji:\"🌟\",factRange:[1,5]}",
+    "{id:51,world:5,name:\"Tabla del 9 completa\",kind:\"tabla\",tables:[9],questions:10,passAt:7,emoji:\"💫\"}",
+    "{id:52,world:5,name:\"Repaso: tablas 8 y 9\",kind:\"tabla\",tables:[8,9],questions:10,passAt:7,emoji:\"🔁\"}",
+    "{id:53,world:5,name:\"Número escondido 3\",kind:\"factor\",tables:[8,9],questions:10,passAt:7,emoji:\"🧩\"}",
+    "{id:54,world:5,name:\"Cadena avanzada\",kind:\"cadena\",tables:[],questions:8,passAt:6,emoji:\"⛓️\",hardChain:!0}",
+    "{id:55,world:5,name:\"Jefe: Dr. Eggman\",kind:\"boss\",tables:[2,3,4,5,6,7,8,9,10],questions:14,passAt:11,emoji:\"🥚\"}",
+    "{id:56,world:6,name:\"Dividir entre 2\",kind:\"div\",tables:[2],questions:10,passAt:7,emoji:\"✂️\"}",
+    "{id:57,world:6,name:\"Dividir entre 5\",kind:\"div\",tables:[5],questions:10,passAt:7,emoji:\"🖐️\"}",
+    "{id:58,world:6,name:\"Repaso: dividir entre 2 y 5\",kind:\"div\",tables:[2,5],questions:10,passAt:7,emoji:\"🔁\"}",
+    "{id:59,world:6,name:\"Dividir entre 10\",kind:\"div\",tables:[10],questions:10,passAt:7,emoji:\"🔟\"}",
+    "{id:60,world:6,name:\"División sorpresa\",kind:\"div\",tables:[2,5,10],questions:10,passAt:7,emoji:\"🎲\"}",
+    "{id:61,world:6,name:\"Multiplica y divide\",kind:\"multidiv\",tables:[2,5,10],questions:10,passAt:7,emoji:\"🔄\"}",
+    "{id:62,world:6,name:\"Las tablas no se olvidan: 8 y 9\",kind:\"tabla\",tables:[8,9],questions:10,passAt:7,emoji:\"🧠\"}",
+    "{id:63,world:6,name:\"Jefe: Wither\",kind:\"boss\",tables:[2,5,10],questions:12,passAt:9,emoji:\"💀\"}",
+    "{id:64,world:7,name:\"Dividir entre 3\",kind:\"div\",tables:[3],questions:10,passAt:7,emoji:\"🪓\"}",
+    "{id:65,world:7,name:\"Dividir entre 4\",kind:\"div\",tables:[4],questions:10,passAt:7,emoji:\"🧱\"}",
+    "{id:66,world:7,name:\"Repaso: dividir entre 3 y 4\",kind:\"div\",tables:[3,4],questions:10,passAt:7,emoji:\"🔁\"}",
+    "{id:67,world:7,name:\"Dividir entre 6\",kind:\"div\",tables:[6],questions:10,passAt:7,emoji:\"🛰️\"}",
+    "{id:68,world:7,name:\"Dividir entre 7\",kind:\"div\",tables:[7],questions:10,passAt:7,emoji:\"🗡️\"}",
+    "{id:69,world:7,name:\"Repaso: dividir entre 6 y 7\",kind:\"div\",tables:[6,7],questions:10,passAt:7,emoji:\"🔁\"}",
+    "{id:70,world:7,name:\"Multiplica y divide 2\",kind:\"multidiv\",tables:[2,3,4,5,6,7],questions:10,passAt:7,emoji:\"🔄\"}",
+    "{id:71,world:7,name:\"Las tablas no se olvidan: 6 y 7\",kind:\"tabla\",tables:[6,7],questions:10,passAt:7,emoji:\"🧠\"}",
+    "{id:72,world:7,name:\"Jefe: Kylo Ren\",kind:\"boss\",tables:[3,4,6,7],questions:12,passAt:9,emoji:\"⚡\"}",
+    "{id:73,world:8,name:\"Dividir entre 8\",kind:\"div\",tables:[8],questions:10,passAt:7,emoji:\"🕷️\"}",
+    "{id:74,world:8,name:\"Dividir entre 9\",kind:\"div\",tables:[9],questions:10,passAt:7,emoji:\"☄️\"}",
+    "{id:75,world:8,name:\"Repaso: dividir entre 8 y 9\",kind:\"div\",tables:[8,9],questions:10,passAt:7,emoji:\"🔁\"}",
+    "{id:76,world:8,name:\"Gran división\",kind:\"div\",tables:[2,3,4,5,6,7,8,9],questions:10,passAt:7,emoji:\"🌠\"}",
+    "{id:77,world:8,name:\"División sorpresa 2\",kind:\"div\",tables:[2,3,4,5,6,7,8,9],questions:10,passAt:7,emoji:\"🎰\"}",
+    "{id:78,world:8,name:\"Cadena con división\",kind:\"cadena\",tables:[],questions:8,passAt:6,emoji:\"🌀\",hardChain:!0}",
+    "{id:79,world:8,name:\"Todas las tablas juntas\",kind:\"tabla\",tables:[2,3,4,5,6,7,8,9],questions:10,passAt:7,emoji:\"🧠\"}",
+    "{id:80,world:8,name:\"Jefe: Emperador\",kind:\"boss\",tables:[2,3,4,5,6,7,8,9,10],questions:14,passAt:11,emoji:\"👑\"}",
+    "{id:81,world:9,name:\"Multiplica y divide total\",kind:\"multidiv\",tables:[2,3,4,5,6,7,8,9],questions:10,passAt:7,emoji:\"🔄\"}",
+    "{id:82,world:9,name:\"Secuencias misteriosas 2\",kind:\"secuencia\",tables:[],questions:8,passAt:6,emoji:\"🔍\"}",
+    "{id:83,world:9,name:\"Par o impar veloz\",kind:\"parimpar\",tables:[],questions:10,passAt:7,emoji:\"🎭\"}",
+    "{id:84,world:9,name:\"Número escondido 4\",kind:\"factor\",tables:[6,7,8,9],questions:10,passAt:7,emoji:\"🎭\"}",
+    "{id:85,world:9,name:\"Cadena maestra\",kind:\"cadena\",tables:[],questions:8,passAt:6,emoji:\"🐲\",hardChain:!0}",
+    "{id:86,world:9,name:\"Jefe supremo: Maestro del tiempo\",kind:\"boss\",tables:[2,3,4,5,6,7,8,9,10],questions:14,passAt:11,emoji:\"⏳\"}",
+    "{id:87,world:10,name:\"Multiplica en grande\",kind:\"mult2d\",tables:[],questions:8,passAt:6,emoji:\"🐋\"}",
+    "{id:88,world:10,name:\"Por 10 y por 100\",kind:\"pot10\",tables:[],questions:10,passAt:7,emoji:\"0️⃣\"}",
+    "{id:89,world:10,name:\"División con resto\",kind:\"resto\",tables:[],questions:8,passAt:6,emoji:\"🍕\"}",
+    "{id:90,world:10,name:\"Fracciones de un número\",kind:\"fracnum\",tables:[],questions:8,passAt:6,emoji:\"🍰\"}",
+    "{id:91,world:10,name:\"Redondea a la decena\",kind:\"redondeo\",tables:[],questions:10,passAt:7,emoji:\"🎯\"}",
+    "{id:92,world:10,name:\"El reloj\",kind:\"hora\",tables:[],questions:8,passAt:6,emoji:\"🕐\"}",
+    "{id:93,world:10,name:\"Jefe: Sabio galáctico\",kind:\"boss\",tables:[2,3,4,5,6,7,8,9,10],questions:14,passAt:11,emoji:\"🧙\"}"
+  ],
+  "little_levels_raw": [
+    "{id:1,world:0,name:\"Cuenta hasta 3\",mode:\"contar\",max:3,questions:8,emoji:\"🐚\",sticker:\"🐬\",stickerName:\"Delfín saltarín\"}",
+    "{id:2,world:0,name:\"Cuenta hasta 5\",mode:\"contar\",max:5,questions:8,emoji:\"🌊\",sticker:\"🐢\",stickerName:\"Tortuga marina\"}",
+    "{id:3,world:0,name:\"¿Cuál tiene más?\",mode:\"comparar\",max:5,questions:8,emoji:\"⚖️\",sticker:\"🦀\",stickerName:\"Cangrejo pinzas\"}",
+    "{id:4,world:0,name:\"Reto de la playa\",mode:\"mix\",max:5,questions:8,emoji:\"🏆\",sticker:\"🐠\",stickerName:\"Pez arcoíris\"}",
+    "{id:5,world:1,name:\"Suma hasta 5\",mode:\"sumar\",max:5,questions:8,emoji:\"🍄\",sticker:\"🦊\",stickerName:\"Zorro veloz\"}",
+    "{id:6,world:1,name:\"Cuenta hasta 8\",mode:\"contar\",max:8,questions:8,emoji:\"🌲\",sticker:\"🦉\",stickerName:\"Búho sabio\"}",
+    "{id:7,world:1,name:\"Más y menos\",mode:\"comparar\",max:8,questions:8,emoji:\"🍎\",sticker:\"🦋\",stickerName:\"Mariposa mágica\"}",
+    "{id:8,world:1,name:\"Reto del bosque\",mode:\"mix\",max:8,questions:8,emoji:\"🏆\",sticker:\"🐿️\",stickerName:\"Ardilla traviesa\"}",
+    "{id:9,world:2,name:\"Suma hasta 10\",mode:\"sumar\",max:10,questions:8,emoji:\"🌙\",sticker:\"🛸\",stickerName:\"Nave espacial\"}",
+    "{id:10,world:2,name:\"Cuenta hasta 10\",mode:\"contar\",max:10,questions:8,emoji:\"⭐\",sticker:\"🪐\",stickerName:\"Planeta anillado\"}",
+    "{id:11,world:2,name:\"Gran comparación\",mode:\"comparar\",max:10,questions:8,emoji:\"🔭\",sticker:\"👽\",stickerName:\"Amigo alien\"}",
+    "{id:12,world:2,name:\"Reto galáctico\",mode:\"mix\",max:10,questions:8,emoji:\"👑\",sticker:\"🌟\",stickerName:\"Superestrella\"}",
+    "{id:13,world:3,name:\"Palitos hasta 5\",mode:\"palitos\",max:5,questions:8,emoji:\"🌾\",sticker:\"🐮\",stickerName:\"Vaquita feliz\"}",
+    "{id:14,world:3,name:\"Palitos hasta 10\",mode:\"palitos\",max:10,questions:8,emoji:\"🌻\",sticker:\"🐝\",stickerName:\"Abeja trabajadora\"}",
+    "{id:15,world:3,name:\"Quitar y contar\",mode:\"restar\",max:5,questions:8,emoji:\"🍃\",sticker:\"🐞\",stickerName:\"Mariquita de la suerte\"}",
+    "{id:16,world:3,name:\"Reto de la pradera\",mode:\"mix\",max:8,questions:8,emoji:\"🏆\",sticker:\"🦔\",stickerName:\"Erizo valiente\",pool:[\"palitos\",\"restar\",\"contar\"]}",
+    "{id:17,world:4,name:\"Puntos hasta 5\",mode:\"puntos\",max:5,questions:8,emoji:\"🔦\",sticker:\"🦇\",stickerName:\"Murciélago amigable\"}",
+    "{id:18,world:4,name:\"Puntos hasta 10\",mode:\"puntos\",max:10,questions:8,emoji:\"💠\",sticker:\"💎\",stickerName:\"Gema brillante\"}",
+    "{id:19,world:4,name:\"Quitar y contar 2\",mode:\"restar\",max:8,questions:8,emoji:\"🕯️\",sticker:\"🐌\",stickerName:\"Caracol paciente\"}",
+    "{id:20,world:4,name:\"Reto de la cueva\",mode:\"mix\",max:10,questions:8,emoji:\"🏆\",sticker:\"🦉\",stickerName:\"Búho de cristal\",pool:[\"puntos\",\"restar\",\"sumar\"]}",
+    "{id:21,world:5,name:\"¿Qué sigue?\",mode:\"patron\",max:2,questions:8,emoji:\"🎨\",sticker:\"🦄\",stickerName:\"Unicornio mágico\"}",
+    "{id:22,world:5,name:\"Patrones mágicos\",mode:\"patron\",max:3,questions:8,emoji:\"🪄\",sticker:\"🧚\",stickerName:\"Hada de los números\"}",
+    "{id:23,world:5,name:\"Suma y resta\",mode:\"mix\",max:10,questions:8,emoji:\"⚔️\",sticker:\"🎠\",stickerName:\"Carrusel real\"}",
+    "{id:24,world:5,name:\"Gran reto del castillo\",mode:\"mix\",max:10,questions:8,emoji:\"👑\",sticker:\"🏅\",stickerName:\"Medalla dorada\",pool:[\"contar\",\"sumar\",\"comparar\",\"palitos\",\"puntos\",\"restar\",\"patron\"]}",
+    "{id:25,world:6,name:\"¿Qué número falta?\",mode:\"falta\",max:5,questions:8,emoji:\"🌋\",sticker:\"🦖\",stickerName:\"Dino explorador\"}",
+    "{id:26,world:6,name:\"Cuenta hasta 15\",mode:\"contar\",max:15,questions:8,emoji:\"🔥\",sticker:\"🌶️\",stickerName:\"Chile picante\"}",
+    "{id:27,world:6,name:\"Toca en orden\",mode:\"orden\",max:4,questions:6,emoji:\"👆\",sticker:\"🦅\",stickerName:\"Águila veloz\"}",
+    "{id:28,world:6,name:\"Reto del volcán\",mode:\"mix\",max:10,questions:8,emoji:\"🏆\",sticker:\"🐊\",stickerName:\"Coco sonriente\",pool:[\"falta\",\"contar\",\"orden\"]}",
+    "{id:29,world:7,name:\"Falta hasta 10\",mode:\"falta\",max:10,questions:8,emoji:\"🌈\",sticker:\"🦜\",stickerName:\"Loro parlanchín\"}",
+    "{id:30,world:7,name:\"Palitos hasta 15\",mode:\"palitos\",max:15,questions:8,emoji:\"🎋\",sticker:\"🍭\",stickerName:\"Dulce premio\"}",
+    "{id:31,world:7,name:\"Toca en orden 5\",mode:\"orden\",max:5,questions:6,emoji:\"👆\",sticker:\"🦩\",stickerName:\"Flamenco bailarín\"}",
+    "{id:32,world:7,name:\"Reto arcoíris\",mode:\"mix\",max:10,questions:8,emoji:\"🏆\",sticker:\"🌈\",stickerName:\"Arcoíris mágico\",pool:[\"falta\",\"palitos\",\"orden\",\"comparar\"]}",
+    "{id:33,world:8,name:\"Sumas heladas\",mode:\"sumar\",max:12,questions:8,emoji:\"⛄\",sticker:\"🐧\",stickerName:\"Pingüino saltarín\"}",
+    "{id:34,world:8,name:\"Resta en la nieve\",mode:\"restar\",max:10,questions:8,emoji:\"☃️\",sticker:\"🦭\",stickerName:\"Foca juguetona\"}",
+    "{id:35,world:8,name:\"Orden maestro\",mode:\"orden\",max:6,questions:6,emoji:\"👆\",sticker:\"🧊\",stickerName:\"Cubo de hielo\"}",
+    "{id:36,world:8,name:\"Gran reto helado\",mode:\"mix\",max:12,questions:8,emoji:\"👑\",sticker:\"❄️\",stickerName:\"Copo brillante\",pool:[\"contar\",\"sumar\",\"restar\",\"falta\",\"orden\",\"palitos\",\"puntos\"]}",
+    "{id:37,world:9,name:\"La figura igual\",mode:\"figura\",max:3,questions:8,emoji:\"🔷\",sticker:\"🐿️\",stickerName:\"Ardilla curiosa\"}",
+    "{id:38,world:9,name:\"Cuenta de 2 en 2\",mode:\"depar\",max:5,questions:8,emoji:\"🧦\",sticker:\"🐛\",stickerName:\"Oruga contadora\"}",
+    "{id:39,world:9,name:\"¿Cuántos faltan para 5?\",mode:\"para5\",max:5,questions:8,emoji:\"🖐️\",sticker:\"🌺\",stickerName:\"Flor gigante\"}",
+    "{id:40,world:9,name:\"Gran reto del jardín\",mode:\"mix\",max:12,questions:8,emoji:\"👑\",sticker:\"🦚\",stickerName:\"Pavo real\",pool:[\"figura\",\"depar\",\"para5\",\"patron\",\"sumar\"]}"
+  ],
+  "adventure_worlds": [
+    {
+      "name": "Green Hill",
+      "emoji": "🌀"
+    },
+    {
+      "name": "Torre de restas",
+      "emoji": "➖"
+    },
+    {
+      "name": "Cueva de bloques",
+      "emoji": "⛏️"
+    },
+    {
+      "name": "Galaxia lejana",
+      "emoji": "🌌"
+    },
+    {
+      "name": "Nebulosa violeta",
+      "emoji": "💜"
+    },
+    {
+      "name": "Isla del caos",
+      "emoji": "🌋"
+    },
+    {
+      "name": "Mina profunda",
+      "emoji": "💎"
+    },
+    {
+      "name": "Estrella oscura",
+      "emoji": "🌑"
+    },
+    {
+      "name": "Corona galáctica",
+      "emoji": "👑"
+    },
+    {
+      "name": "Cima del maestro",
+      "emoji": "🏔️"
+    },
+    {
+      "name": "Nebulosa experta",
+      "emoji": "🔮"
+    }
+  ],
+  "little_worlds": [
+    {
+      "name": "Playa soleada",
+      "emoji": "🏖️"
+    },
+    {
+      "name": "Bosque mágico",
+      "emoji": "🌳"
+    },
+    {
+      "name": "Espacio estrellado",
+      "emoji": "🚀"
+    },
+    {
+      "name": "Pradera de palitos",
+      "emoji": "🌾"
+    },
+    {
+      "name": "Cueva de puntos",
+      "emoji": "🔦"
+    },
+    {
+      "name": "Castillo de patrones",
+      "emoji": "🏰"
+    },
+    {
+      "name": "Volcán de números",
+      "emoji": "🌋"
+    },
+    {
+      "name": "Isla arcoíris",
+      "emoji": "🌈"
+    },
+    {
+      "name": "Montaña helada",
+      "emoji": "🏔️"
+    },
+    {
+      "name": "Jardín de formas",
+      "emoji": "🌷"
+    }
+  ],
+  "storage_keys": [
+    "mg_brain",
+    "mg_coins",
+    "mg_daily",
+    "mg_facts",
+    "mg_goals",
+    "mg_inv",
+    "mg_lbrain",
+    "mg_little",
+    "mg_little_path",
+    "mg_outfit",
+    "mg_path",
+    "mg_pathver",
+    "mg_practice",
+    "mg_reto",
+    "mg_sound"
+  ],
+  "outfits": [
+    {
+      "id": "lentes",
+      "name": "Lentes de sol",
+      "emoji": "🕶️",
+      "price": 50
+    },
+    {
+      "id": "mono",
+      "name": "Moño elegante",
+      "emoji": "🎀",
+      "price": 60
+    },
+    {
+      "id": "gorra",
+      "name": "Gorra veloz",
+      "emoji": "🧢",
+      "price": 80
+    },
+    {
+      "id": "corona",
+      "name": "Corona real",
+      "emoji": "👑",
+      "price": 120
+    },
+    {
+      "id": "mago",
+      "name": "Sombrero de mago",
+      "emoji": "🧙",
+      "price": 150
+    }
+  ]
+}
