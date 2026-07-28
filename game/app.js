@@ -18987,7 +18987,7 @@ function e8({
       (n, a, l, s) => {
         let i = n >= e.passAt && s > 0,
           o = n / e.questions,
-          c = i ? eG(o) : 0;
+          c = i ? ("boss" === e.kind ? (s >= 3 ? 3 : 2 === s ? 2 : 1) : eG(o)) : 0;
         r({
           passed: i,
           correct: n,
@@ -19002,7 +19002,8 @@ function e8({
     ef = (0, i.useCallback)(
       (t, n, a, r) => {
         let l = y + 1;
-        if (l >= e.questions || r <= 0) return void ed(t, n, a, r);
+        if (("boss" === e.kind && t >= e.passAt) || l >= e.questions || r <= 0)
+          return void ed(t, n, a, r);
         let s = e_(e, k.current, l);
         (x(l), F(0), w(s), es(s), I(""), B("ask"), b(!1), (ea.current = !1));
       },
@@ -19089,6 +19090,17 @@ function e8({
           }),
         ],
       }),
+      "boss" === e.kind &&
+        MG_H("div", { className: "boss-duel" },
+          MG_H("span", { className: "boss-face" + ("right" === U ? " boss-hit" : "") }, e.emoji),
+          MG_H("div", { className: "boss-hp-wrap" },
+            MG_H("div", { className: "boss-hp-label" },
+              "Vida del jefe · " + Math.max(0, e.passAt - Q) + "/" + e.passAt),
+            MG_H("div", { className: "boss-hp-track" },
+              MG_H("div", {
+                className: "boss-hp-fill",
+                style: { width: (Math.max(0, e.passAt - Q) / e.passAt) * 100 + "%" },
+              })))),
       (0, s.jsx)("div", {
         className: "timer-track",
         children: (0, s.jsx)("div", {
