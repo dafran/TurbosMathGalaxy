@@ -1,0 +1,26 @@
+{
+  "name": "Math Galaxy",
+  "short_name": "Math Galaxy",
+  "description": "Juego de matemáticas en español para niños: camino de niveles, jefes, lógica y más.",
+  "lang": "es",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#2a1150",
+  "theme_color": "#2a1150",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

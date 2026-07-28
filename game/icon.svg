@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="42%" r="75%">
+      <stop offset="0%" stop-color="#5a2ea0"/>
+      <stop offset="100%" stop-color="#2a1150"/>
+    </radialGradient>
+    <radialGradient id="core" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#fff7d6"/>
+      <stop offset="45%" stop-color="#ffd447"/>
+      <stop offset="100%" stop-color="#ff7a3b"/>
+    </radialGradient>
+  </defs>
+  <rect width="512" height="512" fill="url(#bg)"/>
+  <!-- estrellas -->
+  <g fill="#ffffff">
+    <circle cx="70" cy="90" r="4"/><circle cx="430" cy="70" r="5"/><circle cx="120" cy="180" r="3"/>
+    <circle cx="400" cy="160" r="3"/><circle cx="60" cy="300" r="3"/><circle cx="450" cy="300" r="4"/>
+    <circle cx="90" cy="430" r="4"/><circle cx="420" cy="440" r="3"/><circle cx="250" cy="60" r="3"/>
+  </g>
+  <!-- galaxia en espiral -->
+  <g transform="translate(256 236)">
+    <ellipse rx="150" ry="52" fill="none" stroke="#b98bff" stroke-width="14" opacity="0.55" transform="rotate(-20)"/>
+    <ellipse rx="110" ry="36" fill="none" stroke="#e6c6ff" stroke-width="12" opacity="0.75" transform="rotate(-20)"/>
+    <circle r="42" fill="url(#core)"/>
+  </g>
+  <!-- texto -->
+  <text x="256" y="392" text-anchor="middle" font-family="Verdana, Geneva, sans-serif" font-weight="bold" font-size="62" fill="#ffd447">MATH</text>
+  <text x="256" y="452" text-anchor="middle" font-family="Verdana, Geneva, sans-serif" font-weight="bold" font-size="62" fill="#ffffff">GALAXY</text>
+</svg>
