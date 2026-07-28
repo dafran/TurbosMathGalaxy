@@ -20969,6 +20969,7 @@ function tc({ facts: e, onBack: t, onReset: n }) {
         [mgA, mgSetA] = (0, i.useState)(mgGetActive()),
         [mgEd, mgSetEd] = (0, i.useState)(null);
       (0, i.useEffect)(() => {
+        if (!mgA) return;
         (async () => {
           (a(await eH("mg_facts", {})),
             l(await eH("mg_daily", { date: "", streak: 0, bestScore: 0 })),
