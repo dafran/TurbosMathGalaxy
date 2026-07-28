@@ -18855,6 +18855,9 @@ function e8({
     [K, G] = (0, i.useState)(null),
     [Y, X] = (0, i.useState)([]),
     [J, Z] = (0, i.useState)(25),
+    [mgStreak, mgSetStreak] = (0, i.useState)(0),
+    [mgFrozen, mgSetFrozen] = (0, i.useState)(!1),
+    mgFreezePend = (0, i.useRef)(!1),
     ee = (0, i.useRef)(null),
     en = (0, i.useRef)(null),
     ea = (0, i.useRef)(!1),
@@ -18970,7 +18973,8 @@ function e8({
   };
   ((0, i.useEffect)(() => () => eu(), []),
     (0, i.useEffect)(() => {
-      if ("ask" === U)
+      if ("ask" === U) {
+        if (mgFrozen) return void Z(25);
         return (
           Z(25),
           (ee.current = setInterval(() => {
@@ -18982,7 +18986,8 @@ function e8({
             ee.current && clearInterval(ee.current);
           }
         );
-    }, [y, D, U]));
+      }
+    }, [y, D, U, mgFrozen]));
   let ed = (0, i.useCallback)(
       (n, a, l, s) => {
         let i = n >= e.passAt && s > 0,
@@ -19005,7 +19010,16 @@ function e8({
         if (("boss" === e.kind && t >= e.passAt) || l >= e.questions || r <= 0)
           return void ed(t, n, a, r);
         let s = e_(e, k.current, l);
-        (x(l), F(0), w(s), es(s), I(""), B("ask"), b(!1), (ea.current = !1));
+        (mgSetFrozen(mgFreezePend.current),
+          (mgFreezePend.current = !1),
+          x(l),
+          F(0),
+          w(s),
+          es(s),
+          I(""),
+          B("ask"),
+          b(!1),
+          (ea.current = !1));
       },
       [y, e, ed],
     );
@@ -19025,6 +19039,8 @@ function e8({
       }
     }
     if (e) {
+      let ns = mgStreak + 1;
+      (mgSetStreak(ns), ns % 3 == 0 && (mgFreezePend.current = !0));
       let e = J > 15,
         t = 2 + +!!e,
         a = W + t;
@@ -19042,7 +19058,9 @@ function e8({
         let e = Q + 1;
         (H(e), (en.current = setTimeout(() => ef(e, a, n, c), 950)));
       }
-    } else f ? (m(!1), B("shielded")) : (u((e) => e - 1), B("wrong"));
+    } else
+      (mgSetStreak(0),
+        f ? (m(!1), B("shielded")) : (u((e) => e - 1), B("wrong")));
   }
   let ep = (e) => {
       em(($ === eo) === e);
@@ -19088,6 +19106,12 @@ function e8({
             className: "hud-item coins",
             children: ["🪙 ", W],
           }),
+          mgStreak >= 1 &&
+            MG_H(
+              "span",
+              { className: "hud-item streak" + (mgStreak % 3 === 0 ? " ready" : "") },
+              "🔥 " + mgStreak + (mgStreak % 3 === 0 ? " ❄️" : ""),
+            ),
         ],
       }),
       "boss" === e.kind &&
@@ -19102,18 +19126,26 @@ function e8({
                 style: { width: (Math.max(0, e.passAt - Q) / e.passAt) * 100 + "%" },
               })))),
       (0, s.jsx)("div", {
-        className: "timer-track",
+        className: `timer-track ${mgFrozen ? "frozen" : ""}`,
         children: (0, s.jsx)("div", {
           className: "timer-fill",
           style: {
-            width: `${eb}%`,
-            background: eb > 50 ? "#00ff88" : eb > 25 ? "#ffcc00" : "#ff6644",
+            width: mgFrozen ? "100%" : `${eb}%`,
+            background: mgFrozen
+              ? "linear-gradient(90deg,#7fdfff,#b6f0ff)"
+              : eb > 50
+                ? "#00ff88"
+                : eb > 25
+                  ? "#ffcc00"
+                  : "#ff6644",
           },
         }),
       }),
       (0, s.jsx)("div", {
         className: "timer-note",
-        children: "⏱️ responde rápido y gana más monedas",
+        children: mgFrozen
+          ? "❄️ ¡Tiempo congelado! Respira y responde con calma."
+          : "⏱️ responde rápido y gana más monedas",
       }),
       (0, s.jsxs)("div", {
         className: `q-card ${"wrong" === U ? "shake" : ""}`,
