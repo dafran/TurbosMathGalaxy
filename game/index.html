@@ -82,6 +82,13 @@
     .timer-track.frozen { border: 2px solid #9be8ff; box-shadow: 0 0 12px rgba(127,223,255,.7); }
     .timer-track.frozen .timer-fill { animation: frostGlow 1.2s ease-in-out infinite alternate; }
     @keyframes frostGlow { from { filter: brightness(1); } to { filter: brightness(1.4); } }
+    /* Fix: títulos de fin de nivel no deben desbordar en pantallas angostas */
+    .title-pixel { overflow-wrap: break-word; max-width: 100%; }
+    .result-panel { overflow: hidden; }
+    .result-panel .title-pixel { font-size: clamp(1.25rem, 5vw, 2.3rem); letter-spacing: 1px; }
+    @media (max-width: 420px) {
+      .screen.world-sonic .title-pixel.accent { font-size: clamp(1.15rem, 5.2vw, 2.2rem); letter-spacing: 1px; }
+    }
     </style>
     <script type="module" src="./app.js"></script>
   
