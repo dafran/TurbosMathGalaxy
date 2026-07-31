@@ -15719,6 +15719,27 @@ let Z = (e, t) => Math.floor(Math.random() * (t - e + 1)) + e,
       emoji: "🥚",
     },
     {
+      id: 0,
+      world: 6,
+      name: "Reparto en partes iguales",
+      kind: "reparto",
+      tables: [],
+      questions: 8,
+      passAt: 6,
+      emoji: "🍐",
+    },
+    {
+      id: 0,
+      world: 6,
+      name: "Gran reparto",
+      kind: "reparto",
+      tables: [],
+      questions: 8,
+      passAt: 6,
+      emoji: "🧺",
+      big: !0,
+    },
+    {
       id: 56,
       world: 6,
       name: "Dividir entre 2",
@@ -16942,6 +16963,34 @@ const MG_V2_NAMES = {
   89: "División con resto", 90: "Fracciones de un número", 91: "Redondea a la decena", 92: "El reloj",
   93: "Jefe: Sabio galáctico",
 };
+/* Mapa id→nombre de la versión v3 (97 niveles), para migrar saves v3→v4. */
+const MG_V3_NAMES = {
+  1: "Sumas rápidas", 2: "Parejas del 10", 3: "Sumas con decenas", 4: "Llevando una",
+  5: "Dos cifras sin llevar", 6: "Sumas de 2 dígitos", 7: "Par o impar", 8: "Dobles hasta 20",
+  9: "Dobles y mitades", 10: "Jefe: Robotnik", 11: "Restas sencillas", 12: "Restas veloces",
+  13: "Restas de 2 dígitos", 14: "Parejas del 20", 15: "Secuencias misteriosas", 16: "Jefe: Caballero resta",
+  17: "Reglas del 1 y el 0", 18: "Salta de 2 en 2", 19: "Tabla del 2, primera parte", 20: "Tabla del 2 completa",
+  21: "Salta de 5 en 5", 22: "Tabla del 5, primera parte", 23: "Tabla del 5 completa", 24: "Repaso: tablas 2 y 5",
+  25: "Salta de 10 en 10", 26: "Tabla del 10", 27: "Jefe: Dragón Ender", 28: "Salta de 3 en 3",
+  29: "Tabla del 3, primera parte", 30: "Tabla del 3 completa", 31: "Repaso: tablas 2 y 3", 32: "Salta de 4 en 4",
+  33: "Tabla del 4, primera parte", 34: "Tabla del 4 completa", 35: "Repaso: tablas 3 y 4", 36: "Número escondido",
+  37: "Jefe: Darth Vader", 38: "Salta de 6 en 6", 39: "Tabla del 6, primera parte", 40: "Tabla del 6 completa",
+  41: "Repaso: tablas 4, 5 y 6", 42: "Salta de 7 en 7", 43: "Tabla del 7, primera parte", 44: "Tabla del 7 completa",
+  45: "Repaso: tablas 6 y 7", 46: "Número escondido 2", 47: "Cadena mental", 48: "Jefe: Metal Sonic",
+  49: "Salta de 8 en 8", 50: "Tabla del 8, primera parte", 51: "Tabla del 8 completa", 52: "Repaso: tablas 7 y 8",
+  53: "Salta de 9 en 9", 54: "Tabla del 9, primera parte", 55: "Tabla del 9 completa", 56: "Repaso: tablas 8 y 9",
+  57: "Número escondido 3", 58: "Cadena avanzada", 59: "Jefe: Dr. Eggman", 60: "Dividir entre 2",
+  61: "Dividir entre 5", 62: "Repaso: dividir entre 2 y 5", 63: "Dividir entre 10", 64: "División sorpresa",
+  65: "Multiplica y divide", 66: "Las tablas no se olvidan: 8 y 9", 67: "Jefe: Wither", 68: "Dividir entre 3",
+  69: "Dividir entre 4", 70: "Repaso: dividir entre 3 y 4", 71: "Dividir entre 6", 72: "Dividir entre 7",
+  73: "Repaso: dividir entre 6 y 7", 74: "Multiplica y divide 2", 75: "Las tablas no se olvidan: 6 y 7", 76: "Jefe: Kylo Ren",
+  77: "Dividir entre 8", 78: "Dividir entre 9", 79: "Repaso: dividir entre 8 y 9", 80: "Gran división",
+  81: "División sorpresa 2", 82: "Cadena con división", 83: "Todas las tablas juntas", 84: "Jefe: Emperador",
+  85: "Multiplica y divide total", 86: "Secuencias misteriosas 2", 87: "Par o impar veloz", 88: "Número escondido 4",
+  89: "Cadena maestra", 90: "Jefe supremo: Maestro del tiempo", 91: "Multiplica en grande", 92: "Por 10 y por 100",
+  93: "División con resto", 94: "Fracciones de un número", 95: "Redondea a la decena", 96: "El reloj",
+  97: "Jefe: Sabio galáctico",
+};
 /* Generadores de la rampa suave de sumas (Mundo 1). */
 function exDec() {
   let d = 10 * Z(1, 8),
@@ -16992,6 +17041,27 @@ function exDobleFacil() {
     answer: 2 * e,
     factKey: "add",
     hint: `Doblar es sumar el número consigo mismo: ${e} + ${e} = ${2 * e}.`,
+  };
+}
+function eReparto(big) {
+  let gc = big ? [3, 4, 5] : [2, 3],
+    M = gc[Math.floor(Math.random() * gc.length)],
+    K = big ? Z(3, 8) : Z(2, 5),
+    N = M * K,
+    items = ["🍐", "🍎", "🍪", "⭐", "🦴", "🍬"],
+    whos = ["👦", "👧", "🧺", "🐶", "🐰", "🧒"],
+    it = items[Math.floor(Math.random() * items.length)],
+    wh = whos[Math.floor(Math.random() * whos.length)];
+  return {
+    kind: "reparto",
+    total: N,
+    groups: M,
+    item: it,
+    who: wh,
+    prompt: `Reparte ${N} ${it} en partes iguales entre ${M} ${wh}. ¿Cuántas para cada uno?`,
+    answer: K,
+    factKey: "add",
+    hint: `Da una a cada uno y repite hasta que no queden. A cada uno le tocan ${K}.`,
   };
 }
 function ex(e) {
@@ -17187,6 +17257,8 @@ function e_(e, t, n) {
       return exNC();
     case "doblesFacil":
       return exDobleFacil();
+    case "reparto":
+      return eReparto(e.big);
     case "salto":
       var a;
       let r, l, s, i;
@@ -17625,6 +17697,36 @@ function MgHub({ kind: k, name: nm, coins: c, streak: st, onBack: bk, items: it 
           MG_H("span", { className: "hub-card-emoji" }, item.emoji),
           MG_H("span", { className: "hub-card-title" }, item.title),
           item.sub ? MG_H("span", { className: "hub-card-sub" }, item.sub) : null))));
+}
+function MgReparto({ total: N, groups: M, item: it, who: wh }) {
+  const [dealt, setDealt] = i.useState(0);
+  const each = Math.floor(dealt / M);
+  const remaining = N - dealt;
+  const dealRound = () => {
+    if (remaining <= 0) return;
+    (SFX.pop(), setDealt((d) => Math.min(N, d + M)));
+  };
+  return MG_H("div", { className: "reparto" },
+    MG_H("div", { className: "reparto-pile" + (remaining <= 0 ? " empty" : "") },
+      MG_H("span", { className: "reparto-pile-n" }, remaining > 0 ? "Quedan " + remaining : "¡Ya no quedan!"),
+      MG_H("div", { className: "reparto-items" },
+        Array.from({ length: remaining }).map((_, ix) =>
+          MG_H("span", { key: ix, className: "reparto-item" }, it)))),
+    MG_H("div", { className: "reparto-groups" },
+      Array.from({ length: M }).map((_, gi) =>
+        MG_H("div", { key: gi, className: "reparto-group" },
+          MG_H("span", { className: "reparto-who" }, wh),
+          MG_H("div", { className: "reparto-basket" },
+            each > 0
+              ? Array.from({ length: each }).map((_, ii) =>
+                  MG_H("span", { key: ii, className: "reparto-item" }, it))
+              : MG_H("span", { className: "reparto-empty" }, "·"))))),
+    MG_H("button", {
+      className: "reparto-btn",
+      type: "button",
+      onClick: dealRound,
+      disabled: remaining <= 0,
+    }, remaining > 0 ? "🤲 Dar una a cada uno" : "✅ ¡Ya está! ¿Cuántas por cada uno?"));
 }
 function eJ({ soundOn: e, onToggleSound: t, onParents: n, onPick: a }) {
   return (0, s.jsxs)("div", {
@@ -18876,6 +18978,7 @@ function e8({
       if ((L(null), R(null), "chain" === t.kind || "salto" === t.kind))
         return void S("write");
       if ("parity" === t.kind) return void S("parity");
+      if ("reparto" === t.kind) return void S("write");
       if ("hora" === t.kind) return void S("write");
       if ("resto" === t.kind || "fracnum" === t.kind || "redondeo" === t.kind)
         return 0.65 > Math.random()
@@ -19169,6 +19272,17 @@ function e8({
             (0, s.jsxs)(s.Fragment, {
               children: [
                 ev?.clock && (0, s.jsx)(e6, { h: ev.clock.h, m: ev.clock.m }),
+                "reparto" === ev?.kind &&
+                  (0, s.jsx)(
+                    MgReparto,
+                    {
+                      total: ev.total,
+                      groups: ev.groups,
+                      item: ev.item,
+                      who: ev.who,
+                    },
+                    "rep" + y,
+                  ),
                 (0, s.jsx)("div", {
                   className: `q-prompt ${ev?.clock ? "clock-prompt" : ""}`,
                   children: ei,
@@ -20992,20 +21106,21 @@ function tc({ facts: e, onBack: t, onReset: n }) {
                 let k = ea[Number(n)];
                 k && !t[k] && (t[k] = a);
               }
-              path = t;
+              ((path = t), (ver = 2));
             }
-            if (ver < 3 && Object.keys(path).length > 0) {
-              let nameToNew = {};
+            if (ver < 4 && Object.keys(path).length > 0) {
+              let idToName = ver >= 3 ? MG_V3_NAMES : MG_V2_NAMES,
+                nameToNew = {};
               en.forEach((l) => (nameToNew[l.name] = l.id));
               let t = {};
               for (let [n, a] of Object.entries(path)) {
-                let nm = MG_V2_NAMES[Number(n)],
+                let nm = idToName[Number(n)],
                   nid = nm ? nameToNew[nm] : null;
                 nid && (t[nid] = a);
               }
               path = t;
             }
-            (x(path), eQ("mg_path", path), eQ("mg_pathver", { v: 3 }));
+            (x(path), eQ("mg_path", path), eQ("mg_pathver", { v: 4 }));
           }
           (j(await eH("mg_coins", 0)),
             N({ ...el, ...(await eH("mg_inv", { ...el })) }),
