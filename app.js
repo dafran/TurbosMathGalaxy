@@ -12985,7 +12985,7 @@ let c = [
     { id: "mago", name: "Sombrero de mago", emoji: "🧙", price: 150 },
   ],
   u = null;
-function d({ mood: e = "happy", size: t = 80, outfit: n }) {
+function d({ mood: e = "happy", size: t = 80, outfit: n, extra: ec }) {
   let a = void 0 === n ? u : n,
     r = "#e9c98f",
     l = "#c9a36a",
@@ -12995,7 +12995,7 @@ function d({ mood: e = "happy", size: t = 80, outfit: n }) {
     width: t,
     height: t,
     viewBox: "0 0 100 100",
-    className: `pug pug-${e}`,
+    className: `pug pug-${e}${ec ? " " + ec : ""}`,
     "aria-hidden": "true",
     children: [
       (0, s.jsx)("circle", {
@@ -15067,7 +15067,7 @@ function X({ levels: e, onWin: t, onBack: n }) {
           children: (0, s.jsxs)("div", {
             className: "chest-modal",
             children: [
-              (0, s.jsx)(d, { mood: "excited", size: 84 }),
+              (0, s.jsx)(d, { mood: "excited", size: 84, extra: "pug-walk" }),
               (0, s.jsxs)("div", {
                 className: "chest-title",
                 children: ["¡", 5, " rondas seguidas! 🏆"],
@@ -19662,7 +19662,7 @@ function e9({
               (0, s.jsxs)("div", {
                 className: "result-hero",
                 children: [
-                  (0, s.jsx)(d, { mood: "excited", size: 82 }),
+                  (0, s.jsx)(d, { mood: "excited", size: 82, extra: "pug-walk" }),
                   (0, s.jsx)("span", {
                     className: "end-emoji",
                     children:
