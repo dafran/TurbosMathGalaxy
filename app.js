@@ -15120,6 +15120,16 @@ let Z = (e, t) => Math.floor(Math.random() * (t - e + 1)) + e,
   ],
   en = [
     {
+      id: 0,
+      world: 0,
+      name: "Cuenta y suma",
+      kind: "sumaobj",
+      tables: [],
+      questions: 8,
+      passAt: 6,
+      emoji: "🍪",
+    },
+    {
       id: 1,
       world: 0,
       name: "Sumas rápidas",
@@ -16991,6 +17001,34 @@ const MG_V3_NAMES = {
   93: "División con resto", 94: "Fracciones de un número", 95: "Redondea a la decena", 96: "El reloj",
   97: "Jefe: Sabio galáctico",
 };
+/* Mapa id→nombre de la versión v4 (99 niveles), para migrar saves v4→v5. */
+const MG_V4_NAMES = {
+  1: "Sumas rápidas", 2: "Parejas del 10", 3: "Sumas con decenas", 4: "Llevando una",
+  5: "Dos cifras sin llevar", 6: "Sumas de 2 dígitos", 7: "Par o impar", 8: "Dobles hasta 20",
+  9: "Dobles y mitades", 10: "Jefe: Robotnik", 11: "Restas sencillas", 12: "Restas veloces",
+  13: "Restas de 2 dígitos", 14: "Parejas del 20", 15: "Secuencias misteriosas", 16: "Jefe: Caballero resta",
+  17: "Reglas del 1 y el 0", 18: "Salta de 2 en 2", 19: "Tabla del 2, primera parte", 20: "Tabla del 2 completa",
+  21: "Salta de 5 en 5", 22: "Tabla del 5, primera parte", 23: "Tabla del 5 completa", 24: "Repaso: tablas 2 y 5",
+  25: "Salta de 10 en 10", 26: "Tabla del 10", 27: "Jefe: Dragón Ender", 28: "Salta de 3 en 3",
+  29: "Tabla del 3, primera parte", 30: "Tabla del 3 completa", 31: "Repaso: tablas 2 y 3", 32: "Salta de 4 en 4",
+  33: "Tabla del 4, primera parte", 34: "Tabla del 4 completa", 35: "Repaso: tablas 3 y 4", 36: "Número escondido",
+  37: "Jefe: Darth Vader", 38: "Salta de 6 en 6", 39: "Tabla del 6, primera parte", 40: "Tabla del 6 completa",
+  41: "Repaso: tablas 4, 5 y 6", 42: "Salta de 7 en 7", 43: "Tabla del 7, primera parte", 44: "Tabla del 7 completa",
+  45: "Repaso: tablas 6 y 7", 46: "Número escondido 2", 47: "Cadena mental", 48: "Jefe: Metal Sonic",
+  49: "Salta de 8 en 8", 50: "Tabla del 8, primera parte", 51: "Tabla del 8 completa", 52: "Repaso: tablas 7 y 8",
+  53: "Salta de 9 en 9", 54: "Tabla del 9, primera parte", 55: "Tabla del 9 completa", 56: "Repaso: tablas 8 y 9",
+  57: "Número escondido 3", 58: "Cadena avanzada", 59: "Jefe: Dr. Eggman", 60: "Reparto en partes iguales",
+  61: "Gran reparto", 62: "Dividir entre 2", 63: "Dividir entre 5", 64: "Repaso: dividir entre 2 y 5",
+  65: "Dividir entre 10", 66: "División sorpresa", 67: "Multiplica y divide", 68: "Las tablas no se olvidan: 8 y 9",
+  69: "Jefe: Wither", 70: "Dividir entre 3", 71: "Dividir entre 4", 72: "Repaso: dividir entre 3 y 4",
+  73: "Dividir entre 6", 74: "Dividir entre 7", 75: "Repaso: dividir entre 6 y 7", 76: "Multiplica y divide 2",
+  77: "Las tablas no se olvidan: 6 y 7", 78: "Jefe: Kylo Ren", 79: "Dividir entre 8", 80: "Dividir entre 9",
+  81: "Repaso: dividir entre 8 y 9", 82: "Gran división", 83: "División sorpresa 2", 84: "Cadena con división",
+  85: "Todas las tablas juntas", 86: "Jefe: Emperador", 87: "Multiplica y divide total", 88: "Secuencias misteriosas 2",
+  89: "Par o impar veloz", 90: "Número escondido 4", 91: "Cadena maestra", 92: "Jefe supremo: Maestro del tiempo",
+  93: "Multiplica en grande", 94: "Por 10 y por 100", 95: "División con resto", 96: "Fracciones de un número",
+  97: "Redondea a la decena", 98: "El reloj", 99: "Jefe: Sabio galáctico",
+};
 /* Generadores de la rampa suave de sumas (Mundo 1). */
 function exDec() {
   let d = 10 * Z(1, 8),
@@ -17062,6 +17100,23 @@ function eReparto(big) {
     answer: K,
     factKey: "add",
     hint: `Da una a cada uno y repite hasta que no queden. A cada uno le tocan ${K}.`,
+  };
+}
+function eSumaObj() {
+  let a = Z(2, 6),
+    b = Z(2, 6),
+    pairs = [["🍪", "🥛"], ["🍎", "🍏"], ["🐟", "🐠"], ["⭐", "🌟"], ["🚗", "🚕"], ["🐶", "🐱"], ["🎈", "🎁"]],
+    p = pairs[Math.floor(Math.random() * pairs.length)];
+  return {
+    kind: "sumaobj",
+    a: a,
+    b: b,
+    itemA: p[0],
+    itemB: p[1],
+    prompt: `¿Cuántos hay en total?`,
+    answer: a + b,
+    factKey: "add",
+    hint: `Cuéntalos todos juntos: ${a} y ${b} son ${a + b}.`,
   };
 }
 function ex(e) {
@@ -17259,6 +17314,8 @@ function e_(e, t, n) {
       return exDobleFacil();
     case "reparto":
       return eReparto(e.big);
+    case "sumaobj":
+      return eSumaObj();
     case "salto":
       var a;
       let r, l, s, i;
@@ -17768,6 +17825,24 @@ function MgReparto({ total: N, groups: M, item: it, who: wh }) {
       onClick: dealRound,
       disabled: remaining <= 0,
     }, remaining > 0 ? "🤲 Dar una a cada uno" : "✅ ¡Ya está! ¿Cuántas por cada uno?"));
+}
+function MgSumaObjetos({ a: A, b: B, itemA: ia, itemB: ib }) {
+  const [counted, setCounted] = i.useState(0);
+  const total = A + B;
+  const tap = () => {
+    if (counted >= total) return;
+    (SFX.pop(), setCounted((c) => Math.min(total, c + 1)));
+  };
+  return MG_H("div", { className: "sumaobj" },
+    MG_H("div", { className: "sumaobj-groups" },
+      MG_H("div", { className: "sumaobj-group" },
+        Array.from({ length: A }).map((_, ix) =>
+          MG_H("button", { key: "a" + ix, type: "button", className: "sumaobj-item" + (ix < counted ? " counted" : ""), onClick: tap }, ia))),
+      MG_H("span", { className: "sumaobj-plus" }, "➕"),
+      MG_H("div", { className: "sumaobj-group" },
+        Array.from({ length: B }).map((_, ix) =>
+          MG_H("button", { key: "b" + ix, type: "button", className: "sumaobj-item" + (A + ix < counted ? " counted" : ""), onClick: tap }, ib)))),
+    MG_H("div", { className: "sumaobj-count" }, counted > 0 ? "Contados: " + counted : "Tócalos para contar 👆"));
 }
 function eJ({ soundOn: e, onToggleSound: t, onParents: n, onPick: a }) {
   return (0, s.jsxs)("div", {
@@ -19020,6 +19095,7 @@ function e8({
         return void S("write");
       if ("parity" === t.kind) return void S("parity");
       if ("reparto" === t.kind) return void S("write");
+      if ("sumaobj" === t.kind) return void S("write");
       if ("hora" === t.kind) return void S("write");
       if ("resto" === t.kind || "fracnum" === t.kind || "redondeo" === t.kind)
         return 0.65 > Math.random()
@@ -19323,6 +19399,12 @@ function e8({
                       who: ev.who,
                     },
                     "rep" + y,
+                  ),
+                "sumaobj" === ev?.kind &&
+                  (0, s.jsx)(
+                    MgSumaObjetos,
+                    { a: ev.a, b: ev.b, itemA: ev.itemA, itemB: ev.itemB },
+                    "so" + y,
                   ),
                 (0, s.jsx)("div", {
                   className: `q-prompt ${ev?.clock ? "clock-prompt" : ""}`,
@@ -21149,8 +21231,9 @@ function tc({ facts: e, onBack: t, onReset: n }) {
               }
               ((path = t), (ver = 2));
             }
-            if (ver < 4 && Object.keys(path).length > 0) {
-              let idToName = ver >= 3 ? MG_V3_NAMES : MG_V2_NAMES,
+            if (ver < 5 && Object.keys(path).length > 0) {
+              let idToName =
+                  ver >= 4 ? MG_V4_NAMES : ver >= 3 ? MG_V3_NAMES : MG_V2_NAMES,
                 nameToNew = {};
               en.forEach((l) => (nameToNew[l.name] = l.id));
               let t = {};
@@ -21161,7 +21244,7 @@ function tc({ facts: e, onBack: t, onReset: n }) {
               }
               path = t;
             }
-            (x(path), eQ("mg_path", path), eQ("mg_pathver", { v: 4 }));
+            (x(path), eQ("mg_path", path), eQ("mg_pathver", { v: 5 }));
           }
           (j(await eH("mg_coins", 0)),
             N({ ...el, ...(await eH("mg_inv", { ...el })) }),
