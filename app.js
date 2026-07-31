@@ -17641,10 +17641,51 @@ function mgClearProfileData(id) {
   const raw = mgRaw();
   MG_PROFILE_KEYS.forEach((k) => raw.remove("mg_" + id + "__" + k));
 }
+/* Música de fondo suave y opcional (WebAudio). Progresión lenta en Do
+   mayor, volumen bajo. Respeta el silencio general (g) y su propio flag. */
+let mgMusicOn = !1,
+  mgMusicTimer = null,
+  mgMusicI = 0;
+const MG_MUSIC = [
+  [261.63, 329.63, 392, 329.63],
+  [220, 261.63, 329.63, 261.63],
+  [174.61, 261.63, 349.23, 261.63],
+  [196, 293.66, 392, 293.66],
+];
+try {
+  mgMusicOn = !!(JSON.parse((window.__mgRaw && window.__mgRaw.get("mg_music")) || "null") || {}).on;
+} catch (e) {}
+function mgMusicStart() {
+  if (mgMusicTimer || !mgMusicOn) return;
+  mgMusicTimer = setInterval(() => {
+    if (g) return;
+    let chord = MG_MUSIC[Math.floor(mgMusicI / 4) % MG_MUSIC.length];
+    (b(chord[mgMusicI % 4], 0, 0.7, "sine", 0.035), mgMusicI++);
+  }, 520);
+}
+function mgMusicStop() {
+  (mgMusicTimer && clearInterval(mgMusicTimer), (mgMusicTimer = null));
+}
+function mgMusicToggle() {
+  mgMusicOn = !mgMusicOn;
+  try {
+    window.__mgRaw && window.__mgRaw.set("mg_music", JSON.stringify({ on: mgMusicOn }));
+  } catch (e) {}
+  return (mgMusicOn ? mgMusicStart() : mgMusicStop(), mgMusicOn);
+}
+function MgMusicToggle() {
+  const [on, setOn] = i.useState(mgMusicOn);
+  return MG_H(
+    "button",
+    { className: "sound-toggle music-toggle", type: "button", onClick: () => setOn(mgMusicToggle()) },
+    on ? "🎵" : "🔕",
+  );
+}
 function MgProfileSelector({ profiles: e, soundOn: t, onToggleSound: n, onParents: a, onPick: r, onAdd: l }) {
   return MG_H("div", { className: "screen world-starwars" },
     s.jsx(eX, {}),
     MG_H("button", { className: "sound-toggle", onClick: n }, t ? "🔊" : "🔇"),
+    s.jsx(MgMusicToggle, {}),
     MG_H("div", { className: "stack center" },
       MG_H("div", { className: "title-block" },
         MG_H("div", { className: "title-pixel" }, "🌌 Math"),
@@ -21179,7 +21220,8 @@ function tc({ facts: e, onBack: t, onReset: n }) {
               },
               onParents: () => t("parents"),
               onPick: (pf) => {
-                (mgSetActive(pf.id),
+                (mgMusicStart(),
+                  mgSetActive(pf.id),
                   mgSetA(pf.id),
                   t(mgRouteForAge(pf.age) === "pequeno" ? "little-hub" : "hub"));
               },
