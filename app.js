@@ -13496,6 +13496,7 @@ let v = {
     b(500, 0, 0.045, "sine", 0.06);
   },
 };
+let SFX = v;
 var i = r("2YQ6R");
 let y = {
     sudoku: 0,
@@ -14247,7 +14248,7 @@ function q({ levels: e, onReward: t, onBack: n }) {
     [c, u] = (0, i.useState)(0),
     d = (n) => (a) => {
       let r = a ? 4 + Math.min(4, Math.floor(e[n] / 3)) : 0;
-      (a && t(n, r), o({ success: a, coins: r }));
+      (a ? v.win() : v.no(), a && t(n, r), o({ success: a, coins: r }));
     },
     f = () => {
       (o(null), r("hub"));
@@ -14255,6 +14256,9 @@ function q({ levels: e, onReward: t, onBack: n }) {
     m = w.find((e) => e.id === a);
   return (0, s.jsxs)("div", {
     className: "screen world-starwars brain-bg",
+    onPointerDown: (ev) => {
+      ev.target.closest && ev.target.closest("button") && v.pop();
+    },
     children: [
       "hub" === a
         ? (0, s.jsxs)("div", {
@@ -14907,15 +14911,17 @@ function X({ levels: e, onWin: t, onBack: n }) {
         t(e);
         let n = l + 1;
         if (n >= 5) {
-          (o(n), m(!0));
+          (SFX.win(), o(n), m(!0));
           return;
         }
-        (u("win"),
+        (SFX.ok(),
+          u("win"),
           (g.current = setTimeout(() => {
             (u(null), o(n), h((e) => e + 1));
           }, 1e3)));
       } else
-        (u("fail"),
+        (SFX.no(),
+          u("fail"),
           (g.current = setTimeout(() => {
             (u(null), h((e) => e + 1));
           }, 1200)));
@@ -14926,6 +14932,9 @@ function X({ levels: e, onWin: t, onBack: n }) {
     y = D.find((e) => e.id === a);
   return (0, s.jsxs)("div", {
     className: "screen world-sonic brain-bg",
+    onPointerDown: (ev) => {
+      ev.target.closest && ev.target.closest("button") && SFX.pop();
+    },
     children: [
       "hub" === a
         ? (0, s.jsxs)("div", {
