@@ -15320,6 +15320,27 @@ let Z = (e, t) => Math.floor(Math.random() * (t - e + 1)) + e,
       emoji: "🛡️",
     },
     {
+      id: 0,
+      world: 2,
+      name: "Grupos iguales",
+      kind: "arreglo",
+      tables: [],
+      questions: 8,
+      passAt: 6,
+      emoji: "🍎",
+    },
+    {
+      id: 0,
+      world: 2,
+      name: "Filas y columnas",
+      kind: "arreglo",
+      tables: [],
+      questions: 8,
+      passAt: 6,
+      emoji: "🔲",
+      big: !0,
+    },
+    {
       id: 13,
       world: 2,
       name: "Reglas del 1 y el 0",
@@ -17116,6 +17137,35 @@ const MG_V6_NAMES = {
   97: "Multiplica en grande", 98: "Por 10 y por 100", 99: "División con resto", 100: "Fracciones de un número",
   101: "Redondea a la decena", 102: "El reloj", 103: "Jefe: Sabio galáctico",
 };
+/* Mapa id→nombre de la versión v7 (103 niveles), para migrar saves v7→v8. */
+const MG_V7_NAMES = {
+  1: "Cuenta y suma", 2: "Sumas rápidas", 3: "Parejas del 10", 4: "Sumas con decenas",
+  5: "Llevando una", 6: "Dos cifras sin llevar", 7: "Sumas de 2 dígitos", 8: "Par o impar",
+  9: "Dobles hasta 20", 10: "Dobles y mitades", 11: "Jefe: Robotnik", 12: "Restas sencillas",
+  13: "Restas veloces", 14: "Restas con decenas", 15: "Dos cifras sin prestar", 16: "Pide prestado",
+  17: "Restas de 2 dígitos", 18: "Parejas del 20", 19: "Secuencias misteriosas", 20: "Jefe: Caballero resta",
+  21: "Reglas del 1 y el 0", 22: "Salta de 2 en 2", 23: "Tabla del 2, primera parte", 24: "Tabla del 2 completa",
+  25: "Salta de 5 en 5", 26: "Tabla del 5, primera parte", 27: "Tabla del 5 completa", 28: "Repaso: tablas 2 y 5",
+  29: "Salta de 10 en 10", 30: "Tabla del 10", 31: "Jefe: Dragón Ender", 32: "Salta de 3 en 3",
+  33: "Tabla del 3, primera parte", 34: "Tabla del 3 completa", 35: "Repaso: tablas 2 y 3", 36: "Salta de 4 en 4",
+  37: "Tabla del 4, primera parte", 38: "Tabla del 4 completa", 39: "Repaso: tablas 3 y 4", 40: "Número escondido",
+  41: "Jefe: Darth Vader", 42: "Salta de 6 en 6", 43: "Tabla del 6, primera parte", 44: "Tabla del 6 completa",
+  45: "Repaso: tablas 4, 5 y 6", 46: "Salta de 7 en 7", 47: "Tabla del 7, primera parte", 48: "Tabla del 7 completa",
+  49: "Repaso: tablas 6 y 7", 50: "Número escondido 2", 51: "Cadena mental", 52: "Jefe: Metal Sonic",
+  53: "Salta de 8 en 8", 54: "Tabla del 8, primera parte", 55: "Tabla del 8 completa", 56: "Repaso: tablas 7 y 8",
+  57: "Salta de 9 en 9", 58: "Tabla del 9, primera parte", 59: "Tabla del 9 completa", 60: "Repaso: tablas 8 y 9",
+  61: "Número escondido 3", 62: "Cadena avanzada", 63: "Jefe: Dr. Eggman", 64: "Reparto en partes iguales",
+  65: "Gran reparto", 66: "Dividir entre 2", 67: "Dividir entre 5", 68: "Repaso: dividir entre 2 y 5",
+  69: "Dividir entre 10", 70: "División sorpresa", 71: "Multiplica y divide", 72: "Las tablas no se olvidan: 8 y 9",
+  73: "Jefe: Wither", 74: "Dividir entre 3", 75: "Dividir entre 4", 76: "Repaso: dividir entre 3 y 4",
+  77: "Dividir entre 6", 78: "Dividir entre 7", 79: "Repaso: dividir entre 6 y 7", 80: "Multiplica y divide 2",
+  81: "Las tablas no se olvidan: 6 y 7", 82: "Jefe: Kylo Ren", 83: "Dividir entre 8", 84: "Dividir entre 9",
+  85: "Repaso: dividir entre 8 y 9", 86: "Gran división", 87: "División sorpresa 2", 88: "Cadena con división",
+  89: "Todas las tablas juntas", 90: "Jefe: Emperador", 91: "Multiplica y divide total", 92: "Secuencias misteriosas 2",
+  93: "Par o impar veloz", 94: "Número escondido 4", 95: "Cadena maestra", 96: "Jefe supremo: Maestro del tiempo",
+  97: "Multiplica en grande", 98: "Por 10 y por 100", 99: "División con resto", 100: "Fracciones de un número",
+  101: "Redondea a la decena", 102: "El reloj", 103: "Jefe: Sabio galáctico",
+};
 /* Generadores de la rampa suave de sumas (Mundo 1). */
 function exDec() {
   let d = 10 * Z(1, 8),
@@ -17204,6 +17254,22 @@ function eSumaObj() {
     answer: a + b,
     factKey: "add",
     hint: `Cuéntalos todos juntos: ${a} y ${b} son ${a + b}.`,
+  };
+}
+function eArreglo(big) {
+  let rows = big ? Z(3, 5) : Z(2, 4),
+    cols = big ? Z(3, 6) : Z(2, 5),
+    items = ["🍎", "⭐", "🐟", "🍪", "🌸", "🚗", "🐥"],
+    it = items[Math.floor(Math.random() * items.length)];
+  return {
+    kind: "arreglo",
+    rows: rows,
+    cols: cols,
+    item: it,
+    prompt: `${rows} filas de ${cols}. ¿Cuántos hay en total?`,
+    answer: rows * cols,
+    factKey: "add",
+    hint: `Son ${rows} grupos de ${cols}. Cuéntalos o suma ${cols} ${rows} veces: da ${rows * cols}.`,
   };
 }
 function ex(e) {
@@ -17453,6 +17519,8 @@ function e_(e, t, n) {
       return eReparto(e.big);
     case "sumaobj":
       return eSumaObj();
+    case "arreglo":
+      return eArreglo(e.big);
     case "salto":
       var a;
       let r, l, s, i;
@@ -17988,6 +18056,21 @@ function MgSumaObjetos({ a: A, b: B, itemA: ia, itemB: ib }) {
         Array.from({ length: B }).map((_, ix) =>
           MG_H("button", { key: "b" + ix, type: "button", className: "sumaobj-item" + (A + ix < counted ? " counted" : ""), onClick: tap }, ib)))),
     MG_H("div", { className: "sumaobj-count" }, counted > 0 ? "Contados: " + counted : "Tócalos para contar 👆"));
+}
+function MgArreglo({ rows: R, cols: C, item: it }) {
+  const [counted, setCounted] = i.useState(0);
+  const total = R * C;
+  const tap = () => {
+    if (counted >= total) return;
+    (SFX.pop(), setCounted((c) => Math.min(total, c + 1)));
+  };
+  return MG_H("div", { className: "arreglo" },
+    MG_H("div", { className: "arreglo-grid" },
+      Array.from({ length: R }).map((_, r) =>
+        MG_H("div", { key: r, className: "arreglo-row" },
+          Array.from({ length: C }).map((_, c) =>
+            MG_H("button", { key: c, type: "button", className: "arreglo-item" + (r * C + c < counted ? " counted" : ""), onClick: tap }, it))))),
+    MG_H("div", { className: "arreglo-count" }, counted > 0 ? "Contados: " + counted : R + " filas de " + C + " 👆"));
 }
 function eJ({ soundOn: e, onToggleSound: t, onParents: n, onPick: a }) {
   return (0, s.jsxs)("div", {
@@ -19241,6 +19324,7 @@ function e8({
       if ("parity" === t.kind) return void S("parity");
       if ("reparto" === t.kind) return void S("write");
       if ("sumaobj" === t.kind) return void S("write");
+      if ("arreglo" === t.kind) return void S("write");
       if ("hora" === t.kind) return void S("write");
       if ("resto" === t.kind || "fracnum" === t.kind || "redondeo" === t.kind)
         return 0.65 > Math.random()
@@ -19550,6 +19634,12 @@ function e8({
                     MgSumaObjetos,
                     { a: ev.a, b: ev.b, itemA: ev.itemA, itemB: ev.itemB },
                     "so" + y,
+                  ),
+                "arreglo" === ev?.kind &&
+                  (0, s.jsx)(
+                    MgArreglo,
+                    { rows: ev.rows, cols: ev.cols, item: ev.item },
+                    "ar" + y,
                   ),
                 (0, s.jsx)("div", {
                   className: `q-prompt ${ev?.clock ? "clock-prompt" : ""}`,
@@ -21376,17 +21466,19 @@ function tc({ facts: e, onBack: t, onReset: n }) {
               }
               ((path = t), (ver = 2));
             }
-            if (ver < 7 && Object.keys(path).length > 0) {
+            if (ver < 8 && Object.keys(path).length > 0) {
               let idToName =
-                  ver >= 6
-                    ? MG_V6_NAMES
-                    : ver >= 5
-                      ? MG_V5_NAMES
-                      : ver >= 4
-                        ? MG_V4_NAMES
-                        : ver >= 3
-                          ? MG_V3_NAMES
-                          : MG_V2_NAMES,
+                  ver >= 7
+                    ? MG_V7_NAMES
+                    : ver >= 6
+                      ? MG_V6_NAMES
+                      : ver >= 5
+                        ? MG_V5_NAMES
+                        : ver >= 4
+                          ? MG_V4_NAMES
+                          : ver >= 3
+                            ? MG_V3_NAMES
+                            : MG_V2_NAMES,
                 nameToNew = {};
               en.forEach((l) => (nameToNew[l.name] = l.id));
               let t = {};
@@ -21397,7 +21489,7 @@ function tc({ facts: e, onBack: t, onReset: n }) {
               }
               path = t;
             }
-            (x(path), eQ("mg_path", path), eQ("mg_pathver", { v: 7 }));
+            (x(path), eQ("mg_path", path), eQ("mg_pathver", { v: 8 }));
           }
           (j(await eH("mg_coins", 0)),
             N({ ...el, ...(await eH("mg_inv", { ...el })) }),

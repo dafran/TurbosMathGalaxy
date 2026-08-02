@@ -120,6 +120,14 @@
     .sumaobj-item:hover { transform: scale(1.1); }
     .sumaobj-item.counted { background: rgba(127,223,255,.35); transform: scale(1.12); }
     .sumaobj-count { text-align: center; font-weight: 800; font-size: .85rem; opacity: .9; margin-top: 8px; }
+    /* Arreglos (grupos en filas → multiplicación) */
+    .arreglo { width: 100%; max-width: 420px; margin: 0 auto 8px; }
+    .arreglo-grid { display: flex; flex-direction: column; gap: 5px; align-items: center; background: rgba(255,255,255,.08); border-radius: 14px; padding: 10px; }
+    .arreglo-row { display: flex; gap: 5px; justify-content: center; }
+    .arreglo-item { font-size: 1.6rem; line-height: 1; padding: 1px; border-radius: 7px; cursor: pointer; transition: transform .1s, background .1s; }
+    .arreglo-item:hover { transform: scale(1.1); }
+    .arreglo-item.counted { background: rgba(127,223,255,.35); transform: scale(1.12); }
+    .arreglo-count { text-align: center; font-weight: 800; font-size: .85rem; opacity: .9; margin-top: 8px; }
     </style>
     <script type="module" src="./app.js"></script>
     <script>
