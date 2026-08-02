@@ -15300,6 +15300,16 @@ let Z = (e, t) => Math.floor(Math.random() * (t - e + 1)) + e,
       emoji: "🤝",
     },
     {
+      id: 0,
+      world: 1,
+      name: "La balanza",
+      kind: "balanza",
+      tables: [],
+      questions: 8,
+      passAt: 6,
+      emoji: "⚖️",
+    },
+    {
       id: 11,
       world: 1,
       name: "Secuencias misteriosas",
@@ -17166,6 +17176,36 @@ const MG_V7_NAMES = {
   97: "Multiplica en grande", 98: "Por 10 y por 100", 99: "División con resto", 100: "Fracciones de un número",
   101: "Redondea a la decena", 102: "El reloj", 103: "Jefe: Sabio galáctico",
 };
+/* Mapa id→nombre de la versión v8 (105 niveles), para migrar saves v8→v9. */
+const MG_V8_NAMES = {
+  1: "Cuenta y suma", 2: "Sumas rápidas", 3: "Parejas del 10", 4: "Sumas con decenas",
+  5: "Llevando una", 6: "Dos cifras sin llevar", 7: "Sumas de 2 dígitos", 8: "Par o impar",
+  9: "Dobles hasta 20", 10: "Dobles y mitades", 11: "Jefe: Robotnik", 12: "Restas sencillas",
+  13: "Restas veloces", 14: "Restas con decenas", 15: "Dos cifras sin prestar", 16: "Pide prestado",
+  17: "Restas de 2 dígitos", 18: "Parejas del 20", 19: "Secuencias misteriosas", 20: "Jefe: Caballero resta",
+  21: "Grupos iguales", 22: "Filas y columnas", 23: "Reglas del 1 y el 0", 24: "Salta de 2 en 2",
+  25: "Tabla del 2, primera parte", 26: "Tabla del 2 completa", 27: "Salta de 5 en 5", 28: "Tabla del 5, primera parte",
+  29: "Tabla del 5 completa", 30: "Repaso: tablas 2 y 5", 31: "Salta de 10 en 10", 32: "Tabla del 10",
+  33: "Jefe: Dragón Ender", 34: "Salta de 3 en 3", 35: "Tabla del 3, primera parte", 36: "Tabla del 3 completa",
+  37: "Repaso: tablas 2 y 3", 38: "Salta de 4 en 4", 39: "Tabla del 4, primera parte", 40: "Tabla del 4 completa",
+  41: "Repaso: tablas 3 y 4", 42: "Número escondido", 43: "Jefe: Darth Vader", 44: "Salta de 6 en 6",
+  45: "Tabla del 6, primera parte", 46: "Tabla del 6 completa", 47: "Repaso: tablas 4, 5 y 6", 48: "Salta de 7 en 7",
+  49: "Tabla del 7, primera parte", 50: "Tabla del 7 completa", 51: "Repaso: tablas 6 y 7", 52: "Número escondido 2",
+  53: "Cadena mental", 54: "Jefe: Metal Sonic", 55: "Salta de 8 en 8", 56: "Tabla del 8, primera parte",
+  57: "Tabla del 8 completa", 58: "Repaso: tablas 7 y 8", 59: "Salta de 9 en 9", 60: "Tabla del 9, primera parte",
+  61: "Tabla del 9 completa", 62: "Repaso: tablas 8 y 9", 63: "Número escondido 3", 64: "Cadena avanzada",
+  65: "Jefe: Dr. Eggman", 66: "Reparto en partes iguales", 67: "Gran reparto", 68: "Dividir entre 2",
+  69: "Dividir entre 5", 70: "Repaso: dividir entre 2 y 5", 71: "Dividir entre 10", 72: "División sorpresa",
+  73: "Multiplica y divide", 74: "Las tablas no se olvidan: 8 y 9", 75: "Jefe: Wither", 76: "Dividir entre 3",
+  77: "Dividir entre 4", 78: "Repaso: dividir entre 3 y 4", 79: "Dividir entre 6", 80: "Dividir entre 7",
+  81: "Repaso: dividir entre 6 y 7", 82: "Multiplica y divide 2", 83: "Las tablas no se olvidan: 6 y 7", 84: "Jefe: Kylo Ren",
+  85: "Dividir entre 8", 86: "Dividir entre 9", 87: "Repaso: dividir entre 8 y 9", 88: "Gran división",
+  89: "División sorpresa 2", 90: "Cadena con división", 91: "Todas las tablas juntas", 92: "Jefe: Emperador",
+  93: "Multiplica y divide total", 94: "Secuencias misteriosas 2", 95: "Par o impar veloz", 96: "Número escondido 4",
+  97: "Cadena maestra", 98: "Jefe supremo: Maestro del tiempo", 99: "Multiplica en grande", 100: "Por 10 y por 100",
+  101: "División con resto", 102: "Fracciones de un número", 103: "Redondea a la decena", 104: "El reloj",
+  105: "Jefe: Sabio galáctico",
+};
 /* Generadores de la rampa suave de sumas (Mundo 1). */
 function exDec() {
   let d = 10 * Z(1, 8),
@@ -17270,6 +17310,22 @@ function eArreglo(big) {
     answer: rows * cols,
     factKey: "add",
     hint: `Son ${rows} grupos de ${cols}. Cuéntalos o suma ${cols} ${rows} veces: da ${rows * cols}.`,
+  };
+}
+function eBalanza() {
+  let a = Z(1, 9),
+    b = Z(1, 9),
+    S = a + b,
+    c = Z(1, S - 1);
+  return {
+    kind: "balanza",
+    a: a,
+    b: b,
+    known: c,
+    prompt: `¿Qué número equilibra la balanza?`,
+    answer: S - c,
+    factKey: "add",
+    hint: `Los dos platos deben pesar igual: ${a} + ${b} = ${S}, y ${c} + ? = ${S}, así que ? = ${S - c}.`,
   };
 }
 function ex(e) {
@@ -17521,6 +17577,8 @@ function e_(e, t, n) {
       return eSumaObj();
     case "arreglo":
       return eArreglo(e.big);
+    case "balanza":
+      return eBalanza();
     case "salto":
       var a;
       let r, l, s, i;
@@ -18071,6 +18129,15 @@ function MgArreglo({ rows: R, cols: C, item: it }) {
           Array.from({ length: C }).map((_, c) =>
             MG_H("button", { key: c, type: "button", className: "arreglo-item" + (r * C + c < counted ? " counted" : ""), onClick: tap }, it))))),
     MG_H("div", { className: "arreglo-count" }, counted > 0 ? "Contados: " + counted : R + " filas de " + C + " 👆"));
+}
+function MgBalanza({ a: A, b: B, known: C }) {
+  return MG_H("div", { className: "balance-area mg-balanza" },
+    MG_H("div", { className: "balance-beam" },
+      MG_H("div", { className: "balance-pan" },
+        MG_H("div", { className: "pan-content" }, A + " + " + B)),
+      MG_H("div", { className: "balance-center" }, "⚖️"),
+      MG_H("div", { className: "balance-pan" },
+        MG_H("div", { className: "pan-content" }, C + " + ?"))));
 }
 function eJ({ soundOn: e, onToggleSound: t, onParents: n, onPick: a }) {
   return (0, s.jsxs)("div", {
@@ -19325,6 +19392,7 @@ function e8({
       if ("reparto" === t.kind) return void S("write");
       if ("sumaobj" === t.kind) return void S("write");
       if ("arreglo" === t.kind) return void S("write");
+      if ("balanza" === t.kind) return void S("write");
       if ("hora" === t.kind) return void S("write");
       if ("resto" === t.kind || "fracnum" === t.kind || "redondeo" === t.kind)
         return 0.65 > Math.random()
@@ -19640,6 +19708,12 @@ function e8({
                     MgArreglo,
                     { rows: ev.rows, cols: ev.cols, item: ev.item },
                     "ar" + y,
+                  ),
+                "balanza" === ev?.kind &&
+                  (0, s.jsx)(
+                    MgBalanza,
+                    { a: ev.a, b: ev.b, known: ev.known },
+                    "ba" + y,
                   ),
                 (0, s.jsx)("div", {
                   className: `q-prompt ${ev?.clock ? "clock-prompt" : ""}`,
@@ -21466,12 +21540,14 @@ function tc({ facts: e, onBack: t, onReset: n }) {
               }
               ((path = t), (ver = 2));
             }
-            if (ver < 8 && Object.keys(path).length > 0) {
+            if (ver < 9 && Object.keys(path).length > 0) {
               let idToName =
-                  ver >= 7
-                    ? MG_V7_NAMES
-                    : ver >= 6
-                      ? MG_V6_NAMES
+                  ver >= 8
+                    ? MG_V8_NAMES
+                    : ver >= 7
+                      ? MG_V7_NAMES
+                      : ver >= 6
+                        ? MG_V6_NAMES
                       : ver >= 5
                         ? MG_V5_NAMES
                         : ver >= 4
@@ -21489,7 +21565,7 @@ function tc({ facts: e, onBack: t, onReset: n }) {
               }
               path = t;
             }
-            (x(path), eQ("mg_path", path), eQ("mg_pathver", { v: 8 }));
+            (x(path), eQ("mg_path", path), eQ("mg_pathver", { v: 9 }));
           }
           (j(await eH("mg_coins", 0)),
             N({ ...el, ...(await eH("mg_inv", { ...el })) }),
