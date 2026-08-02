@@ -15233,7 +15233,7 @@ let Z = (e, t) => Math.floor(Math.random() * (t - e + 1)) + e,
       id: 7,
       world: 1,
       name: "Restas sencillas",
-      kind: "restas1",
+      kind: "restas1d",
       tables: [],
       questions: 10,
       passAt: 7,
@@ -15262,22 +15262,22 @@ let Z = (e, t) => Math.floor(Math.random() * (t - e + 1)) + e,
     {
       id: 0,
       world: 1,
-      name: "Pide prestado",
-      kind: "restas2d1dC",
-      tables: [],
-      questions: 10,
-      passAt: 7,
-      emoji: "🤝",
-    },
-    {
-      id: 0,
-      world: 1,
       name: "Dos cifras sin prestar",
       kind: "restas2dNC",
       tables: [],
       questions: 10,
       passAt: 7,
       emoji: "🧱",
+    },
+    {
+      id: 0,
+      world: 1,
+      name: "Pide prestado",
+      kind: "restas2d1dC",
+      tables: [],
+      questions: 10,
+      passAt: 7,
+      emoji: "🤝",
     },
     {
       id: 9,
@@ -17087,6 +17087,35 @@ const MG_V5_NAMES = {
   93: "Jefe supremo: Maestro del tiempo", 94: "Multiplica en grande", 95: "Por 10 y por 100", 96: "División con resto",
   97: "Fracciones de un número", 98: "Redondea a la decena", 99: "El reloj", 100: "Jefe: Sabio galáctico",
 };
+/* Mapa id→nombre de la versión v6 (103 niveles), para migrar saves v6→v7. */
+const MG_V6_NAMES = {
+  1: "Cuenta y suma", 2: "Sumas rápidas", 3: "Parejas del 10", 4: "Sumas con decenas",
+  5: "Llevando una", 6: "Dos cifras sin llevar", 7: "Sumas de 2 dígitos", 8: "Par o impar",
+  9: "Dobles hasta 20", 10: "Dobles y mitades", 11: "Jefe: Robotnik", 12: "Restas sencillas",
+  13: "Restas veloces", 14: "Restas con decenas", 15: "Pide prestado", 16: "Dos cifras sin prestar",
+  17: "Restas de 2 dígitos", 18: "Parejas del 20", 19: "Secuencias misteriosas", 20: "Jefe: Caballero resta",
+  21: "Reglas del 1 y el 0", 22: "Salta de 2 en 2", 23: "Tabla del 2, primera parte", 24: "Tabla del 2 completa",
+  25: "Salta de 5 en 5", 26: "Tabla del 5, primera parte", 27: "Tabla del 5 completa", 28: "Repaso: tablas 2 y 5",
+  29: "Salta de 10 en 10", 30: "Tabla del 10", 31: "Jefe: Dragón Ender", 32: "Salta de 3 en 3",
+  33: "Tabla del 3, primera parte", 34: "Tabla del 3 completa", 35: "Repaso: tablas 2 y 3", 36: "Salta de 4 en 4",
+  37: "Tabla del 4, primera parte", 38: "Tabla del 4 completa", 39: "Repaso: tablas 3 y 4", 40: "Número escondido",
+  41: "Jefe: Darth Vader", 42: "Salta de 6 en 6", 43: "Tabla del 6, primera parte", 44: "Tabla del 6 completa",
+  45: "Repaso: tablas 4, 5 y 6", 46: "Salta de 7 en 7", 47: "Tabla del 7, primera parte", 48: "Tabla del 7 completa",
+  49: "Repaso: tablas 6 y 7", 50: "Número escondido 2", 51: "Cadena mental", 52: "Jefe: Metal Sonic",
+  53: "Salta de 8 en 8", 54: "Tabla del 8, primera parte", 55: "Tabla del 8 completa", 56: "Repaso: tablas 7 y 8",
+  57: "Salta de 9 en 9", 58: "Tabla del 9, primera parte", 59: "Tabla del 9 completa", 60: "Repaso: tablas 8 y 9",
+  61: "Número escondido 3", 62: "Cadena avanzada", 63: "Jefe: Dr. Eggman", 64: "Reparto en partes iguales",
+  65: "Gran reparto", 66: "Dividir entre 2", 67: "Dividir entre 5", 68: "Repaso: dividir entre 2 y 5",
+  69: "Dividir entre 10", 70: "División sorpresa", 71: "Multiplica y divide", 72: "Las tablas no se olvidan: 8 y 9",
+  73: "Jefe: Wither", 74: "Dividir entre 3", 75: "Dividir entre 4", 76: "Repaso: dividir entre 3 y 4",
+  77: "Dividir entre 6", 78: "Dividir entre 7", 79: "Repaso: dividir entre 6 y 7", 80: "Multiplica y divide 2",
+  81: "Las tablas no se olvidan: 6 y 7", 82: "Jefe: Kylo Ren", 83: "Dividir entre 8", 84: "Dividir entre 9",
+  85: "Repaso: dividir entre 8 y 9", 86: "Gran división", 87: "División sorpresa 2", 88: "Cadena con división",
+  89: "Todas las tablas juntas", 90: "Jefe: Emperador", 91: "Multiplica y divide total", 92: "Secuencias misteriosas 2",
+  93: "Par o impar veloz", 94: "Número escondido 4", 95: "Cadena maestra", 96: "Jefe supremo: Maestro del tiempo",
+  97: "Multiplica en grande", 98: "Por 10 y por 100", 99: "División con resto", 100: "Fracciones de un número",
+  101: "Redondea a la decena", 102: "El reloj", 103: "Jefe: Sabio galáctico",
+};
 /* Generadores de la rampa suave de sumas (Mundo 1). */
 function exDec() {
   let d = 10 * Z(1, 8),
@@ -17230,6 +17259,17 @@ function ej(e) {
         : t % 10 < n % 10
           ? `Truco: baja ${t} hasta la decena y luego resta lo que falta. Da ${t - n}.`
           : `Resta primero las decenas y luego las unidades. ${t} \u{2212} ${n} = ${t - n}.`,
+  };
+}
+function ejUno() {
+  let a = Z(2, 9),
+    b = Z(1, a);
+  return {
+    kind: "subtraction",
+    prompt: `${a} \u{2212} ${b}`,
+    answer: a - b,
+    factKey: "add",
+    hint: `Cuenta hacia atr\xe1s desde ${a}: ${b} pasos. Da ${a - b}.`,
   };
 }
 function ejDec() {
@@ -17434,6 +17474,8 @@ function e_(e, t, n) {
       );
     case "restas1":
       return ej(!1);
+    case "restas1d":
+      return ejUno();
     case "restas2":
       return ej(n >= 3);
     case "restas2d1d":
@@ -21334,15 +21376,17 @@ function tc({ facts: e, onBack: t, onReset: n }) {
               }
               ((path = t), (ver = 2));
             }
-            if (ver < 6 && Object.keys(path).length > 0) {
+            if (ver < 7 && Object.keys(path).length > 0) {
               let idToName =
-                  ver >= 5
-                    ? MG_V5_NAMES
-                    : ver >= 4
-                      ? MG_V4_NAMES
-                      : ver >= 3
-                        ? MG_V3_NAMES
-                        : MG_V2_NAMES,
+                  ver >= 6
+                    ? MG_V6_NAMES
+                    : ver >= 5
+                      ? MG_V5_NAMES
+                      : ver >= 4
+                        ? MG_V4_NAMES
+                        : ver >= 3
+                          ? MG_V3_NAMES
+                          : MG_V2_NAMES,
                 nameToNew = {};
               en.forEach((l) => (nameToNew[l.name] = l.id));
               let t = {};
@@ -21353,7 +21397,7 @@ function tc({ facts: e, onBack: t, onReset: n }) {
               }
               path = t;
             }
-            (x(path), eQ("mg_path", path), eQ("mg_pathver", { v: 6 }));
+            (x(path), eQ("mg_path", path), eQ("mg_pathver", { v: 7 }));
           }
           (j(await eH("mg_coins", 0)),
             N({ ...el, ...(await eH("mg_inv", { ...el })) }),
