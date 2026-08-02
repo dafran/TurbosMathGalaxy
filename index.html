@@ -128,6 +128,12 @@
     .arreglo-item:hover { transform: scale(1.1); }
     .arreglo-item.counted { background: rgba(127,223,255,.35); transform: scale(1.12); }
     .arreglo-count { text-align: center; font-weight: 800; font-size: .85rem; opacity: .9; margin-top: 8px; }
+    /* Banner de instalación (PWA) */
+    #mg-install-banner { position: fixed; left: 0; right: 0; bottom: 0; z-index: 99999; display: flex; align-items: center; gap: 10px; padding: 10px 14px calc(10px + env(safe-area-inset-bottom)); background: #2a1150; border-top: 3px solid #ffd447; color: #fff; font-family: "Nunito", system-ui, sans-serif; font-weight: 800; box-shadow: 0 -4px 16px rgba(0,0,0,.4); animation: mibUp .3s ease; }
+    @keyframes mibUp { from { transform: translateY(110%); } to { transform: none; } }
+    #mg-install-banner .mib-txt { flex: 1; font-size: .88rem; line-height: 1.3; }
+    #mg-install-banner .mib-go { background: #ffd447; color: #2a1a4a; border: 0; border-radius: 10px; padding: 9px 16px; font-family: inherit; font-weight: 800; font-size: .95rem; cursor: pointer; white-space: nowrap; }
+    #mg-install-banner .mib-x { background: transparent; border: 0; color: #fff; font-size: 1.1rem; cursor: pointer; padding: 4px 6px; opacity: .8; }
     </style>
     <script type="module" src="./app.js"></script>
     <script>
@@ -136,6 +142,48 @@
         navigator.serviceWorker.register("./sw.js").catch(function () {});
       });
     }
+    </script>
+    <script>
+    /* Banner de instalación: botón nativo en Android/Chrome, instrucción en iOS. */
+    (function () {
+      var KEY = "pwaInstallDismissed", deferred = null, banner = null;
+      function installed() {
+        try { return matchMedia("(display-mode: standalone)").matches || navigator.standalone === true; } catch (e) { return false; }
+      }
+      function dismissed() { try { return localStorage.getItem(KEY) === "1"; } catch (e) { return false; } }
+      function isIOS() { return /iphone|ipad|ipod/i.test(navigator.userAgent); }
+      function isMobile() { return /android|iphone|ipad|ipod|mobile/i.test(navigator.userAgent); }
+      function hide(remember) {
+        if (banner) { banner.remove(); banner = null; }
+        if (remember) { try { localStorage.setItem(KEY, "1"); } catch (e) {} }
+      }
+      function show(kind) {
+        if (banner || installed() || dismissed()) return;
+        banner = document.createElement("div");
+        banner.id = "mg-install-banner";
+        banner.innerHTML =
+          kind === "ios"
+            ? '<span class="mib-txt">📲 Instala Math Galaxy: toca <b>Compartir</b> y luego <b>Añadir a inicio</b></span><button class="mib-x" aria-label="Cerrar">✕</button>'
+            : '<span class="mib-txt">📲 Instala Math Galaxy en tu dispositivo</span><button class="mib-go">Instalar</button><button class="mib-x" aria-label="Cerrar">✕</button>';
+        document.body.appendChild(banner);
+        banner.querySelector(".mib-x").onclick = function () { hide(true); };
+        var go = banner.querySelector(".mib-go");
+        if (go) go.onclick = function () {
+          if (!deferred) return;
+          deferred.prompt();
+          deferred.userChoice.finally(function () { deferred = null; hide(true); });
+        };
+      }
+      window.addEventListener("beforeinstallprompt", function (e) {
+        e.preventDefault();
+        deferred = e;
+        if (isMobile()) show("android");
+      });
+      window.addEventListener("appinstalled", function () { hide(true); });
+      if (isIOS() && !installed() && !dismissed()) {
+        window.addEventListener("load", function () { setTimeout(function () { show("ios"); }, 2500); });
+      }
+    })();
     </script>
   
 
