@@ -16302,8 +16302,15 @@ let Z = (e, t) => Math.floor(Math.random() * (t - e + 1)) + e,
       price: 25,
       desc: "Revela el truco de una pregunta difícil",
     },
+    {
+      id: "retry",
+      name: "Doble intento",
+      emoji: "🔄",
+      price: 35,
+      desc: "Si te equivocas, tú eliges volver a intentar una pregunta sin perder corazón",
+    },
   ],
-  el = { potion: 0, shield: 0, lens: 0 };
+  el = { potion: 0, shield: 0, lens: 0, retry: 0 };
 function es(e, t) {
   return 1 === e || !!t[e]?.done || !!t[e - 1]?.done;
 }
@@ -19165,7 +19172,7 @@ function e3({
   });
 }
 function e5({ level: e, progress: t, inv: n, onStart: a, onBack: r }) {
-  let [l, o] = (0, i.useState)({ potion: !1, shield: !1, lens: 0 }),
+  let [l, o] = (0, i.useState)({ potion: !1, shield: !1, lens: 0, retry: 0 }),
     c = t[e.id]?.done,
     u = et[e.world],
     d = "boss" === e.kind;
@@ -19216,7 +19223,8 @@ function e5({ level: e, progress: t, inv: n, onStart: a, onBack: r }) {
               }),
               er.map((e) => {
                 let t = n[e.id],
-                  a = "lens" === e.id ? l.lens > 0 : l[e.id];
+                  isCount = "lens" === e.id || "retry" === e.id,
+                  a = isCount ? l[e.id] > 0 : l[e.id];
                 return (0, s.jsxs)(
                   "button",
                   {
@@ -19224,8 +19232,8 @@ function e5({ level: e, progress: t, inv: n, onStart: a, onBack: r }) {
                     disabled: 0 === t,
                     onClick: () =>
                       o((n) =>
-                        "lens" === e.id
-                          ? { ...n, lens: n.lens > 0 ? 0 : Math.min(2, t) }
+                        isCount
+                          ? { ...n, [e.id]: n[e.id] > 0 ? 0 : Math.min(2, t) }
                           : { ...n, [e.id]: !n[e.id] },
                       ),
                     children: [
@@ -19381,6 +19389,7 @@ function e8({
     [c, u] = (0, i.useState)(o),
     [f, m] = (0, i.useState)(t.shield),
     [p, h] = (0, i.useState)(t.lens),
+    [mgRetry, mgSetRetry] = (0, i.useState)(t.retry || 0),
     [g, b] = (0, i.useState)(!1),
     [y, x] = (0, i.useState)(0),
     k = (0, i.useRef)(n),
@@ -19555,9 +19564,10 @@ function e8({
           stars: c,
           missed: l,
           usedLens: t.lens - p,
+          usedRetry: (t.retry || 0) - mgRetry,
         });
       },
-      [e, r, t.lens, p],
+      [e, r, t.lens, p, t.retry, mgRetry],
     ),
     ef = (0, i.useCallback)(
       (t, n, a, r) => {
@@ -19586,6 +19596,9 @@ function e8({
       },
       [y, e, ed],
     );
+  function mgApplyMiss() {
+    f ? (m(!1), B("shielded")) : (u((e) => e - 1), B("wrong"));
+  }
   function em(e, t = !1) {
     if ((e ? v.ok() : v.no(), ea.current)) return;
     ((ea.current = !0), eu());
@@ -19642,9 +19655,9 @@ function e8({
         (mgSinceFreeze.current = 0),
         mgStar > 0
           ? B("starred")
-          : f
-            ? (m(!1), B("shielded"))
-            : (u((e) => e - 1), B("wrong")));
+          : mgRetry > 0
+            ? B("retryoffer")
+            : mgApplyMiss());
   }
   let ep = (e) => {
       em(($ === eo) === e);
@@ -19911,6 +19924,15 @@ function e8({
                 " ¡Correcto!",
               ],
             }),
+          "retryoffer" === U &&
+            (0, s.jsx)("div", {
+              className: "q-feedback shieldmsg",
+              children: (0, s.jsx)("div", {
+                className: "wrong-answer",
+                children:
+                  "🔄 ¡Ups! ¿Quieres usar un doble intento y volver a probar esta pregunta?",
+              }),
+            }),
           "shielded" === U &&
             (0, s.jsxs)("div", {
               className: "q-feedback shieldmsg",
@@ -19964,17 +19986,38 @@ function e8({
             }),
         ],
       }),
-      "wrong" === U || "shielded" === U || "starred" === U
-        ? (0, s.jsx)("button", {
-            className: "btn-pixel btn-go next-btn",
-            onClick: () => {
-              el && D < j.stages.length - 1 && c > 0
-                ? (F((e) => e + 1), I(""), B("ask"), b(!1), (ea.current = !1))
-                : ef(Q, W, Y, c);
-            },
-            children: "Entendido ▶",
+      "retryoffer" === U
+        ? (0, s.jsxs)("div", {
+            className: "retry-btns",
+            children: [
+              (0, s.jsxs)("button", {
+                className: "btn-pixel btn-go next-btn",
+                onClick: () => {
+                  (mgSetRetry((r) => r - 1),
+                    I(""),
+                    (ea.current = !1),
+                    B("ask"));
+                },
+                children: ["🔄 Volver a intentar (", mgRetry, ")"],
+              }),
+              (0, s.jsx)("button", {
+                className: "btn-pixel next-btn retry-ghost",
+                onClick: () => mgApplyMiss(),
+                children: "Ver respuesta",
+              }),
+            ],
           })
-        : (0, s.jsxs)(s.Fragment, {
+        : "wrong" === U || "shielded" === U || "starred" === U
+          ? (0, s.jsx)("button", {
+              className: "btn-pixel btn-go next-btn",
+              onClick: () => {
+                el && D < j.stages.length - 1 && c > 0
+                  ? (F((e) => e + 1), I(""), B("ask"), b(!1), (ea.current = !1))
+                  : ef(Q, W, Y, c);
+              },
+              children: "Entendido ▶",
+            })
+          : (0, s.jsxs)(s.Fragment, {
             children: [
               p > 0 &&
                 !g &&
@@ -21875,6 +21918,7 @@ function tc({ facts: e, onBack: t, onReset: n }) {
                   potion: w.potion - !!e.potion,
                   shield: w.shield - !!e.shield,
                   lens: w.lens - e.lens,
+                  retry: w.retry - e.retry,
                 };
                 (N(n), eQ("mg_inv", n), $(e), t("level-play"));
               },
@@ -21888,7 +21932,13 @@ function tc({ facts: e, onBack: t, onReset: n }) {
               setFacts: ed,
               onDone: (e) => {
                 e.passed && ef("path");
-                let a = E.lens - e.usedLens;
+                let a = E.lens - e.usedLens,
+                  ar = (E.retry || 0) - (e.usedRetry || 0);
+                ar > 0 &&
+                  N((e) => {
+                    let t = { ...e, retry: (e.retry || 0) + ar };
+                    return (eQ("mg_inv", t), t);
+                  });
                 if (
                   (a > 0 &&
                     N((e) => {
