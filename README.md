@@ -10,7 +10,20 @@ Un juego educativo de matemáticas en español para niños, con **Turbo el pug**
 
 - **Pequeño explorador** (~4 años): 40 niveles, 10 mundos — lógica y matemáticas tempranas.
 - **Aventurero** (~8 años): 90+ niveles, 11 mundos — sumas, restas, multiplicación, división, fracciones, patrones y jefes.
-- Mascota interactiva (Turbo el pug), camino de niveles, tienda de ítems, mapa de dominio de hechos y modo **Reto relámpago** (60 s).
+- Mascota interactiva (Turbo el pug), camino de niveles y jefes de fin de mundo.
+
+## ✨ Características
+
+- **🐶 Turbo, la mascota:** un pug interactivo que reacciona (hace "guau"), da pistas y ánimos, y se puede **personalizar con outfits**.
+- **👨‍👩‍👧 Perfiles estilo Netflix:** hasta 4 perfiles por dispositivo, cada niño con su nombre, avatar, edad y **progreso independiente** (guardado en `localStorage`).
+- **🗺️ Camino de niveles y jefes:** avance por mundos temáticos (playa, bosque, espacio, volcán, castillo…), con **jefes** de fin de mundo que dan más reto y recompensa.
+- **📖 Álbum de stickers:** cada nivel superado regala un **sticker coleccionable** (animales, naves, planetas…) que se guardan en "Mi álbum".
+- **🪙 Monedas y 🛒 tienda:** se ganan monedas por acertar (más si respondés rápido) y se gastan en ítems — **🧪 Poción de vida** (corazón extra), **🛡️ Escudo** (absorbe un error) y **🔍 Lupa mágica** (revela el truco de una pregunta).
+- **⭐ Superestrella:** ítem raro que se **gana** jugando (drop al acertar o por racha larga) y da invulnerabilidad por varias preguntas.
+- **🎯 Mapa de dominio de hechos:** rastrea qué hechos (sumas, tablas…) ya domina el niño, marcándolos con estrellas — recordatorio visual del progreso real.
+- **⚡ Reto relámpago:** modo de 60 segundos que guarda el **récord** personal y refuerza la fluidez.
+- **📅 Metas diarias:** objetivos por día para sostener el hábito de práctica.
+- **📱 PWA instalable:** funciona offline y se instala en el teléfono como una app.
 
 ## 🧱 Tecnología
 
