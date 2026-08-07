@@ -78,6 +78,12 @@
     /* Racha y congelador de tiempo (potenciador de batalla) */
     .hud-item.streak { background: rgba(255,140,40,.25); border-radius: 999px; padding: 2px 8px; }
     .hud-item.streak.ready { background: rgba(127,223,255,.35); box-shadow: 0 0 10px rgba(127,223,255,.7); animation: streakReady .8s ease-in-out infinite alternate; }
+    .hud-item.star { background: rgba(255,205,60,.28); border-radius: 999px; padding: 2px 8px; box-shadow: 0 0 10px rgba(255,205,60,.7); animation: streakReady .8s ease-in-out infinite alternate; }
+    .col-op { width: max-content; margin: 10px auto 6px; padding: 6px 16px 6px 22px; text-align: right; font-family: 'Press Start 2P', monospace; font-variant-numeric: tabular-nums; letter-spacing: .28em; line-height: 1.55; }
+    .col-op-row { font-size: 1.7rem; color: #fff; position: relative; }
+    .col-op-sign { position: absolute; left: -.95em; color: var(--accent); }
+    .col-op-line { border-top: 4px solid var(--accent); margin: 8px 0 6px; }
+    .col-op-ans { color: var(--accent); min-height: 1.7rem; }
     @keyframes streakReady { from { transform: scale(1); } to { transform: scale(1.12); } }
     .timer-track.frozen { border: 2px solid #9be8ff; box-shadow: 0 0 12px rgba(127,223,255,.7); }
     .timer-track.frozen .timer-fill { animation: frostGlow 1.2s ease-in-out infinite alternate; }
