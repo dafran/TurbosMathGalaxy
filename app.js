@@ -17557,6 +17557,20 @@ function eM() {
     hint: `La aguja corta se\xf1ala la hora: est\xe1 en el ${e}. Son las ${e} en punto.`,
   };
 }
+function mgTimeFor(q) {
+  if (!q) return 25;
+  if (q.kind === "chain") return 33;
+  if (q.kind === "multiplication" || q.kind === "division") return 30;
+  if (
+    (q.kind === "addition" || q.kind === "subtraction") &&
+    /[1-9]\d/.test(q.prompt || "")
+  )
+    return 30;
+  return 25;
+}
+function mgWarmup() {
+  return Math.random() < 0.5 ? ex(!1) : ejUno();
+}
 function e_(e, t, n) {
   switch (e.kind) {
     case "tabla":
@@ -19380,6 +19394,11 @@ function e8({
     [mgStreak, mgSetStreak] = (0, i.useState)(0),
     [mgFrozen, mgSetFrozen] = (0, i.useState)(!1),
     mgFreezePend = (0, i.useRef)(!1),
+    mgSinceFreeze = (0, i.useRef)(0),
+    mgFreezeGoal = (0, i.useRef)(2),
+    mgFastRef = (0, i.useRef)(!1),
+    [mgStar, mgSetStar] = (0, i.useState)(0),
+    [mgMax, mgSetMax] = (0, i.useState)(25),
     ee = (0, i.useRef)(null),
     en = (0, i.useRef)(null),
     ea = (0, i.useRef)(!1),
@@ -19482,6 +19501,7 @@ function e8({
     };
   (0, i.useEffect)(() => {
     es(j);
+    mgSetMax(mgTimeFor(j));
   }, []);
   let ei = "",
     eo = 0,
@@ -19500,9 +19520,9 @@ function e8({
   ((0, i.useEffect)(() => () => eu(), []),
     (0, i.useEffect)(() => {
       if ("ask" === U) {
-        if (mgFrozen) return void Z(25);
+        if (mgFrozen) return void Z(mgMax);
         return (
-          Z(25),
+          Z(mgMax),
           (ee.current = setInterval(() => {
             Z((e) =>
               e <= 1 ? (clearInterval(ee.current), em(!1, !0), 0) : e - 1,
@@ -19513,7 +19533,7 @@ function e8({
           }
         );
       }
-    }, [y, D, U, mgFrozen]));
+    }, [y, D, U, mgFrozen, mgMax]));
   let ed = (0, i.useCallback)(
       (n, a, l, s) => {
         let i = n >= e.passAt && s > 0,
@@ -19536,6 +19556,14 @@ function e8({
         if (("boss" === e.kind && t >= e.passAt) || l >= e.questions || r <= 0)
           return void ed(t, n, a, r);
         let s = e_(e, k.current, l);
+        e.world >= 2 &&
+          e.kind !== "boss" &&
+          Math.random() < 0.2 &&
+          (s = mgWarmup());
+        let mgBase = mgTimeFor(s) + (mgFastRef.current ? 5 : 0);
+        ((mgFastRef.current = !1),
+          mgSetMax(mgBase),
+          mgSetStar((v) => Math.max(0, v - 1)));
         (mgSetFrozen(mgFreezePend.current),
           (mgFreezePend.current = !1),
           x(l),
@@ -19566,14 +19594,30 @@ function e8({
     }
     if (e) {
       let ns = mgStreak + 1;
-      (mgSetStreak(ns), ns % 3 == 0 && (mgFreezePend.current = !0));
-      let e = J > 15,
-        t = 2 + +!!e,
+      mgSetStreak(ns);
+      mgSinceFreeze.current += 1;
+      if (mgSinceFreeze.current >= mgFreezeGoal.current) {
+        ((mgFreezePend.current = !0),
+          (mgSinceFreeze.current = 0),
+          (mgFreezeGoal.current = Math.random() < 0.5 ? 2 : 3));
+      }
+      let mgGotStar = !1;
+      0 === mgStar &&
+        (ns >= 6 && ns % 6 == 0
+          ? (mgSetStar(5), (mgGotStar = !0))
+          : Math.random() < 0.05 && (mgSetStar(5), (mgGotStar = !0)));
+      let e = J > mgMax * 0.6;
+      mgFastRef.current = e;
+      let t = 2 + +!!e,
         a = W + t;
       if (
         (V(a),
-        G(`+${t} \u{1FA99}${e ? " ¡veloz!" : ""}`),
-        setTimeout(() => G(null), 900),
+        G(
+          mgGotStar
+            ? "⭐ \xa1Superestrella!"
+            : `+${t} \u{1FA99}${e ? " ¡veloz!" : ""}`,
+        ),
+        setTimeout(() => G(null), mgGotStar ? 1200 : 900),
         B("right"),
         el && D < j.stages.length - 1)
       )
@@ -19586,7 +19630,12 @@ function e8({
       }
     } else
       (mgSetStreak(0),
-        f ? (m(!1), B("shielded")) : (u((e) => e - 1), B("wrong")));
+        (mgSinceFreeze.current = 0),
+        mgStar > 0
+          ? B("starred")
+          : f
+            ? (m(!1), B("shielded"))
+            : (u((e) => e - 1), B("wrong")));
   }
   let ep = (e) => {
       em(($ === eo) === e);
@@ -19597,7 +19646,7 @@ function e8({
     eg = (e) => {
       _ && (L(e), em(("a" === e ? eo : _.value) > ("a" === e ? _.value : eo)));
     },
-    eb = (J / 25) * 100,
+    eb = Math.min(100, (J / mgMax) * 100),
     ev = el ? null : j,
     ey = () =>
       "parity" === N && ev
@@ -19628,16 +19677,21 @@ function e8({
             children: ["❤️".repeat(c), "🖤".repeat(Math.max(0, o - c))],
           }),
           f && (0, s.jsx)("span", { className: "hud-item", children: "🛡️" }),
+          mgStar > 0 &&
+            MG_H("span", { className: "hud-item star" }, "⭐ " + mgStar),
           (0, s.jsxs)("span", {
             className: "hud-item coins",
             children: ["🪙 ", W],
           }),
           mgStreak >= 1 &&
-            MG_H(
-              "span",
-              { className: "hud-item streak" + (mgStreak % 3 === 0 ? " ready" : "") },
-              "🔥 " + mgStreak + (mgStreak % 3 === 0 ? " ❄️" : ""),
-            ),
+            (() => {
+              let ready = mgSinceFreeze.current + 1 >= mgFreezeGoal.current;
+              return MG_H(
+                "span",
+                { className: "hud-item streak" + (ready ? " ready" : "") },
+                "🔥 " + mgStreak + (ready ? " ❄️" : ""),
+              );
+            })(),
         ],
       }),
       "boss" === e.kind &&
@@ -19839,6 +19893,21 @@ function e8({
                   }),
               ],
             }),
+          "starred" === U &&
+            (0, s.jsxs)("div", {
+              className: "q-feedback shieldmsg",
+              children: [
+                (0, s.jsxs)("div", {
+                  className: "wrong-answer",
+                  children: ["⭐ ¡La superestrella te protegió! ", ey()],
+                }),
+                ec &&
+                  (0, s.jsxs)("div", {
+                    className: "hint-box",
+                    children: ["💡 ", ec],
+                  }),
+              ],
+            }),
           "wrong" === U &&
             (0, s.jsxs)("div", {
               className: "q-feedback no",
@@ -19862,7 +19931,7 @@ function e8({
             }),
         ],
       }),
-      "wrong" === U || "shielded" === U
+      "wrong" === U || "shielded" === U || "starred" === U
         ? (0, s.jsx)("button", {
             className: "btn-pixel btn-go next-btn",
             onClick: () => {
