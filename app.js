@@ -18129,6 +18129,15 @@ function MgSumaObjetos({ a: A, b: B, itemA: ia, itemB: ib }) {
           MG_H("button", { key: "b" + ix, type: "button", className: "sumaobj-item" + (A + ix < counted ? " counted" : ""), onClick: tap }, ib)))),
     MG_H("div", { className: "sumaobj-count" }, counted > 0 ? "Contados: " + counted : "Tócalos para contar 👆"));
 }
+function MgColumna({ a, b, op, typed }) {
+  return MG_H("div", { className: "col-op" },
+    MG_H("div", { className: "col-op-row" }, String(a)),
+    MG_H("div", { className: "col-op-row" },
+      MG_H("span", { className: "col-op-sign" }, op),
+      MG_H("span", null, String(b))),
+    MG_H("div", { className: "col-op-line" }),
+    MG_H("div", { className: "col-op-row col-op-ans" }, typed || "_"));
+}
 function MgArreglo({ rows: R, cols: C, item: it }) {
   const [counted, setCounted] = i.useState(0);
   const total = R * C;
@@ -19648,6 +19657,15 @@ function e8({
     },
     eb = Math.min(100, (J / mgMax) * 100),
     ev = el ? null : j,
+    mgColNums =
+      ev && ("addition" === ev.kind || "subtraction" === ev.kind)
+        ? (ev.prompt || "").match(/\d+/g)
+        : null,
+    mgUseColumn =
+      !!mgColNums &&
+      2 === mgColNums.length &&
+      Math.max(+mgColNums[0], +mgColNums[1]) >= 10,
+    mgColOp = ev && "subtraction" === ev.kind ? "−" : "+",
     ey = () =>
       "parity" === N && ev
         ? `${ev.prompt} es ${0 === ev.answer ? "par" : "impar"}`
@@ -19769,14 +19787,29 @@ function e8({
                     { a: ev.a, b: ev.b, known: ev.known },
                     "ba" + y,
                   ),
-                (0, s.jsx)("div", {
-                  className: `q-prompt ${ev?.clock ? "clock-prompt" : ""}`,
-                  children: ei,
-                }),
-                (0, s.jsx)("div", {
-                  className: "q-input-display",
-                  children: O || "_",
-                }),
+                mgUseColumn
+                  ? (0, s.jsx)(
+                      MgColumna,
+                      {
+                        a: mgColNums[0],
+                        b: mgColNums[1],
+                        op: mgColOp,
+                        typed: O,
+                      },
+                      "col" + y,
+                    )
+                  : (0, s.jsxs)(s.Fragment, {
+                      children: [
+                        (0, s.jsx)("div", {
+                          className: `q-prompt ${ev?.clock ? "clock-prompt" : ""}`,
+                          children: ei,
+                        }),
+                        (0, s.jsx)("div", {
+                          className: "q-input-display",
+                          children: O || "_",
+                        }),
+                      ],
+                    }),
               ],
             }),
           "falling" === N &&
