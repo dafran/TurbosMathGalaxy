@@ -39,8 +39,17 @@ Un juego educativo de matemáticas en español para niños, con **Turbo el pug**
   </tr>
   <tr>
     <td align="center" colspan="3">
+      <b>📖 Micro-lecciones — Turbo enseña el concepto <i>antes</i> de practicar</b>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="50%" colspan="2">
       <img src="docs/screenshots/07-leccion.png" width="230" alt="Micro-lección de multiplicación"><br>
-      <sub><b>Micro-lección</b> · Turbo enseña la multiplicación (grupos iguales → arreglo → ejemplo) <b>antes</b> de practicar</sub>
+      <sub><b>Multiplicación</b> · grupos iguales → arreglo → ejemplo</sub>
+    </td>
+    <td align="center" width="50%">
+      <img src="docs/screenshots/08-leccion-division.png" width="230" alt="Micro-lección de división"><br>
+      <sub><b>División</b> · repartir en partes iguales (e inversa de ×)</sub>
     </td>
   </tr>
 </table>
