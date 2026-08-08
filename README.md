@@ -6,6 +6,41 @@ Un juego educativo de matemáticas en español para niños, con **Turbo el pug**
 
 ---
 
+## 📸 Capturas
+
+<table>
+  <tr>
+    <td align="center" width="33%">
+      <img src="docs/screenshots/01-perfiles.png" width="220" alt="Selector de perfiles con Turbo"><br>
+      <sub><b>Perfiles</b><br>estilo Netflix, uno por niño</sub>
+    </td>
+    <td align="center" width="33%">
+      <img src="docs/screenshots/02-inicio.png" width="220" alt="Menú principal"><br>
+      <sub><b>Inicio</b><br>camino, práctica, reto, colección…</sub>
+    </td>
+    <td align="center" width="33%">
+      <img src="docs/screenshots/03-camino.png" width="220" alt="Camino de niveles"><br>
+      <sub><b>Camino</b><br>mundos, niveles, estrellas y jefes</sub>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="33%">
+      <img src="docs/screenshots/04-columna.png" width="220" alt="Suma en columna vertical"><br>
+      <sub><b>Columna vertical</b><br>multi-dígito, unidades bajo unidades</sub>
+    </td>
+    <td align="center" width="33%">
+      <img src="docs/screenshots/05-tienda.png" width="220" alt="Tienda de ítems"><br>
+      <sub><b>Tienda</b><br>poción, escudo, lupa y doble intento</sub>
+    </td>
+    <td align="center" width="33%">
+      <img src="docs/screenshots/06-equipar.png" width="220" alt="Pantalla de equipamiento"><br>
+      <sub><b>Equípate</b><br>elige tus ítems antes del nivel</sub>
+    </td>
+  </tr>
+</table>
+
+---
+
 ## 🎮 Qué es
 
 - **Pequeño explorador** (~4 años): 40 niveles, 10 mundos — lógica y matemáticas tempranas.
