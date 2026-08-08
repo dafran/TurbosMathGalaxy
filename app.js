@@ -18151,7 +18151,61 @@ function mgMarkLesson(id) {
 }
 function mgConceptOf(level) {
   if (["arreglo", "tabla", "salto"].includes(level.kind)) return "multiplicacion";
+  if (["reparto", "resto", "division"].includes(level.kind)) return "division";
   return null;
+}
+function mgLessonData(concept, groups, array, grid) {
+  if ("division" === concept)
+    return {
+      title: "📖 Aprendamos a dividir",
+      steps: [
+        {
+          turbo: "Dividir es repartir en partes iguales. Tenemos 12 galletas para 3 amigos.",
+          big: "12 galletas para 3",
+          visual: grid(12, 6),
+        },
+        {
+          turbo: "Le damos la misma cantidad a cada uno… ¡a cada amigo le tocan 4!",
+          big: "12 ÷ 3 = 4",
+          visual: groups(),
+        },
+        {
+          turbo: "Es lo contrario de multiplicar: si 3 × 4 = 12, entonces 12 ÷ 3 = 4.",
+          big: "3 × 4 = 12",
+          visual: groups(),
+        },
+        {
+          turbo: "¡Ya lo sabés! 12 ÷ 3 = 4. Ahora probá vos.",
+          big: "¡Lo lograste! 🎉",
+          visual: MG_H("div", { className: "lec-result" }, "12 ÷ 3 = 4"),
+        },
+      ],
+    };
+  return {
+    title: "📖 Aprendamos a multiplicar",
+    steps: [
+      {
+        turbo: "Multiplicar es hacer grupos iguales. ¡Mirá! 3 grupos, y en cada uno 4 galletas.",
+        big: "3 grupos de 4",
+        visual: groups(),
+      },
+      {
+        turbo: "Por eso 3 × 4 significa sumar 4 tres veces.",
+        big: "4 + 4 + 4 = 12",
+        visual: groups(),
+      },
+      {
+        turbo: "También lo podés ver como filas y columnas. ¡Contá, es lo mismo!",
+        big: "3 filas de 4 = 12",
+        visual: array(),
+      },
+      {
+        turbo: "¡Ya lo sabés! Entonces 3 × 4 = 12. Ahora probá vos.",
+        big: "¡Lo lograste! 🎉",
+        visual: MG_H("div", { className: "lec-result" }, "3 × 4 = 12"),
+      },
+    ],
+  };
 }
 function MgLeccion({ concept: concept, bg: bg, onDone: onDone, onSkip: onSkip }) {
   let A = 3,
@@ -18180,28 +18234,17 @@ function MgLeccion({ concept: concept, bg: bg, onDone: onDone, onSkip: onSkip })
           MG_H("span", { key: k, className: "lec-emoji" }, it),
         ),
       ),
-    steps = [
-      {
-        turbo: "Multiplicar es hacer grupos iguales. ¡Mirá! 3 grupos, y en cada uno 4 galletas.",
-        big: "3 grupos de 4",
-        visual: groups(),
-      },
-      {
-        turbo: "Por eso 3 × 4 significa sumar 4 tres veces.",
-        big: "4 + 4 + 4 = 12",
-        visual: groups(),
-      },
-      {
-        turbo: "También lo podés ver como filas y columnas. ¡Contá, es lo mismo!",
-        big: "3 filas de 4 = 12",
-        visual: array(),
-      },
-      {
-        turbo: "¡Ya lo sabés! Entonces 3 × 4 = 12. Ahora probá vos.",
-        big: "¡Lo lograste! 🎉",
-        visual: MG_H("div", { className: "lec-result" }, "3 × 4 = 12"),
-      },
-    ],
+    grid = (n, cols) =>
+      MG_H(
+        "div",
+        { className: "lec-array", style: { gridTemplateColumns: `repeat(${cols},1fr)` } },
+        Array.from({ length: n }).map((_, k) =>
+          MG_H("span", { key: k, className: "lec-emoji" }, it),
+        ),
+      ),
+    L = mgLessonData(concept, groups, array, grid),
+    title = L.title,
+    steps = L.steps,
     cur = steps[step],
     last = step === steps.length - 1;
   return MG_H(
@@ -18212,7 +18255,7 @@ function MgLeccion({ concept: concept, bg: bg, onDone: onDone, onSkip: onSkip })
       "div",
       { className: "panel leccion" },
       MG_H("button", { className: "link-back", onClick: onSkip }, "Saltar ▶"),
-      MG_H("div", { className: "lec-title" }, "📖 Aprendamos a multiplicar"),
+      MG_H("div", { className: "lec-title" }, title),
       MG_H(f, { mood: last ? "excited" : "happy", text: cur.turbo, size: 60 }),
       MG_H("div", { className: "lec-visual" }, cur.visual),
       MG_H("div", { className: "lec-big" }, cur.big),
