@@ -19745,10 +19745,10 @@ function e8({
             background: mgFrozen
               ? "linear-gradient(90deg,#7fdfff,#b6f0ff)"
               : eb > 50
-                ? "#00ff88"
+                ? "#4ade80"
                 : eb > 25
                   ? "#ffcc00"
-                  : "#ff6644",
+                  : "#ff6b57",
           },
         }),
       }),
@@ -20491,7 +20491,7 @@ function te({ progress: e, facts: t, setFacts: n, onDone: a, onQuit: r }) {
           className: "timer-fill",
           style: {
             width: `${E}%`,
-            background: E > 50 ? "#7ec8ff" : E > 25 ? "#ffcc00" : "#ff6644",
+            background: E > 50 ? "#7ec8ff" : E > 25 ? "#ffcc00" : "#ff6b57",
           },
         }),
       }),
@@ -20950,7 +20950,7 @@ function tr({
                                     ? "#00d68a"
                                     : t >= 0.65
                                       ? "#ffd700"
-                                      : "#ff5577"
+                                      : "#ff6b57"
                                   : "#6a628a",
                             },
                           }),
