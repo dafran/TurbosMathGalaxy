@@ -131,6 +131,18 @@
     @keyframes turboWin { 0% { transform: translateY(0) scale(1); } 30% { transform: translateY(-18px) scale(1.15) rotate(-6deg); } 60% { transform: translateY(0) scale(1.15) rotate(6deg); } 100% { transform: translateY(0) scale(1); } }
     @keyframes bannerPop { 0% { transform: scale(.5); opacity: 0; } 60% { transform: scale(1.15); } 100% { transform: scale(1); opacity: 1; } }
     @keyframes arenaFlash { 0%,100% { box-shadow: 0 0 30px #5032b44d; } 40% { box-shadow: 0 0 46px #ffd70099; } }
+    .damage-float { position: absolute; top: 4px; left: 50%; font-family: 'Press Start 2P', monospace; font-size: .9rem; color: #ff5252; text-shadow: 0 0 8px #ff000088, 0 2px 0 #000; animation: dmgFloat .95s ease-out forwards; pointer-events: none; z-index: 3; }
+    @keyframes dmgFloat { 0% { opacity: 0; transform: translate(-50%, 6px) scale(.6); } 20% { opacity: 1; transform: translate(-50%, -8px) scale(1.15); } 100% { opacity: 0; transform: translate(-50%, -44px) scale(1); } }
+    .attack-name { text-align: center; font-family: 'Press Start 2P', monospace; font-size: .6rem; color: hsl(var(--bh,300) 90% 74%); text-shadow: 0 0 10px hsl(var(--bh,300) 90% 55% / .7); margin: 2px 0 6px; animation: atkName .5s ease; }
+    @keyframes atkName { 0% { opacity: 0; transform: scale(.6) translateY(6px); } 60% { transform: scale(1.12); } 100% { opacity: 1; transform: scale(1); } }
+    .boss-particles { position: absolute; inset: 0; animation: bossRing 6s linear infinite; pointer-events: none; }
+    .boss-particles .bp { position: absolute; width: 7px; height: 7px; border-radius: 50%; background: hsl(var(--bh,300) 90% 66%); box-shadow: 0 0 8px hsl(var(--bh,300) 90% 60%); }
+    .bp1 { top: -4px; left: 48%; }
+    .bp2 { bottom: 2px; left: -3px; }
+    .bp3 { bottom: 8px; right: -3px; width: 5px; height: 5px; }
+    .boss-champ.defeated .boss-particles { opacity: 0; }
+    .boss-orb.boss-shape-1:before { border-radius: 46% 54% 52% 48% / 55% 46% 54% 45%; }
+    .boss-orb.boss-shape-2:before { border-radius: 54% 46% 44% 56% / 44% 56% 44% 56%; }
     .boss-face-big { position: relative; font-size: 2.7rem; line-height: 1; filter: drop-shadow(0 2px 3px #0009); }
     .duel-spark { font-size: 1.4rem; align-self: center; opacity: .45; margin-bottom: 22px; }
     .duel-spark.boom { opacity: 1; font-size: 2rem; animation: sparkBoom .45s; }
@@ -159,6 +171,14 @@
     @keyframes ambTwinkle { 0%,100% { opacity: .3; transform: scale(.9); } 50% { opacity: .9; transform: scale(1.15); } }
     @keyframes ambComet { 0% { transform: translate(0,0) rotate(22deg); opacity: 0; } 12% { opacity: .7; } 88% { opacity: .7; } 100% { transform: translate(130vw,40px) rotate(22deg); opacity: 0; } }
     @keyframes ambShip { 0% { transform: translateX(0); opacity: 0; } 10% { opacity: .85; } 90% { opacity: .85; } 100% { transform: translateX(135vw); opacity: 0; } }
+    .amb-cloud1 { left: -18%; top: 12%; font-size: 2.4rem; opacity: .8; animation: ambDrift 26s linear infinite; }
+    .amb-cloud2 { left: -22%; top: 40%; font-size: 3rem; opacity: .7; animation: ambDrift 34s linear infinite; animation-delay: -12s; }
+    .amb-balloon { right: 8%; top: 66%; font-size: 2.2rem; opacity: .85; animation: ambFloat 7s ease-in-out infinite; }
+    .amb-butterfly { left: 8%; top: 78%; font-size: 1.6rem; opacity: .9; animation: ambFloat 4.5s ease-in-out infinite; }
+    .amb-bird { left: -14%; top: 26%; font-size: 1.5rem; opacity: 0; animation: ambBird 16s linear infinite; }
+    .amb-rainbow { right: 4%; top: 14%; font-size: 2.4rem; opacity: .55; animation: ambFloat 10s ease-in-out infinite; }
+    @keyframes ambDrift { 0% { transform: translateX(0); } 100% { transform: translateX(150vw); } }
+    @keyframes ambBird { 0% { transform: translateX(0) translateY(0); opacity: 0; } 10% { opacity: .85; } 50% { transform: translateX(70vw) translateY(-18px); } 90% { opacity: .85; } 100% { transform: translateX(140vw) translateY(6px); opacity: 0; } }
     @keyframes streakReady { from { transform: scale(1); } to { transform: scale(1.12); } }
     .timer-track.frozen { border: 2px solid #9be8ff; box-shadow: 0 0 12px rgba(127,223,255,.7); }
     .timer-track.frozen .timer-fill { animation: frostGlow 1.2s ease-in-out infinite alternate; }

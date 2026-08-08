@@ -18154,6 +18154,17 @@ function mgConceptOf(level) {
   if (["reparto", "resto", "division"].includes(level.kind)) return "division";
   return null;
 }
+function mgAttackName(kind) {
+  let K = String(kind || "");
+  if (K.includes("sum") || "addition" === K || "bond" === K || "bonds10" === K || "bonds20" === K)
+    return "¡Golpe de suma!";
+  if (K.includes("rest") || "subtraction" === K) return "¡Corte de resta!";
+  if (K.includes("tabla") || "arreglo" === K || "salto" === K || "multiplication" === K || "double" === K)
+    return "¡Rayo multiplicador!";
+  if (K.includes("repart") || "reparto" === K || "resto" === K || "division" === K)
+    return "¡Tajo divisor!";
+  return "¡Ataque veloz!";
+}
 function mgPathCurve(n) {
   if (n < 2) return "M 15 5";
   let xs = (i) => (i % 2 === 0 ? 15 : 33),
@@ -18451,6 +18462,16 @@ function eZ({ progress: e, onLevel: t, onStickers: n, onBrain: a, onBack: r }) {
       (0, s.jsxs)("div", {
         className: "path-scroll",
         children: [
+          MG_H(
+            "div",
+            { className: "path-ambient sky", "aria-hidden": "true" },
+            MG_H("span", { className: "amb amb-cloud1" }, "☁️"),
+            MG_H("span", { className: "amb amb-cloud2" }, "☁️"),
+            MG_H("span", { className: "amb amb-balloon" }, "🎈"),
+            MG_H("span", { className: "amb amb-butterfly" }, "🦋"),
+            MG_H("span", { className: "amb amb-bird" }, "🐦"),
+            MG_H("span", { className: "amb amb-rainbow" }, "🌈"),
+          ),
           (0, s.jsxs)("div", {
             className: "path-header",
             children: [
@@ -18484,9 +18505,23 @@ function eZ({ progress: e, onLevel: t, onStickers: n, onBrain: a, onBack: r }) {
                       }),
                     ],
                   }),
-                  (0, s.jsx)("div", {
+                  (0, s.jsxs)("div", {
                     className: "node-column",
-                    children: r.map((n, a) => {
+                    children: [
+                      MG_H(
+                        "svg",
+                        {
+                          className: "path-curve",
+                          viewBox: `0 0 100 ${r.length * 10}`,
+                          preserveAspectRatio: "none",
+                          "aria-hidden": "true",
+                        },
+                        MG_H("path", {
+                          className: "path-curve-line",
+                          d: mgPathCurve(r.length),
+                        }),
+                      ),
+                      ...r.map((n, a) => {
                       var r;
                       let l = e[n.id],
                         i = ((r = n.id), 1 === r || !!e[r - 1]?.done),
@@ -18542,6 +18577,7 @@ function eZ({ progress: e, onLevel: t, onStickers: n, onBrain: a, onBack: r }) {
                         n.id,
                       );
                     }),
+                    ],
                   }),
                 ],
               },
@@ -19939,7 +19975,8 @@ function e8({
             frac = hp / e.passAt,
             defeated = 0 === hp,
             bossName = e.name.replace(/^[^:]*:\s*/, ""),
-            hue = (53 * e.world + 350) % 360;
+            hue = (53 * e.world + 350) % 360,
+            bshape = "boss-shape-" + (e.world % 3);
           return MG_H(
             "div",
             {
@@ -19981,15 +20018,27 @@ function e8({
                 },
                 MG_H(
                   "div",
-                  { className: "boss-orb" },
+                  { className: "boss-orb " + bshape },
                   MG_H("div", { className: "boss-ring" }),
+                  MG_H(
+                    "div",
+                    { className: "boss-particles" },
+                    MG_H("span", { className: "bp bp1" }),
+                    MG_H("span", { className: "bp bp2" }),
+                    MG_H("span", { className: "bp bp3" }),
+                  ),
                   MG_H("div", { className: "boss-aura" }),
                   MG_H("span", { className: "boss-face-big" }, e.emoji),
                   MG_H("div", { className: "boss-burst" }, "💥"),
+                  "right" === U &&
+                    MG_H("div", { className: "damage-float" }, "−1"),
                 ),
                 MG_H("div", { className: "champ-name boss-name" }, bossName),
               ),
             ),
+            "right" === U &&
+              !defeated &&
+              MG_H("div", { className: "attack-name" }, mgAttackName(j.kind)),
             defeated &&
               MG_H("div", { className: "victory-banner" }, "🏆 ¡Jefe derrotado!"),
             MG_H(
