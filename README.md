@@ -37,6 +37,12 @@ Un juego educativo de matemáticas en español para niños, con **Turbo el pug**
       <sub><b>Equípate</b><br>elige tus ítems antes del nivel</sub>
     </td>
   </tr>
+  <tr>
+    <td align="center" colspan="3">
+      <img src="docs/screenshots/07-leccion.png" width="230" alt="Micro-lección de multiplicación"><br>
+      <sub><b>Micro-lección</b> · Turbo enseña la multiplicación (grupos iguales → arreglo → ejemplo) <b>antes</b> de practicar</sub>
+    </td>
+  </tr>
 </table>
 
 ---
@@ -50,6 +56,7 @@ Un juego educativo de matemáticas en español para niños, con **Turbo el pug**
 ## ✨ Características
 
 - **🐶 Turbo, la mascota:** un pug interactivo que reacciona (hace "guau"), da pistas y ánimos, y se puede **personalizar con outfits**.
+- **📖 Micro-lecciones:** antes de introducir un concepto nuevo (multiplicación, división), Turbo lo explica en pocos segundos con dibujos — saltable y re-visible desde "¿cómo funciona?". Enseña, no solo evalúa.
 - **👨‍👩‍👧 Perfiles estilo Netflix:** hasta 4 perfiles por dispositivo, cada niño con su nombre, avatar, edad y **progreso independiente** (guardado en `localStorage`).
 - **🗺️ Camino de niveles y jefes:** avance por mundos temáticos (playa, bosque, espacio, volcán, castillo…), con **jefes** de fin de mundo que dan más reto y recompensa.
 - **📖 Álbum de stickers:** cada nivel superado regala un **sticker coleccionable** (animales, naves, planetas…) que se guardan en "Mi álbum".
@@ -97,6 +104,7 @@ A continuación, las mecánicas principales y la razón detrás de cada una.
 | **Protectores de tiempo (congelar)** | Cada 2–3 correctas (razón variable) la siguiente pregunta viene con el tiempo congelado. | Menos presión de tiempo en momentos clave + los refuerzos de **razón variable** sostienen mejor la motivación que los fijos. | [4] |
 | **Superestrella (invulnerabilidad)** | Ítem raro que evita perder corazón por varios errores, **pero sigue mostrando la respuesta correcta**. | Reduce el miedo a equivocarse y favorece el riesgo productivo; se conserva la **retroalimentación correctiva**, que es lo que enseña (no el castigo). | [1] |
 | **Doble intento** | Ítem que el niño **decide** usar tras un error para reintentar esa misma pregunta (sin ver la respuesta) en vez de perder un corazón. | Un segundo intento de recuperación tras fallar, en vez de solo mostrar la solución, refuerza el aprendizaje (recuperación activa y agencia del alumno). | [1] |
+| **Micro-lecciones (× y ÷)** | Antes de un concepto nuevo, Turbo lo explica en ~15–25 s con dibujos (grupos iguales → arreglo → suma repetida → ejemplo resuelto), saltable y re-visible con "¿cómo funciona?". | La práctica de recuperación consolida lo ya entendido, no lo enseña. Para novatos, la **instrucción guiada explícita** supera al descubrimiento solo, y estudiar un **ejemplo trabajado** antes de practicar baja la carga cognitiva. Secuencia **CRA** (concreto→pictórico→abstracto). | [9] |
 | **Recta numérica** | Representación central para sumar/restar y comparar. | La estimación en la recta numérica es uno de los predictores más robustos del logro matemático. | [5] |
 | **Layout horizontal para cálculo mental** | Hechos de 1 dígito y cálculo mental se muestran en horizontal (`45 + 23`). | El formato **horizontal** favorece estrategias de descomposición basadas en el valor posicional. | [6][7] |
 | **Layout en columna para multi-dígito** | Sumas/restas con operandos de 2+ dígitos se muestran apiladas (unidades bajo unidades), como en la escuela. | El formato **vertical** descarga la memoria de trabajo en el multi-dígito con llevada/préstamo y facilita la transferencia al algoritmo escolar. Se introduce **después** del cálculo mental, no como única vía. | [6][7][8] |
@@ -119,8 +127,9 @@ Enlaces verificados y obras fundamentales que respaldan las decisiones anteriore
 6. **Students' Multidigit Addition & Subtraction Strategies** — el formato horizontal induce descomposición y el vertical el algoritmo estándar. https://www.projectmath.net/wp-content/uploads/2017/06/Students%E2%80%99-Multidigit-Addition-_-Subtraction.pdf
 7. **Mental computation or standard algorithm? Children's strategy choices on multi-digit subtractions** (European Journal of Psychology of Education, 2015). https://link.springer.com/article/10.1007/s10212-015-0255-8 · y **Children's Strategy Choices on Complex Subtraction Problems** (Frontiers, 2018): https://pmc.ncbi.nlm.nih.gov/articles/PMC6057409/
 8. **Kamii, C., & Dominick, A. (1998).** *The Harmful Effects of Algorithms in Grades 1–4* (NCTM Yearbook) — el algoritmo estándar impuesto demasiado pronto puede "desenseñar" el valor posicional. Resumen: https://edlab.tc.columbia.edu/blog/5720-The-Harmful-Effects-of-Algorithms-in-Grades-1-4 · Crítica metodológica (para balance): https://nonpartisaneducation.org/Review/Reviews/v9n2.html
+9. **Kirschner, P. A., Sweller, J., & Clark, R. E. (2006).** *Why Minimal Guidance During Instruction Does Not Work: An Analysis of the Failure of Constructivist, Discovery, Problem-Based, Experiential, and Inquiry-Based Teaching.* **Educational Psychologist, 41**(2), 75–86 — para el novato, la guía mínima (descubrimiento puro) es menos eficaz que la instrucción guiada explícita. Relacionados: el **efecto del ejemplo trabajado** (Sweller, carga cognitiva) y la secuencia **CRA / concreto-pictórico-abstracto** (Bruner; método Singapur).
 
-> **Nota honesta sobre las citas:** los enlaces se verificaron al momento de escribir este documento. Para uso académico formal conviene confirmar autores, año, DOI y páginas en la fuente original. Las obras marcadas sin enlace (1, 3, 4, 5) son referencias fundamentales del área, ampliamente citadas y fáciles de localizar.
+> **Nota honesta sobre las citas:** los enlaces se verificaron al momento de escribir este documento. Para uso académico formal conviene confirmar autores, año, DOI y páginas en la fuente original. Las obras marcadas sin enlace (1, 3, 4, 5, 9) son referencias fundamentales del área, ampliamente citadas y fáciles de localizar.
 
 ---
 

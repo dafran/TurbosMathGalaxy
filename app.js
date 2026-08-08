@@ -17966,7 +17966,7 @@ const MG_H = (tag, props, ...kids) => {
   if (kids.length) p.children = kids.length === 1 ? kids[0] : kids;
   return (Array.isArray(p.children) ? s.jsxs : s.jsx)(tag, p, key);
 };
-const MG_PROFILE_KEYS = ["mg_facts", "mg_daily", "mg_little", "mg_little_path", "mg_path", "mg_coins", "mg_inv", "mg_reto", "mg_practice", "mg_brain", "mg_lbrain", "mg_outfit", "mg_pathver", "mg_goals", "mg_worlds_celebrated"];
+const MG_PROFILE_KEYS = ["mg_facts", "mg_daily", "mg_little", "mg_little_path", "mg_path", "mg_coins", "mg_inv", "mg_reto", "mg_practice", "mg_brain", "mg_lbrain", "mg_outfit", "mg_pathver", "mg_goals", "mg_worlds_celebrated", "mg_lessons"];
 const MG_AVATARS = ["🦄", "🐯", "🦖", "🐸", "🦊", "🐼", "🐧", "🦁", "🐙", "🐨", "🦉", "🐢", "🐝", "🦋", "🐬", "🦕", "🚀", "🌟"];
 const mgRaw = () => window.__mgRaw || { get: () => null, set: () => {}, remove: () => {} };
 function mgNewId() { return "p" + Math.random().toString(36).slice(2, 8); }
@@ -18135,6 +18135,113 @@ function MgSumaObjetos({ a: A, b: B, itemA: ia, itemB: ib }) {
         Array.from({ length: B }).map((_, ix) =>
           MG_H("button", { key: "b" + ix, type: "button", className: "sumaobj-item" + (A + ix < counted ? " counted" : ""), onClick: tap }, ib)))),
     MG_H("div", { className: "sumaobj-count" }, counted > 0 ? "Contados: " + counted : "Tócalos para contar 👆"));
+}
+function mgLessonSeen(id) {
+  try {
+    return (JSON.parse(localStorage.getItem("mg_lessons") || "[]") || []).includes(id);
+  } catch (e) {
+    return !1;
+  }
+}
+function mgMarkLesson(id) {
+  try {
+    let s = JSON.parse(localStorage.getItem("mg_lessons") || "[]") || [];
+    s.includes(id) || (s.push(id), localStorage.setItem("mg_lessons", JSON.stringify(s)));
+  } catch (e) {}
+}
+function mgConceptOf(level) {
+  if (["arreglo", "tabla", "salto"].includes(level.kind)) return "multiplicacion";
+  return null;
+}
+function MgLeccion({ concept: concept, bg: bg, onDone: onDone, onSkip: onSkip }) {
+  let A = 3,
+    B = 4,
+    it = "🍪",
+    [step, setStep] = (0, i.useState)(0),
+    groups = () =>
+      MG_H(
+        "div",
+        { className: "lec-groups" },
+        Array.from({ length: A }).map((_, g) =>
+          MG_H(
+            "div",
+            { key: g, className: "lec-group" },
+            Array.from({ length: B }).map((_, j) =>
+              MG_H("span", { key: j, className: "lec-emoji" }, it),
+            ),
+          ),
+        ),
+      ),
+    array = () =>
+      MG_H(
+        "div",
+        { className: "lec-array", style: { gridTemplateColumns: `repeat(${B},1fr)` } },
+        Array.from({ length: A * B }).map((_, k) =>
+          MG_H("span", { key: k, className: "lec-emoji" }, it),
+        ),
+      ),
+    steps = [
+      {
+        turbo: "Multiplicar es hacer grupos iguales. ¡Mirá! 3 grupos, y en cada uno 4 galletas.",
+        big: "3 grupos de 4",
+        visual: groups(),
+      },
+      {
+        turbo: "Por eso 3 × 4 significa sumar 4 tres veces.",
+        big: "4 + 4 + 4 = 12",
+        visual: groups(),
+      },
+      {
+        turbo: "También lo podés ver como filas y columnas. ¡Contá, es lo mismo!",
+        big: "3 filas de 4 = 12",
+        visual: array(),
+      },
+      {
+        turbo: "¡Ya lo sabés! Entonces 3 × 4 = 12. Ahora probá vos.",
+        big: "¡Lo lograste! 🎉",
+        visual: MG_H("div", { className: "lec-result" }, "3 × 4 = 12"),
+      },
+    ],
+    cur = steps[step],
+    last = step === steps.length - 1;
+  return MG_H(
+    "div",
+    { className: `screen world-${bg || "minecraft"}` },
+    MG_H(eX, {}),
+    MG_H(
+      "div",
+      { className: "panel leccion" },
+      MG_H("button", { className: "link-back", onClick: onSkip }, "Saltar ▶"),
+      MG_H("div", { className: "lec-title" }, "📖 Aprendamos a multiplicar"),
+      MG_H(f, { mood: last ? "excited" : "happy", text: cur.turbo, size: 60 }),
+      MG_H("div", { className: "lec-visual" }, cur.visual),
+      MG_H("div", { className: "lec-big" }, cur.big),
+      MG_H(
+        "div",
+        { className: "lec-dots" },
+        steps.map((_, k) =>
+          MG_H("span", { key: k, className: "lec-dot" + (k === step ? " on" : "") }),
+        ),
+      ),
+      MG_H(
+        "div",
+        { className: "lec-nav" },
+        step > 0 &&
+          MG_H(
+            "button",
+            { className: "btn-pixel", onClick: () => setStep(step - 1) },
+            "◀ Atrás",
+          ),
+        last
+          ? MG_H("button", { className: "btn-pixel btn-go", onClick: onDone }, "🚀 ¡A jugar!")
+          : MG_H(
+              "button",
+              { className: "btn-pixel btn-go", onClick: () => setStep(step + 1) },
+              "Siguiente ▶",
+            ),
+      ),
+    ),
+  );
 }
 function MgColumna({ a, b, op, typed }) {
   return MG_H("div", { className: "col-op" },
@@ -19175,7 +19282,18 @@ function e5({ level: e, progress: t, inv: n, onStart: a, onBack: r }) {
   let [l, o] = (0, i.useState)({ potion: !1, shield: !1, lens: 0, retry: 0 }),
     c = t[e.id]?.done,
     u = et[e.world],
-    d = "boss" === e.kind;
+    d = "boss" === e.kind,
+    concept = mgConceptOf(e),
+    [showLesson, setShowLesson] = (0, i.useState)(
+      () => !!concept && !mgLessonSeen(concept),
+    );
+  if (showLesson)
+    return MG_H(MgLeccion, {
+      concept: concept,
+      bg: u.bg,
+      onDone: () => (mgMarkLesson(concept), setShowLesson(!1)),
+      onSkip: () => (mgMarkLesson(concept), setShowLesson(!1)),
+    });
   return (0, s.jsxs)("div", {
     className: `screen world-${u.bg}`,
     children: [
@@ -19202,6 +19320,12 @@ function e5({ level: e, progress: t, inv: n, onStart: a, onBack: r }) {
               " aciertos · ❤️❤️❤️",
             ],
           }),
+          concept &&
+            (0, s.jsx)("button", {
+              className: "pl-howto",
+              onClick: () => setShowLesson(!0),
+              children: "🐶 ¿Cómo funciona?",
+            }),
           c &&
             (0, s.jsx)("div", {
               className: "pl-replay-warn",
