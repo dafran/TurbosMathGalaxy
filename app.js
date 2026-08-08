@@ -18154,6 +18154,21 @@ function mgConceptOf(level) {
   if (["reparto", "resto", "division"].includes(level.kind)) return "division";
   return null;
 }
+function mgPathCurve(n) {
+  if (n < 2) return "M 15 5";
+  let xs = (i) => (i % 2 === 0 ? 15 : 33),
+    y = (i) => i * 10 + 5,
+    d = `M ${xs(0)} ${y(0)}`;
+  for (let i = 1; i < n; i++) {
+    let x0 = xs(i - 1),
+      y0 = y(i - 1),
+      x1 = xs(i),
+      y1 = y(i),
+      my = (y0 + y1) / 2;
+    d += ` C ${x0} ${my}, ${x1} ${my}, ${x1} ${y1}`;
+  }
+  return d;
+}
 function mgLessonData(concept, groups, array, grid) {
   if ("division" === concept)
     return {
@@ -19261,9 +19276,23 @@ function e3({
                       }),
                     ],
                   }),
-                  (0, s.jsx)("div", {
+                  (0, s.jsxs)("div", {
                     className: "node-column",
-                    children: a.map((t, n) => {
+                    children: [
+                      MG_H(
+                        "svg",
+                        {
+                          className: "path-curve",
+                          viewBox: `0 0 100 ${a.length * 10}`,
+                          preserveAspectRatio: "none",
+                          "aria-hidden": "true",
+                        },
+                        MG_H("path", {
+                          className: "path-curve-line",
+                          d: mgPathCurve(a.length),
+                        }),
+                      ),
+                      ...a.map((t, n) => {
                       let a = e[t.id],
                         r = es(t.id, e),
                         l = r && !a?.done,
@@ -19315,6 +19344,7 @@ function e3({
                         t.id,
                       );
                     }),
+                    ],
                   }),
                 ],
               },
@@ -19907,10 +19937,15 @@ function e8({
           let hurt = "wrong" === U || "shielded" === U,
             hp = Math.max(0, e.passAt - Q),
             frac = hp / e.passAt,
-            bossName = e.name.replace(/^[^:]*:\s*/, "");
+            defeated = 0 === hp,
+            bossName = e.name.replace(/^[^:]*:\s*/, ""),
+            hue = (53 * e.world + 350) % 360;
           return MG_H(
             "div",
-            { className: "boss-arena" },
+            {
+              className: "boss-arena" + (defeated ? " victory" : ""),
+              style: { "--bh": hue },
+            },
             MG_H("div", { className: "arena-floor" }),
             MG_H(
               "div",
@@ -19921,7 +19956,8 @@ function e8({
                   className:
                     "champ turbo-champ" +
                     (hurt ? " hurt" : "") +
-                    ("right" === U ? " cheer" : ""),
+                    ("right" === U ? " cheer" : "") +
+                    (defeated ? " win" : ""),
                 },
                 MG_H(d, {
                   mood: hurt ? "sad" : "right" === U ? "excited" : "happy",
@@ -19940,17 +19976,22 @@ function e8({
                   className:
                     "champ boss-champ" +
                     ("right" === U ? " boss-hit" : "") +
-                    (hurt ? " boss-attack" : ""),
+                    (hurt ? " boss-attack" : "") +
+                    (defeated ? " defeated" : ""),
                 },
                 MG_H(
                   "div",
                   { className: "boss-orb" },
+                  MG_H("div", { className: "boss-ring" }),
                   MG_H("div", { className: "boss-aura" }),
                   MG_H("span", { className: "boss-face-big" }, e.emoji),
+                  MG_H("div", { className: "boss-burst" }, "💥"),
                 ),
                 MG_H("div", { className: "champ-name boss-name" }, bossName),
               ),
             ),
+            defeated &&
+              MG_H("div", { className: "victory-banner" }, "🏆 ¡Jefe derrotado!"),
             MG_H(
               "div",
               { className: "boss-hp-wrap" },
