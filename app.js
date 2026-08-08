@@ -19177,6 +19177,16 @@ function e3({
       (0, s.jsxs)("div", {
         className: "path-scroll",
         children: [
+          MG_H(
+            "div",
+            { className: "path-ambient", "aria-hidden": "true" },
+            MG_H("span", { className: "amb amb-planet1" }, "🪐"),
+            MG_H("span", { className: "amb amb-planet2" }, "🌍"),
+            MG_H("span", { className: "amb amb-ship" }, "🛸"),
+            MG_H("span", { className: "amb amb-comet" }, "☄️"),
+            MG_H("span", { className: "amb amb-moon" }, "🌙"),
+            MG_H("span", { className: "amb amb-spark" }, "✨"),
+          ),
           (0, s.jsxs)("div", {
             className: "path-header",
             children: [
@@ -19893,16 +19903,73 @@ function e8({
         ],
       }),
       "boss" === e.kind &&
-        MG_H("div", { className: "boss-duel" },
-          MG_H("span", { className: "boss-face" + ("right" === U ? " boss-hit" : "") }, e.emoji),
-          MG_H("div", { className: "boss-hp-wrap" },
-            MG_H("div", { className: "boss-hp-label" },
-              "Vida del jefe · " + Math.max(0, e.passAt - Q) + "/" + e.passAt),
-            MG_H("div", { className: "boss-hp-track" },
-              MG_H("div", {
-                className: "boss-hp-fill",
-                style: { width: (Math.max(0, e.passAt - Q) / e.passAt) * 100 + "%" },
-              })))),
+        (() => {
+          let hurt = "wrong" === U || "shielded" === U,
+            hp = Math.max(0, e.passAt - Q),
+            frac = hp / e.passAt,
+            bossName = e.name.replace(/^[^:]*:\s*/, "");
+          return MG_H(
+            "div",
+            { className: "boss-arena" },
+            MG_H("div", { className: "arena-floor" }),
+            MG_H(
+              "div",
+              { className: "duel-row" },
+              MG_H(
+                "div",
+                {
+                  className:
+                    "champ turbo-champ" +
+                    (hurt ? " hurt" : "") +
+                    ("right" === U ? " cheer" : ""),
+                },
+                MG_H(d, {
+                  mood: hurt ? "sad" : "right" === U ? "excited" : "happy",
+                  size: 56,
+                }),
+                MG_H("div", { className: "champ-name" }, "Turbo"),
+              ),
+              MG_H(
+                "div",
+                { className: "duel-spark" + ("right" === U ? " boom" : "") },
+                "right" === U ? "💥" : "⚔️",
+              ),
+              MG_H(
+                "div",
+                {
+                  className:
+                    "champ boss-champ" +
+                    ("right" === U ? " boss-hit" : "") +
+                    (hurt ? " boss-attack" : ""),
+                },
+                MG_H(
+                  "div",
+                  { className: "boss-orb" },
+                  MG_H("div", { className: "boss-aura" }),
+                  MG_H("span", { className: "boss-face-big" }, e.emoji),
+                ),
+                MG_H("div", { className: "champ-name boss-name" }, bossName),
+              ),
+            ),
+            MG_H(
+              "div",
+              { className: "boss-hp-wrap" },
+              MG_H(
+                "div",
+                { className: "boss-hp-label" },
+                "❤️ Vida del jefe · " + hp + "/" + e.passAt,
+              ),
+              MG_H(
+                "div",
+                { className: "boss-hp-track" + (frac <= 0.34 ? " low" : "") },
+                MG_H("div", {
+                  className: "boss-hp-fill",
+                  style: { width: frac * 100 + "%" },
+                }),
+              ),
+            ),
+          );
+        })(),
       (0, s.jsx)("div", {
         className: `timer-track ${mgFrozen ? "frozen" : ""}`,
         children: (0, s.jsx)("div", {
