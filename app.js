@@ -12994,12 +12994,68 @@ let c = [
     { id: "conejo", name: "Orejas de conejo", emoji: "🐰", price: 90, season: 4 },
   ],
   u = null;
-function d({ mood: e = "happy", size: t = 80, outfit: n, extra: ec }) {
+let mgChar = "turbo";
+let mgChars = [
+  { id: "turbo", name: "Turbo", emoji: "🐶", unlock: 0, desc: "El pug de siempre" },
+  { id: "gato", name: "Michi", emoji: "🐱", unlock: 12, desc: "Gatito curioso" },
+  { id: "perro2", name: "Bruno", emoji: "🐕", unlock: 30, desc: "Perro negro despeinado" },
+];
+function mgCharSkin(ch) {
+  if ("gato" === ch)
+    return {
+      fur: "#a9aeb6",
+      line: "#888d95",
+      outline: "#4a4e56",
+      snout: "#c99aa2",
+      nose: "#e86a7a",
+      ears: [
+        MG_H("path", { key: "e1", d: "M30 30 L23 9 L45 27 Z", fill: "#a9aeb6", stroke: "#4a4e56", strokeWidth: "1.5" }),
+        MG_H("path", { key: "e2", d: "M70 30 L77 9 L55 27 Z", fill: "#a9aeb6", stroke: "#4a4e56", strokeWidth: "1.5" }),
+        MG_H("path", { key: "e3", d: "M32 27 L28 15 L41 26 Z", fill: "#e8a0b0" }),
+        MG_H("path", { key: "e4", d: "M68 27 L72 15 L59 26 Z", fill: "#e8a0b0" }),
+      ],
+      extras: [
+        MG_H("path", { key: "w1", d: "M42 60 L20 56", stroke: "#7a7f87", strokeWidth: "1.2", strokeLinecap: "round" }),
+        MG_H("path", { key: "w2", d: "M42 63 L20 66", stroke: "#7a7f87", strokeWidth: "1.2", strokeLinecap: "round" }),
+        MG_H("path", { key: "w3", d: "M58 60 L80 56", stroke: "#7a7f87", strokeWidth: "1.2", strokeLinecap: "round" }),
+        MG_H("path", { key: "w4", d: "M58 63 L80 66", stroke: "#7a7f87", strokeWidth: "1.2", strokeLinecap: "round" }),
+      ],
+    };
+  if ("perro2" === ch)
+    return {
+      fur: "#3d3d47",
+      line: "#2a2a34",
+      outline: "#15151d",
+      snout: "#26262e",
+      nose: "#08080c",
+      ears: [
+        MG_H("path", { key: "e1", d: "M22 29 Q9 43 19 58 Q24 47 35 33 Z", fill: "#2b2b33", stroke: "#15151d", strokeWidth: "1.5" }),
+        MG_H("path", { key: "e2", d: "M78 29 Q91 43 81 58 Q76 47 65 33 Z", fill: "#2b2b33", stroke: "#15151d", strokeWidth: "1.5" }),
+      ],
+      extras: [
+        MG_H("path", { key: "t1", d: "M33 25 L37 11 L42 22 L48 9 L53 22 L58 11 L63 22 L67 12 Q50 15 33 25 Z", fill: "#3d3d47", stroke: "#15151d", strokeWidth: "1" }),
+      ],
+    };
+  return {
+    fur: "#e9c98f",
+    line: "#c9a36a",
+    outline: "#3a2a1e",
+    snout: "#4a3426",
+    nose: "#1a120c",
+    ears: [
+      MG_H("path", { key: "e1", d: "M23 28 Q13 42 23 54 Q29 40 35 32 Z", fill: "#3a2a1e" }),
+      MG_H("path", { key: "e2", d: "M77 28 Q87 42 77 54 Q71 40 65 32 Z", fill: "#3a2a1e" }),
+    ],
+    extras: [],
+  };
+}
+function d({ mood: e = "happy", size: t = 80, outfit: n, extra: ec, char: chOv }) {
   let a = void 0 === n ? u : n,
-    r = "#e9c98f",
-    l = "#c9a36a",
+    sk = mgCharSkin(chOv || mgChar),
+    r = sk.fur,
+    l = sk.line,
     i = "#1a120c",
-    o = "#3a2a1e";
+    o = sk.outline;
   return (0, s.jsxs)("svg", {
     width: t,
     height: t,
@@ -13053,8 +13109,7 @@ function d({ mood: e = "happy", size: t = 80, outfit: n, extra: ec }) {
         stroke: o,
         strokeWidth: "1.5",
       }),
-      (0, s.jsx)("path", { d: "M23 28 Q13 42 23 54 Q29 40 35 32 Z", fill: o }),
-      (0, s.jsx)("path", { d: "M77 28 Q87 42 77 54 Q71 40 65 32 Z", fill: o }),
+      ...sk.ears,
       (0, s.jsx)("path", {
         d: "M38 24 Q50 18 62 24",
         fill: "none",
@@ -13074,14 +13129,14 @@ function d({ mood: e = "happy", size: t = 80, outfit: n, extra: ec }) {
         cy: "61",
         rx: "16",
         ry: "13",
-        fill: "#4a3426",
+        fill: sk.snout,
       }),
       (0, s.jsx)("ellipse", {
         cx: "50",
         cy: "55",
         rx: "5.5",
         ry: "4",
-        fill: i,
+        fill: sk.nose,
       }),
       (0, s.jsx)("ellipse", {
         cx: "48.5",
@@ -13248,6 +13303,7 @@ function d({ mood: e = "happy", size: t = 80, outfit: n, extra: ec }) {
           strokeWidth: "2.2",
           strokeLinecap: "round",
         }),
+      ...sk.extras,
       "lentes" === a &&
         (0, s.jsxs)("g", {
           children: [
@@ -13425,11 +13481,11 @@ function d({ mood: e = "happy", size: t = 80, outfit: n, extra: ec }) {
     ],
   });
 }
-function f({ mood: e = "happy", text: t, size: n = 72 }) {
+function f({ mood: e = "happy", text: t, size: n = 72, char: fc }) {
   return (0, s.jsxs)("div", {
     className: "pug-say-wrap",
     children: [
-      (0, s.jsx)(d, { mood: e, size: n }),
+      (0, s.jsx)(d, { mood: e, size: n, char: fc }),
       (0, s.jsx)("div", { className: "pug-bubble", children: t }),
     ],
   });
@@ -17995,7 +18051,7 @@ const MG_H = (tag, props, ...kids) => {
   if (kids.length) p.children = kids.length === 1 ? kids[0] : kids;
   return (Array.isArray(p.children) ? s.jsxs : s.jsx)(tag, p, key);
 };
-const MG_PROFILE_KEYS = ["mg_facts", "mg_daily", "mg_little", "mg_little_path", "mg_path", "mg_coins", "mg_inv", "mg_reto", "mg_practice", "mg_brain", "mg_lbrain", "mg_outfit", "mg_pathver", "mg_goals", "mg_worlds_celebrated", "mg_lessons"];
+const MG_PROFILE_KEYS = ["mg_facts", "mg_daily", "mg_little", "mg_little_path", "mg_path", "mg_coins", "mg_inv", "mg_reto", "mg_practice", "mg_brain", "mg_lbrain", "mg_outfit", "mg_pathver", "mg_goals", "mg_worlds_celebrated", "mg_lessons", "mg_char"];
 const MG_AVATARS = ["🦄", "🐯", "🦖", "🐸", "🦊", "🐼", "🐧", "🦁", "🐙", "🐨", "🦉", "🐢", "🐝", "🦋", "🐬", "🦕", "🚀", "🌟"];
 const mgRaw = () => window.__mgRaw || { get: () => null, set: () => {}, remove: () => {} };
 function mgNewId() { return "p" + Math.random().toString(36).slice(2, 8); }
@@ -18116,6 +18172,36 @@ function MgHub({ kind: k, name: nm, coins: c, streak: st, onBack: bk, items: it 
           MG_H("span", { className: "hub-card-emoji" }, item.emoji),
           MG_H("span", { className: "hub-card-title" }, item.title),
           item.sub ? MG_H("span", { className: "hub-card-sub" }, item.sub) : null))));
+}
+function MgCharScreen({ charDone: dq, onBack: bk }) {
+  const [selChar, setSelChar] = i.useState(mgChar);
+  return MG_H("div", { className: "screen world-starwars hub-screen" },
+    s.jsx(eX, {}),
+    MG_H("div", { className: "hub-top" },
+      MG_H("button", { className: "link-back", onClick: bk }, "◀ Volver")),
+    s.jsx(f, { mood: "excited", text: "¡Elige quién te acompaña en tus juegos!", size: 64, char: selChar }),
+    MG_H("div", { className: "char-picker char-picker-full" },
+      MG_H("div", { className: "char-picker-title" }, "🐾 Elige tu compañero"),
+      MG_H("div", { className: "char-grid" },
+        ...mgChars.map((cc) => {
+          let unlocked = (dq || 0) >= cc.unlock,
+            sel = selChar === cc.id;
+          return MG_H("button",
+            {
+              key: cc.id,
+              className: "char-card" + (sel ? " sel" : "") + (unlocked ? "" : " locked"),
+              disabled: !unlocked,
+              onClick: () =>
+                unlocked &&
+                (setSelChar(cc.id), (mgChar = cc.id), eQ("mg_char", { id: cc.id })),
+            },
+            unlocked
+              ? MG_H(d, { mood: sel ? "excited" : "happy", size: 64, char: cc.id })
+              : MG_H("div", { className: "char-lock" }, "🔒"),
+            MG_H("div", { className: "char-name" }, unlocked ? cc.name : "Nivel " + cc.unlock),
+            unlocked ? MG_H("div", { className: "char-desc" }, cc.desc) : null,
+            sel && MG_H("div", { className: "char-badge" }, "✓ elegido"));
+        }))));
 }
 function MgReparto({ total: N, groups: M, item: it, who: wh }) {
   const [dealt, setDealt] = i.useState(0);
@@ -21727,8 +21813,10 @@ function to({
   onBuyOutfit: r,
   onEquip: l,
   onBack: o,
+  charDone: dq,
 }) {
-  let [u, m] = (0, i.useState)(null);
+  let [u, m] = (0, i.useState)(null),
+    [selChar, setSelChar] = (0, i.useState)(mgChar);
   return (0, s.jsxs)("div", {
     className: "screen world-minecraft",
     children: [
@@ -21804,6 +21892,40 @@ function to({
               );
             }),
           }),
+          MG_H(
+            "div",
+            { className: "char-picker" },
+            MG_H("div", { className: "char-picker-title" }, "🐾 Elige tu compañero"),
+            MG_H(
+              "div",
+              { className: "char-grid" },
+              ...mgChars.map((cc) => {
+                let unlocked = (dq || 0) >= cc.unlock,
+                  sel = selChar === cc.id;
+                return MG_H(
+                  "button",
+                  {
+                    key: cc.id,
+                    className:
+                      "char-card" +
+                      (sel ? " sel" : "") +
+                      (unlocked ? "" : " locked"),
+                    disabled: !unlocked,
+                    onClick: () =>
+                      unlocked &&
+                      (setSelChar(cc.id),
+                      (mgChar = cc.id),
+                      eQ("mg_char", { id: cc.id })),
+                  },
+                  unlocked
+                    ? MG_H(d, { mood: sel ? "excited" : "happy", size: 60, char: cc.id })
+                    : MG_H("div", { className: "char-lock" }, "🔒"),
+                  MG_H("div", { className: "char-name" }, unlocked ? cc.name : "Nivel " + cc.unlock),
+                  sel && MG_H("div", { className: "char-badge" }, "✓ elegido"),
+                );
+              }),
+            ),
+          ),
           (0, s.jsxs)("div", {
             className: "ropero-head",
             children: [
@@ -22105,6 +22227,8 @@ function tc({ facts: e, onBack: t, onReset: n }) {
             K({ ...R, ...(await eH("mg_lbrain", { ...R })) }));
           let e = await eH("mg_outfit", { owned: [], equipped: null });
           (Y(e), (u = e.equipped));
+          let ch = await eH("mg_char", { id: "turbo" });
+          mgChar = ch.id || "turbo";
           let t = await eH("mg_sound", { on: !0 });
           (et(t.on), (g = !t.on));
         })();
@@ -22219,6 +22343,7 @@ function tc({ facts: e, onBack: t, onReset: n }) {
                 { emoji: "🗺️", title: "Mi aventura", sub: "niveles con calcomanías", cls: "wide", onClick: () => t("little-path") },
                 { emoji: "🧩", title: "Juegos de lógica", sub: "memoria · parejas · tren", onClick: () => t("little-brain") },
                 { emoji: "📖", title: "Mi álbum", sub: "tus calcomanías", onClick: () => t("stickers") },
+                { emoji: "🐾", title: "Mi compañero", sub: "elige a Turbo, Michi...", onClick: () => t("charpick") },
               ],
             }),
           "little-path" === e &&
@@ -22244,6 +22369,14 @@ function tc({ facts: e, onBack: t, onReset: n }) {
             }),
           "stickers" === e &&
             (0, s.jsx)(e0, { progress: o, onBack: () => t("little-hub") }),
+          "charpick" === e &&
+            (0, s.jsx)(MgCharScreen, {
+              charDone:
+                Object.values(b).filter((z) => z && z.done).length +
+                Object.values(o).filter((z) => z && z.done).length,
+              onBack: () =>
+                t(mgRouteForAge((mgP.find((p) => p.id === mgA) || {}).age) === "pequeno" ? "little-hub" : "hub"),
+            }),
           "little-play" === e &&
             (0, s.jsx)(e1, {
               level: f,
@@ -22548,6 +22681,9 @@ function tc({ facts: e, onBack: t, onReset: n }) {
               coins: k,
               inv: w,
               outfit: G,
+              charDone:
+                Object.values(b).filter((z) => z && z.done).length +
+                Object.values(o).filter((z) => z && z.done).length,
               onBuy: (e) => {
                 v.coin();
                 let t = er.find((t) => t.id === e);
