@@ -131,6 +131,11 @@
     @keyframes turboWin { 0% { transform: translateY(0) scale(1); } 30% { transform: translateY(-18px) scale(1.15) rotate(-6deg); } 60% { transform: translateY(0) scale(1.15) rotate(6deg); } 100% { transform: translateY(0) scale(1); } }
     @keyframes bannerPop { 0% { transform: scale(.5); opacity: 0; } 60% { transform: scale(1.15); } 100% { transform: scale(1); opacity: 1; } }
     @keyframes arenaFlash { 0%,100% { box-shadow: 0 0 30px #5032b44d; } 40% { box-shadow: 0 0 46px #ffd70099; } }
+    .streak-cheer { position: fixed; top: 13%; left: 50%; z-index: 50; font-family: 'Press Start 2P', monospace; font-size: .72rem; line-height: 1.5; color: #2a1150; background: linear-gradient(135deg, #ffe066, #ffb03a); border: 3px solid #fff; border-radius: 14px; padding: 10px 16px; box-shadow: 0 6px 20px #0007, 0 0 22px #ffd70088; text-align: center; max-width: 88vw; pointer-events: none; animation: cheerPop .45s cubic-bezier(.2,1.6,.5,1), cheerBounce 1s ease-in-out .45s infinite; }
+    @keyframes cheerPop { 0% { transform: translateX(-50%) scale(.3); opacity: 0; } 70% { transform: translateX(-50%) scale(1.12); } 100% { transform: translateX(-50%) scale(1); opacity: 1; } }
+    @keyframes cheerBounce { 0%,100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(-7px); } }
+    .chest-box.shake-1 { animation-duration: .5s; font-size: 5rem; }
+    .chest-box.shake-2 { animation-duration: .28s; font-size: 5.7rem; filter: drop-shadow(0 0 16px #ffd700aa); }
     .damage-float { position: absolute; top: 4px; left: 50%; font-family: 'Press Start 2P', monospace; font-size: .9rem; color: #ff5252; text-shadow: 0 0 8px #ff000088, 0 2px 0 #000; animation: dmgFloat .95s ease-out forwards; pointer-events: none; z-index: 3; }
     @keyframes dmgFloat { 0% { opacity: 0; transform: translate(-50%, 6px) scale(.6); } 20% { opacity: 1; transform: translate(-50%, -8px) scale(1.15); } 100% { opacity: 0; transform: translate(-50%, -44px) scale(1); } }
     .attack-name { text-align: center; font-family: 'Press Start 2P', monospace; font-size: .6rem; color: hsl(var(--bh,300) 90% 74%); text-shadow: 0 0 10px hsl(var(--bh,300) 90% 55% / .7); margin: 2px 0 6px; animation: atkName .5s ease; }
