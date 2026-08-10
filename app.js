@@ -17013,6 +17013,17 @@ function ey(e, t) {
 /* Renumera los niveles del aventurero por posición (ids contiguos 1..N),
    tras insertar los niveles preparatorios del Mundo 1. */
 en.forEach((l, i) => (l.id = i + 1));
+/* Expone a la cáscara el mapa real mundo→ids (aventurero y menor), para que
+   la celebración de "mundo completado" no dependa de un mapa hardcodeado que
+   se desincroniza al agregar niveles. */
+try {
+  let mgAW = {},
+    mgLW = {};
+  en.forEach((l) => ((mgAW[l.world] = mgAW[l.world] || []).push(l.id)));
+  eo.forEach((l) => ((mgLW[l.world] = mgLW[l.world] || []).push(l.id)));
+  window.__mgAdvWorlds = mgAW;
+  window.__mgLitWorlds = mgLW;
+} catch (e) {}
 /* Mapa id→nombre de la versión v2 (93 niveles), para migrar el progreso
    por NOMBRE cuando cambian los ids. No perder el avance de los niños. */
 const MG_V2_NAMES = {
