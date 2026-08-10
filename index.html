@@ -388,14 +388,25 @@
     ov.querySelector('.wp-btn').addEventListener('click', function(){ ov.remove(); });
     document.body.appendChild(ov);
   }
+  // El mapa real mundo\u2192ids lo expone app.js (window.__mgAdvWorlds / __mgLitWorlds)
+  // tras renumerar los niveles. Los ADV_LEVELS/LIT_LEVELS de arriba quedan solo
+  // como respaldo por si app.js a\u00fan no carg\u00f3.
   var seen = readJSON(SEEN_KEY, null);
-  if (!seen){
-    seen = { a: doneWorlds('mg_path', ADV_LEVELS), l: doneWorlds('mg_little_path', LIT_LEVELS) };
-    try { localStorage.setItem(SEEN_KEY, JSON.stringify(seen)); } catch(e){}
-  }
+  var seedNeeded = !seen || seen.v !== 2;
   setInterval(function(){
     if (document.querySelector('.wp-overlay')) return;
-    var a = doneWorlds('mg_path', ADV_LEVELS);
+    var advMap = window.__mgAdvWorlds, litMap = window.__mgLitWorlds;
+    if (!advMap || !litMap) return; // esperar a que app.js exponga el mapa real
+    var a = doneWorlds('mg_path', advMap);
+    var l = doneWorlds('mg_little_path', litMap);
+    if (seedNeeded){
+      // Migraci\u00f3n: marcar como "ya visto" solo lo que de verdad est\u00e1 completo
+      // ahora, para no lanzar celebraciones falsas del mapa viejo.
+      seen = { v: 2, a: a.slice(), l: l.slice() };
+      try { localStorage.setItem(SEEN_KEY, JSON.stringify(seen)); } catch(e){}
+      seedNeeded = false;
+      return;
+    }
     for (var i = 0; i < a.length; i++){
       if (seen.a.indexOf(a[i]) === -1){
         seen.a.push(a[i]);
@@ -405,7 +416,6 @@
         return;
       }
     }
-    var l = doneWorlds('mg_little_path', LIT_LEVELS);
     for (var j = 0; j < l.length; j++){
       if (seen.l.indexOf(l[j]) === -1){
         seen.l.push(l[j]);
