@@ -12983,6 +12983,15 @@ let c = [
     { id: "gorra", name: "Gorra veloz", emoji: "🧢", price: 80 },
     { id: "corona", name: "Corona real", emoji: "👑", price: 120 },
     { id: "mago", name: "Sombrero de mago", emoji: "🧙", price: 150 },
+    { id: "bufanda", name: "Bufanda cálida", emoji: "🧣", price: 55 },
+    { id: "flor", name: "Flor alegre", emoji: "🌸", price: 55 },
+    { id: "arcoiris", name: "Gorro arcoíris", emoji: "🌈", price: 90 },
+    { id: "estrellac", name: "Gorro estrella", emoji: "⭐", price: 100 },
+    { id: "cohetec", name: "Casco cohete", emoji: "🚀", price: 130 },
+    { id: "calabaza", name: "Calabaza de Halloween", emoji: "🎃", price: 90, season: 10 },
+    { id: "santa", name: "Gorro navideño", emoji: "🎅", price: 90, season: 12 },
+    { id: "corazon", name: "Diadema de corazón", emoji: "💝", price: 90, season: 2 },
+    { id: "conejo", name: "Orejas de conejo", emoji: "🐰", price: 90, season: 4 },
   ],
   u = null;
 function d({ mood: e = "happy", size: t = 80, outfit: n, extra: ec }) {
@@ -13403,6 +13412,15 @@ function d({ mood: e = "happy", size: t = 80, outfit: n, extra: ec }) {
               fill: "#ffd700",
             }),
           ],
+        }),
+      a &&
+        !["lentes", "mono", "gorra", "corona", "mago"].includes(a) &&
+        (0, s.jsx)("text", {
+          x: "50",
+          y: "23",
+          textAnchor: "middle",
+          fontSize: "26",
+          children: (c.find((o) => o.id === a) || {}).emoji || "",
         }),
     ],
   });
@@ -18165,6 +18183,14 @@ function mgConceptOf(level) {
   if (["reparto", "resto", "division"].includes(level.kind)) return "division";
   return null;
 }
+function mgStreakCheer(n) {
+  if (3 === n) return "🔥 ¡3 seguidas! ¡Qué racha!";
+  if (5 === n) return "⚡ ¡5 seguidas! ¡Imparable!";
+  if (7 === n) return "🌟 ¡7 seguidas! ¡Qué constancia!";
+  if (10 === n) return "🏆 ¡10 seguidas! ¡Máquina de mates!";
+  if (n > 10 && n % 5 === 0) return "🚀 ¡" + n + " seguidas! ¡No paras!";
+  return null;
+}
 function mgAttackName(kind) {
   let K = String(kind || "");
   if (K.includes("sum") || "addition" === K || "bond" === K || "bonds10" === K || "bonds20" === K)
@@ -19671,6 +19697,8 @@ function e8({
     mgFastRef = (0, i.useRef)(!1),
     [mgStar, mgSetStar] = (0, i.useState)(0),
     [mgMax, mgSetMax] = (0, i.useState)(25),
+    [mgCheer, mgSetCheer] = (0, i.useState)(null),
+    mgCheerT = (0, i.useRef)(null),
     ee = (0, i.useRef)(null),
     en = (0, i.useRef)(null),
     ea = (0, i.useRef)(!1),
@@ -19871,6 +19899,12 @@ function e8({
     if (e) {
       let ns = mgStreak + 1;
       mgSetStreak(ns);
+      let cheer = mgStreakCheer(ns);
+      if (cheer) {
+        (mgSetCheer(cheer),
+          mgCheerT.current && clearTimeout(mgCheerT.current),
+          (mgCheerT.current = setTimeout(() => mgSetCheer(null), 1600)));
+      }
       mgSinceFreeze.current += 1;
       if (mgSinceFreeze.current >= mgFreezeGoal.current) {
         ((mgFreezePend.current = !0),
@@ -19945,6 +19979,7 @@ function e8({
     className: `screen world-${er.bg}`,
     children: [
       (0, s.jsx)(eX, {}),
+      mgCheer && MG_H("div", { className: "streak-cheer" }, mgCheer),
       (0, s.jsxs)("div", {
         className: "adv-hud",
         children: [
@@ -20446,6 +20481,7 @@ function e8({
 }
 function e7({ chest: e, onClose: t }) {
   let [n, a] = (0, i.useState)(!1),
+    [taps, setTaps] = (0, i.useState)(0),
     r = e.item ? er.find((t) => t.id === e.item) : null;
   return (0, s.jsx)("div", {
     className: "chest-overlay",
@@ -20491,13 +20527,16 @@ function e7({ chest: e, onClose: t }) {
                 children: "¡Encontraste un cofre sorpresa!",
               }),
               (0, s.jsx)("button", {
-                className: "chest-box",
-                onClick: () => a(!0),
-                children: "📦",
+                className: "chest-box shake-" + taps,
+                onClick: () => (taps >= 2 ? a(!0) : setTaps(taps + 1)),
+                children: taps >= 2 ? "🎁" : "📦",
               }),
               (0, s.jsx)("div", {
                 className: "chest-tap",
-                children: "toca para abrir",
+                children:
+                  0 === taps
+                    ? "¡toca para abrir!"
+                    : "¡sigue tocando! " + "✨".repeat(taps),
               }),
             ],
           }),
@@ -21786,7 +21825,14 @@ function to({
           }),
           (0, s.jsx)("div", {
             className: "shop-list",
-            children: c.map((t) => {
+            children: c
+              .filter(
+                (t) =>
+                  !t.season ||
+                  t.season === new Date().getMonth() + 1 ||
+                  n.owned.includes(t.id),
+              )
+              .map((t) => {
               let a = n.owned.includes(t.id),
                 i = n.equipped === t.id,
                 o = e >= t.price;
@@ -22299,16 +22345,16 @@ function tc({ facts: e, onBack: t, onReset: n }) {
                         : (a = Math.max(2, Math.floor(a / 4))),
                       (o = null),
                       t &&
-                        (n || 0.4 > Math.random()) &&
+                        (n || 0.55 > Math.random()) &&
                         (o =
-                          Math.random() < (n ? 0.55 : 0.45)
+                          Math.random() < (n ? 0.7 : 0.75)
                             ? {
                                 kind: "coins",
                                 coins: n ? Z(30, 60) : Z(15, 35),
                               }
                             : {
                                 kind: "item",
-                                item: ee(["potion", "shield", "lens"]),
+                                item: ee(["potion", "shield", "lens", "retry"]),
                               }),
                       { coins: a, firstTime: t, chest: o });
                   _(c);
