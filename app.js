@@ -16422,6 +16422,14 @@ let ei = [
     { id: "helada", name: "Montaña helada", emoji: "🏔️" },
     { id: "jardin", name: "Jardín de formas", emoji: "🌷" },
   ],
+  /* Niveles del mundo pequeño. IMPORTANTE: sus `id` son FIJOS y NO se
+     reasignan por posición (a diferencia de `en`, que sí lo hace en
+     en.forEach). El avance (mg_little_path) se guarda por este id, así que
+     no hay migración por versión. Regla para no romper avances: agrega
+     niveles nuevos SIEMPRE con un id nuevo al final; NUNCA renumeres ni
+     reutilices el id de un nivel existente. Si algún día hiciera falta
+     reordenar con renumeración, habría que introducir una migración por
+     nombre no destructiva (como la de `en`, pero que jamás descarte). */
   eo = [
     {
       id: 1,
@@ -22243,6 +22251,8 @@ function tc({ facts: e, onBack: t, onReset: n }) {
         (async () => {
           (a(await eH("mg_facts", {})),
             l(await eH("mg_daily", { date: "", streak: 0, bestScore: 0 })),
+            // mg_little_path se carga tal cual: los ids de `eo` son fijos, así
+            // que no necesita migración por versión (ver nota en la def de eo).
             d(await eH("mg_little_path", {})));
           {
             // Si falta la marca de versión, el avance ya está en el formato
