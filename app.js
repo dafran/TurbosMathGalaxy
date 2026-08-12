@@ -13000,6 +13000,28 @@ let mgChars = [
   { id: "gato", name: "Michi", emoji: "🐱", unlock: 12, desc: "Gatito curioso" },
   { id: "perro2", name: "Bruno", emoji: "🐕", unlock: 30, desc: "Perro negro despeinado" },
 ];
+function mgCharName() {
+  let c = mgChars.find((x) => x.id === mgChar);
+  return c ? c.name : "Turbo";
+}
+// Voz del compañero activo: el gato maúlla, los perros ladran.
+function mgVoz() {
+  return "gato" === mgChar ? "¡Miau!" : "¡Guau!";
+}
+function mgVozLow() {
+  return "gato" === mgChar ? "miau" : "guau";
+}
+// Enemigos menores (secuaces) que aparecen en niveles normales: se
+// derrotan con pocos aciertos, a diferencia del jefe de fin de mundo.
+let mgMinions = [
+  { emoji: "👾", name: "Bichito" },
+  { emoji: "🦠", name: "Germín" },
+  { emoji: "🤖", name: "Robotín" },
+  { emoji: "👻", name: "Fantasmín" },
+  { emoji: "🐛", name: "Gusanín" },
+  { emoji: "🦇", name: "Murcielín" },
+];
+const MG_MINION_HP = 3;
 function mgCharSkin(ch) {
   if ("gato" === ch)
     return {
@@ -13491,24 +13513,24 @@ function f({ mood: e = "happy", text: t, size: n = 72, char: fc }) {
   });
 }
 let m = [
-    "¡Guau! Hoy es buen día para vencer a un jefe.",
+    "¡A entrenar! Hoy es buen día para vencer a un jefe.",
     "¿Ya hiciste tu repaso inteligente de hoy? Yo nunca me lo salto.",
-    "Truco de pug: el 9 es como el 10, pero le restas uno.",
+    "Truco veloz: el 9 es como el 10, pero le restas uno.",
     "Los cofres solo aparecen en niveles nuevos. ¡Avancemos!",
     "Si un nivel se pone difícil, un escudo de la tienda ayuda mucho.",
-    "Responder rápido da monedas extra. ¡Yo soy Turbo por algo!",
+    "Responder rápido da monedas extra. ¡A por ellas!",
     "Repetir niveles viejos da pocas monedas. ¡Lo nuevo paga más!",
     "7 × 8 = 56. Es mi favorita porque casi nadie se la sabe.",
     "Contar saltando es mi paso de baile preferido: 5, 10, 15, 20...",
-    "Cada estrella del mapa de dominio me hace mover la colita.",
+    "Cada estrella del mapa de dominio me hace saltar de alegría.",
   ],
   p = [
     "¡Casi! Equivocarse es entrenar: tu cerebro está creciendo ahora mismo.",
     "Los jefes casi nunca caen al primer intento. ¡Yo creo en ti!",
     "Cada error te enseña algo que un acierto no puede. ¡Otra vez!",
-    "Respira, sacude las patitas y volvemos. ¡Así entrenan los campeones!",
+    "Respira, sacúdete y volvemos. ¡Así entrenan los campeones!",
     "Hoy costó trabajo. Mañana costará menos, porque practicaste hoy.",
-    "Mi truco de pug: cuando algo no sale, lo intento más despacio. ¡Funciona!",
+    "Mi mejor truco: cuando algo no sale, lo intento más despacio. ¡Funciona!",
   ],
   h = null,
   g = !1;
@@ -18165,7 +18187,7 @@ function MgHub({ kind: k, name: nm, coins: c, streak: st, onBack: bk, items: it 
       MG_H("span", { className: "hub-name" }, (k === "little" ? "🧒 " : "🧑‍🚀 ") + (nm || "")),
       k === "big" ? MG_H("span", { className: "coin-pill" }, "🪙 " + c) : null,
       k === "big" ? MG_H("span", { className: "fire-pill" }, "🔥 " + st) : null),
-    s.jsx(f, { mood: "excited", text: nm ? "¡Hola, " + nm + "! ¿Qué jugamos?" : "¿Qué jugamos hoy?", size: 64 }),
+    s.jsx(f, { mood: "excited", text: nm ? mgVoz() + " ¡Hola, " + nm + "! ¿Qué jugamos?" : "¿Qué jugamos hoy?", size: 64 }),
     MG_H("div", { className: "hub-grid" },
       it.map((item) =>
         MG_H("button", { key: item.title, className: "hub-card " + (item.cls || ""), onClick: item.onClick },
@@ -20132,7 +20154,7 @@ function e8({
                   mood: hurt ? "sad" : "right" === U ? "excited" : "happy",
                   size: 56,
                 }),
-                MG_H("div", { className: "champ-name" }, "Turbo"),
+                MG_H("div", { className: "champ-name" }, mgCharName()),
               ),
               MG_H(
                 "div",
@@ -20189,6 +20211,51 @@ function e8({
                   style: { width: frac * 100 + "%" },
                 }),
               ),
+            ),
+          );
+        })(),
+      "boss" !== e.kind &&
+        (() => {
+          let mHp = MG_MINION_HP,
+            beaten = Math.floor(Q / mHp),
+            justBeat = "right" === U && Q > 0 && Q % mHp === 0,
+            idx = (justBeat ? beaten - 1 : beaten) % mgMinions.length,
+            mn = mgMinions[((idx % mgMinions.length) + mgMinions.length) % mgMinions.length],
+            hit = "right" === U,
+            shownHp = justBeat ? 0 : mHp - (Q % mHp);
+          return MG_H(
+            "div",
+            { className: "minion-strip" + (justBeat ? " beat" : "") },
+            MG_H(
+              "div",
+              { className: "mini-champ" + (hit ? " cheer" : "") },
+              MG_H(d, { mood: hit ? "excited" : "happy", size: 40 }),
+            ),
+            MG_H(
+              "div",
+              { className: "mini-spark" + (hit ? " boom" : "") },
+              hit ? "💥" : "⚔️",
+            ),
+            MG_H(
+              "div",
+              { className: "mini-foe" + (justBeat ? " down" : hit ? " hurt" : "") },
+              MG_H("span", { className: "mini-foe-emoji" }, justBeat ? "💫" : mn.emoji),
+              MG_H(
+                "div",
+                { className: "mini-hp" },
+                ...Array.from({ length: mHp }).map((_, i) =>
+                  MG_H(
+                    "span",
+                    { key: i, className: "mini-pip" + (i < shownHp ? " full" : "") },
+                    i < shownHp ? "❤️" : "🤍",
+                  ),
+                ),
+              ),
+            ),
+            MG_H(
+              "div",
+              { className: "mini-label" },
+              justBeat ? "¡" + mn.name + " derrotado! 🎉" : mn.name,
             ),
           );
         })(),
@@ -21201,7 +21268,7 @@ function ta({ run: e, onAgain: t, onPath: n }) {
         children: [
           (0, s.jsx)(f, {
             mood: "thinking",
-            text: "Practicar lo difícil te hace más fuerte. ¡Guau!",
+            text: "Practicar lo difícil te hace más fuerte. " + mgVoz(),
             size: 70,
           }),
           (0, s.jsx)("div", {
@@ -21645,7 +21712,7 @@ function ts({ onStart: e, onBack: t }) {
         }),
         (0, s.jsx)(f, {
           mood: "happy",
-          text: "¿Qué viste hoy en el cole? ¡Practiquémoslo! Guau",
+          text: "¿Qué viste hoy en el cole? ¡Practiquémoslo! " + mgVoz(),
           size: 60,
         }),
         (0, s.jsx)("div", {
@@ -21835,7 +21902,7 @@ function to({
           }),
           (0, s.jsx)(f, {
             mood: "happy",
-            text: "¡Bienvenido a mi tienda! Gasta con sabiduría. ¡Guau!",
+            text: "¡Bienvenido a mi tienda! Gasta con sabiduría. " + mgVoz(),
             size: 60,
           }),
           (0, s.jsxs)("div", {
@@ -21935,11 +22002,11 @@ function to({
                 children: [
                   (0, s.jsx)("span", {
                     className: "rt-name",
-                    children: "🎩 Ropero de Turbo",
+                    children: "🎩 Ropero de " + mgCharName(),
                   }),
                   (0, s.jsx)("span", {
                     className: "rt-sub",
-                    children: "¡Vísteme con tus monedas! Guau",
+                    children: "¡Vísteme con tus monedas! " + mgVoz(),
                   }),
                 ],
               }),
