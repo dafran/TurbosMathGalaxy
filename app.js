@@ -22245,13 +22245,18 @@ function tc({ facts: e, onBack: t, onReset: n }) {
             l(await eH("mg_daily", { date: "", streak: 0, bestScore: 0 })),
             d(await eH("mg_little_path", {})));
           {
-            let ver = (await eH("mg_pathver", { v: 1 })).v,
+            // Si falta la marca de versión, el avance ya está en el formato
+            // actual (perfiles recientes / importado): asumimos la versión de
+            // hoy en vez de "v1", para no pasar datos actuales por la cadena de
+            // remapeo antigua y revolverlos. Además, ninguna reubicación
+            // descarta niveles: lo que no se pueda mapear se conserva tal cual.
+            let ver = (await eH("mg_pathver", { v: 9 })).v,
               path = await eH("mg_path", {});
             if (ver < 2 && Object.keys(path).length > 0) {
               let t = {};
               for (let [n, a] of Object.entries(path)) {
-                let k = ea[Number(n)];
-                k && !t[k] && (t[k] = a);
+                let k = ea[Number(n)] || Number(n);
+                t[k] == null && (t[k] = a);
               }
               ((path = t), (ver = 2));
             }
@@ -22275,8 +22280,8 @@ function tc({ facts: e, onBack: t, onReset: n }) {
               let t = {};
               for (let [n, a] of Object.entries(path)) {
                 let nm = idToName[Number(n)],
-                  nid = nm ? nameToNew[nm] : null;
-                nid && (t[nid] = a);
+                  nid = (nm ? nameToNew[nm] : null) || Number(n);
+                t[nid] == null && (t[nid] = a);
               }
               path = t;
             }
