@@ -13747,7 +13747,7 @@ function N({ success: e, coins: t, onRetry: n, onHub: a }) {
             (0, s.jsx)("button", {
               className: "btn-pixel",
               onClick: a,
-              children: "◀ Poder cerebral",
+              children: "◀\ufe0e Poder cerebral",
             }),
           ],
         }),
@@ -14422,7 +14422,7 @@ function q({ levels: e, onReward: t, onBack: n }) {
               (0, s.jsx)("button", {
                 className: "link-back",
                 onClick: n,
-                children: "◀ Camino",
+                children: "◀\ufe0e Camino",
               }),
               (0, s.jsx)("h2", {
                 className: "panel-title",
@@ -14482,7 +14482,7 @@ function q({ levels: e, onReward: t, onBack: n }) {
                   (0, s.jsx)("button", {
                     className: "link-back",
                     onClick: f,
-                    children: "◀ Volver",
+                    children: "◀\ufe0e Volver",
                   }),
                   (0, s.jsxs)("span", {
                     className: "brain-title-line",
@@ -14653,7 +14653,10 @@ let B = [
   ["⚽", "🏀"],
   ["🚗", "🚕"],
   ["🙂", "🙃"],
-  ["🌟", "⭐"],
+  // Par espejo (🌛/🌜) en lugar de 🌟/⭐: aquel dependía de que la fuente
+  // emoji de la plataforma dibujara distinto el brillo; este es difícil
+  // por percepción y se ve igual de distinto en todas.
+  ["🌛", "🌜"],
   ["🍩", "🍪"],
   ["🦋", "🐛"],
 ];
@@ -15098,7 +15101,7 @@ function X({ levels: e, onWin: t, onBack: n }) {
               (0, s.jsx)("button", {
                 className: "link-back",
                 onClick: n,
-                children: "◀ Mi aventura",
+                children: "◀\ufe0e Mi aventura",
               }),
               (0, s.jsx)("h2", {
                 className: "panel-title",
@@ -15159,7 +15162,7 @@ function X({ levels: e, onWin: t, onBack: n }) {
                   (0, s.jsx)("button", {
                     className: "link-back",
                     onClick: v,
-                    children: "◀ Volver",
+                    children: "◀\ufe0e Volver",
                   }),
                   (0, s.jsxs)("span", {
                     className: "brain-title-line",
@@ -15235,12 +15238,12 @@ function X({ levels: e, onWin: t, onBack: n }) {
                     onClick: () => {
                       (o(0), m(!1), h((e) => e + 1));
                     },
-                    children: "▶ Seguir jugando",
+                    children: "▶\ufe0e Seguir jugando",
                   }),
                   (0, s.jsx)("button", {
                     className: "btn-pixel",
                     onClick: v,
-                    children: "◀ Salir",
+                    children: "◀\ufe0e Salir",
                   }),
                 ],
               }),
@@ -16955,6 +16958,30 @@ let ei = [
     },
   ],
   ec = ["💍", "🟦", "⭐", "🍎", "💎", "🪙"];
+// Figuras del modo "figura" dibujadas en SVG propio: los emojis
+// geométricos son el bloque que más cambia entre plataformas, y aquí el
+// dibujo ES la pregunta. Los valores del juego son los ids (strings), la
+// comparación de respuestas no cambia.
+const MG_FIGURAS = {
+  "circulo-rojo": ["circle", { cx: 24, cy: 24, r: 17, fill: "#e53935" }],
+  "triangulo-rojo": ["path", { d: "M24 7 L41 39 L7 39 Z", fill: "#e53935" }],
+  "cuadrado-azul": ["rect", { x: 8, y: 8, width: 32, height: 32, rx: 5, fill: "#1e88e5" }],
+  "estrella-amarilla": ["path", { d: "M24 5 L29.6 17.6 L43.4 19 L33.2 28.4 L36.2 42 L24 34.8 L11.8 42 L14.8 28.4 L4.6 19 L18.4 17.6 Z", fill: "#fdd835" }],
+  "circulo-verde": ["circle", { cx: 24, cy: 24, r: 17, fill: "#43a047" }],
+  "cuadrado-amarillo": ["rect", { x: 8, y: 8, width: 32, height: 32, rx: 5, fill: "#fdd835" }],
+  "corazon-morado": ["path", { d: "M24 41 C10 30 6 22 10 14 C13 8 21 8 24 15 C27 8 35 8 38 14 C42 22 38 30 24 41 Z", fill: "#8e24aa" }],
+  "rombo-naranja": ["path", { d: "M24 6 L40 24 L24 42 L8 24 Z", fill: "#fb8c00" }],
+};
+function mgShapeSVG(id, size = 44) {
+  let f = MG_FIGURAS[id];
+  return f
+    ? MG_H(
+        "svg",
+        { width: size, height: size, viewBox: "0 0 48 48", "aria-hidden": "true", style: { display: "block", margin: "0 auto" } },
+        MG_H(f[0], { ...f[1], stroke: "rgba(0,0,0,0.3)", strokeWidth: 2, strokeLinejoin: "round" }),
+      )
+    : id;
+}
 function eu(e, t) {
   let n = new Set([e]);
   for (; n.size < 3;) n.add(Z(1, Math.max(3, t)));
@@ -17012,7 +17039,7 @@ function ef(e, t, n) {
       ),
     };
   if ("figura" === r) {
-    let e = J(["🔴", "🔺", "🟦", "⭐", "🟢", "🟨", "💜", "🔶"]).slice(0, 4);
+    let e = J(Object.keys(MG_FIGURAS)).slice(0, 4);
     return { kind: "figura", target: ee(e), choices: J(e) };
   }
   if ("depar" === r) {
@@ -18264,7 +18291,7 @@ function MgHub({ kind: k, name: nm, coins: c, streak: st, onBack: bk, items: it 
   return MG_H("div", { className: "screen world-starwars hub-screen" },
     s.jsx(eX, {}),
     MG_H("div", { className: "hub-top" },
-      MG_H("button", { className: "link-back", onClick: bk }, "◀"),
+      MG_H("button", { className: "link-back", onClick: bk }, "◀\ufe0e"),
       MG_H("span", { className: "hub-name" }, (k === "little" ? "🧒 " : "🧑‍🚀 ") + (nm || "")),
       k === "big" ? MG_H("span", { className: "coin-pill" }, "🪙 " + c) : null,
       k === "big" ? MG_H("span", { className: "fire-pill" }, "🔥 " + st) : null),
@@ -18284,7 +18311,7 @@ function MgCharScreen({ charDone: dq, onBack: bk }) {
   return MG_H("div", { className: "screen world-starwars hub-screen" },
     s.jsx(eX, {}),
     MG_H("div", { className: "hub-top" },
-      MG_H("button", { className: "link-back", onClick: bk }, "◀ Volver")),
+      MG_H("button", { className: "link-back", onClick: bk }, "◀\ufe0e Volver")),
     s.jsx(f, { mood: "excited", text: "¡Elige quién te acompaña en tus juegos!", size: 64, char: selChar }),
     MG_H("div", { className: "char-picker char-picker-full" },
       MG_H("div", { className: "char-picker-title" }, "🐾 Elige tu compañero"),
@@ -18509,7 +18536,7 @@ function MgLeccion({ concept: concept, bg: bg, onDone: onDone, onSkip: onSkip })
     MG_H(
       "div",
       { className: "panel leccion" },
-      MG_H("button", { className: "link-back", onClick: onSkip }, "Saltar ▶"),
+      MG_H("button", { className: "link-back", onClick: onSkip }, "Saltar ▶\ufe0e"),
       MG_H("div", { className: "lec-title" }, title),
       MG_H(f, { mood: last ? "excited" : "happy", text: cur.turbo, size: 60 }),
       MG_H("div", { className: "lec-visual" }, cur.visual),
@@ -18528,14 +18555,14 @@ function MgLeccion({ concept: concept, bg: bg, onDone: onDone, onSkip: onSkip })
           MG_H(
             "button",
             { className: "btn-pixel", onClick: () => setStep(step - 1) },
-            "◀ Atrás",
+            "◀\ufe0e Atrás",
           ),
         last
           ? MG_H("button", { className: "btn-pixel btn-go", onClick: onDone }, "🚀 ¡A jugar!")
           : MG_H(
               "button",
               { className: "btn-pixel btn-go", onClick: () => setStep(step + 1) },
-              "Siguiente ▶",
+              "Siguiente ▶\ufe0e",
             ),
       ),
     ),
@@ -18680,7 +18707,7 @@ function eZ({ progress: e, onLevel: t, onStickers: n, onBrain: a, onBack: r }) {
           (0, s.jsx)("button", {
             className: "link-back",
             onClick: r,
-            children: "◀",
+            children: "◀\ufe0e",
           }),
           (0, s.jsxs)("span", {
             className: "coin-pill sticker-pill",
@@ -18797,7 +18824,7 @@ function eZ({ progress: e, onLevel: t, onStickers: n, onBrain: a, onBack: r }) {
                                 o &&
                                   (0, s.jsx)("span", {
                                     className: "nl-next",
-                                    children: "▶ ¡juega!",
+                                    children: "▶\ufe0e ¡juega!",
                                   }),
                               ],
                             }),
@@ -18835,7 +18862,7 @@ function e0({ progress: e, onBack: t }) {
           (0, s.jsx)("button", {
             className: "btn-pixel back-btn",
             onClick: t,
-            children: "◀ Volver",
+            children: "◀\ufe0e Volver",
           }),
           (0, s.jsxs)("span", {
             className: "topbar-title",
@@ -19143,7 +19170,7 @@ function e1({ level: e, onDone: t }) {
                 }),
                 (0, s.jsx)("div", {
                   className: "figura-target",
-                  children: l.target,
+                  children: mgShapeSVG(l.target, 72),
                 }),
               ],
             }),
@@ -19272,7 +19299,7 @@ function e1({ level: e, onDone: t }) {
                     className: `little-choice pattern-choice ${p === e ? ("right" === c ? "ok" : "no") : ""} ${"wrong" === c && e === x(l) ? "reveal" : ""}`,
                     onClick: () => k(e),
                     disabled: "ask" !== c,
-                    children: e,
+                    children: "figura" === l.kind ? mgShapeSVG(e, 46) : e,
                   },
                   e,
                 ),
@@ -19365,7 +19392,7 @@ function e2({
                   let t = e.currentTarget.closest(".chest-overlay");
                   t && (t.style.display = "none");
                 },
-                children: "¡A mi álbum! ▶",
+                children: "¡A mi álbum! ▶\ufe0e",
               }),
             ],
           }),
@@ -19403,7 +19430,7 @@ function e2({
                 (0, s.jsx)("button", {
                   className: "btn-pixel btn-go",
                   onClick: r,
-                  children: "Siguiente ▶",
+                  children: "Siguiente ▶\ufe0e",
                 }),
               (0, s.jsx)("button", {
                 className: "btn-pixel",
@@ -19445,7 +19472,7 @@ function e3({
           (0, s.jsx)("button", {
             className: "link-back",
             onClick: b,
-            children: "◀",
+            children: "◀\ufe0e",
           }),
           (0, s.jsxs)("span", { className: "coin-pill", children: ["🪙 ", t] }),
           (0, s.jsxs)("span", {
@@ -19600,7 +19627,7 @@ function e3({
                                 l &&
                                   (0, s.jsx)("span", {
                                     className: "nl-next",
-                                    children: "▶ ¡siguiente!",
+                                    children: "▶\ufe0e ¡siguiente!",
                                   }),
                               ],
                             }),
@@ -19652,7 +19679,7 @@ function e5({ level: e, progress: t, inv: n, onStart: a, onBack: r }) {
           (0, s.jsx)("button", {
             className: "link-back",
             onClick: r,
-            children: "◀ Camino",
+            children: "◀\ufe0e Camino",
           }),
           (0, s.jsx)("div", { className: "pl-emoji", children: e.emoji }),
           (0, s.jsxs)("h2", {
@@ -20653,7 +20680,7 @@ function e8({
                   ? (F((e) => e + 1), I(""), B("ask"), b(!1), (ea.current = !1))
                   : ef(Q, W, Y, c);
               },
-              children: "Entendido ▶",
+              children: "Entendido ▶\ufe0e",
             })
           : (0, s.jsxs)(s.Fragment, {
             children: [
@@ -20784,7 +20811,7 @@ function e7({ chest: e, onClose: t }) {
               (0, s.jsx)("button", {
                 className: "btn-pixel btn-go",
                 onClick: t,
-                children: "¡Genial! ▶",
+                children: "¡Genial! ▶\ufe0e",
               }),
             ],
           })
@@ -20935,7 +20962,7 @@ function e9({
                     (0, s.jsx)("button", {
                       className: "btn-pixel btn-go",
                       onClick: o,
-                      children: "Siguiente nivel ▶",
+                      children: "Siguiente nivel ▶\ufe0e",
                     }),
                   (0, s.jsx)("button", {
                     className: "btn-pixel",
@@ -21351,7 +21378,7 @@ function tn({ facts: e, setFacts: t, onDone: n, onQuit: a }) {
         ? (0, s.jsx)("button", {
             className: "btn-pixel btn-go next-btn",
             onClick: () => j(b),
-            children: "Entendido ▶",
+            children: "Entendido ▶\ufe0e",
           })
         : (0, s.jsx)(e4, {
             value: m,
@@ -21467,7 +21494,7 @@ function tr({
           (0, s.jsx)("button", {
             className: "btn-pixel back-btn",
             onClick: c,
-            children: "◀ Volver",
+            children: "◀\ufe0e Volver",
           }),
           (0, s.jsx)("span", {
             className: "topbar-title",
@@ -21482,7 +21509,7 @@ function tr({
             MG_H("div", { key: pf.id, className: "pm-row" },
               MG_H("span", { className: "pm-emoji" }, pf.emoji),
               MG_H("span", { className: "pm-name" }, pf.name + " · " + pf.age + " años"),
-              pmActive === pf.id ? MG_H("span", { className: "pm-active" }, "▶ jugando") : null,
+              pmActive === pf.id ? MG_H("span", { className: "pm-active" }, "▶\ufe0e jugando") : null,
               MG_H("button", { className: "pm-edit", onClick: () => pmEdit(pf) }, "✏️ Editar")))),
         pmProfiles.length < 4
           ? MG_H("button", { className: "pm-add", onClick: pmAdd }, "➕ Agregar jugador")
@@ -21819,7 +21846,7 @@ function ts({ onStart: e, onBack: t }) {
         (0, s.jsx)("button", {
           className: "link-back",
           onClick: t,
-          children: "◀ Camino",
+          children: "◀\ufe0e Camino",
         }),
         (0, s.jsx)("h2", {
           className: "panel-title",
@@ -21965,7 +21992,7 @@ function ti({ op: e, diff: t, facts: n, setFacts: a, onDone: r, onQuit: l }) {
         ? (0, s.jsx)("button", {
             className: "btn-pixel btn-go next-btn",
             onClick: () => w(y),
-            children: "Entendido ▶",
+            children: "Entendido ▶\ufe0e",
           })
         : (0, s.jsx)(e4, {
             value: p,
@@ -22012,7 +22039,7 @@ function to({
           (0, s.jsx)("button", {
             className: "link-back",
             onClick: o,
-            children: "◀ Volver",
+            children: "◀\ufe0e Volver",
           }),
           (0, s.jsx)("h2", {
             className: "panel-title",
@@ -22221,7 +22248,7 @@ function tc({ facts: e, onBack: t, onReset: n }) {
           (0, s.jsx)("button", {
             className: "link-back",
             onClick: t,
-            children: "◀ Volver",
+            children: "◀\ufe0e Volver",
           }),
           (0, s.jsx)("h2", {
             className: "panel-title",
