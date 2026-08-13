@@ -17,6 +17,8 @@ const assetFiles = [
   'sw.js',
   'icon.svg',
   'icon-192.png',
+  'fonts/nunito-latin.woff2',
+  'fonts/press-start-2p-latin.woff2',
 ];
 
 // Required files that must be present in www/ for the app to boot
@@ -32,6 +34,7 @@ if (!fs.existsSync(wwwDir)) {
 for (const file of assetFiles) {
   const src = path.join(srcDir, file);
   const dest = path.join(wwwDir, file);
+  fs.mkdirSync(path.dirname(dest), { recursive: true });
   if (fs.existsSync(src)) {
     fs.copyFileSync(src, dest);
     const size = (fs.statSync(dest).size / 1024).toFixed(1);

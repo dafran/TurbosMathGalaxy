@@ -1,7 +1,7 @@
 /* Math Galaxy · Service Worker — permite jugar sin conexión.
    Estrategia: red primero para HTML/JS (para recibir actualizaciones al
    estar en línea) con respaldo al caché; caché primero para imágenes. */
-const CACHE = "math-galaxy-v1";
+const CACHE = "math-galaxy-v2";
 const CORE = [
   "./",
   "./index.html",
@@ -9,6 +9,8 @@ const CORE = [
   "./manifest.webmanifest",
   "./icon.svg",
   "./icon-192.png",
+  "./fonts/nunito-latin.woff2",
+  "./fonts/press-start-2p-latin.woff2",
 ];
 
 self.addEventListener("install", (e) => {

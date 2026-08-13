@@ -12996,20 +12996,85 @@ let c = [
   u = null;
 let mgChar = "turbo";
 let mgChars = [
-  { id: "turbo", name: "Turbo", emoji: "🐶", unlock: 0, desc: "El pug de siempre" },
-  { id: "gato", name: "Michi", emoji: "🐱", unlock: 12, desc: "Gatito curioso" },
-  { id: "perro2", name: "Bruno", emoji: "🐕", unlock: 30, desc: "Perro negro despeinado" },
+  { id: "turbo", name: "Turbo", emoji: "🐶", unlock: 0, desc: "El pug de siempre", voice: "¡Guau!", voiceLow: "guau", sound: "bark", treat: "huesitos" },
+  { id: "gato", name: "Michi", emoji: "🐱", unlock: 12, desc: "Gatito curioso", voice: "¡Miau!", voiceLow: "miau", sound: "meow", treat: "pescaditos" },
+  { id: "perro2", name: "Bruno", emoji: "🐕", unlock: 30, desc: "Perro negro despeinado", voice: "¡Guau!", voiceLow: "guau", sound: "bark", treat: "huesitos" },
 ];
-function mgCharName() {
-  let c = mgChars.find((x) => x.id === mgChar);
-  return c ? c.name : "Turbo";
+function mgCharDef() {
+  return mgChars.find((x) => x.id === mgChar) || mgChars[0];
 }
-// Voz del compañero activo: el gato maúlla, los perros ladran.
+function mgCharName() {
+  return mgCharDef().name;
+}
+// Voz, sonido y golosina del compañero activo, tomados del roster: una
+// mascota nueva solo necesita definir ahí sus campos para sonar bien.
 function mgVoz() {
-  return "gato" === mgChar ? "¡Miau!" : "¡Guau!";
+  return mgCharDef().voice || "¡Guau!";
 }
 function mgVozLow() {
-  return "gato" === mgChar ? "miau" : "guau";
+  return mgCharDef().voiceLow || "guau";
+}
+function mgTreat() {
+  return mgCharDef().treat || "huesitos";
+}
+// Desbloqueo FAMILIAR de compañeros: si cualquier perfil del dispositivo
+// alcanza el umbral, el compañero queda disponible para todos (llave
+// global mg_chars_unlocked, fuera del prefijo por perfil). El compañero
+// ELEGIDO (mg_char) sigue siendo por perfil.
+function mgCharsUnlocked() {
+  try {
+    let e = window.__mgRaw && window.__mgRaw.get("mg_chars_unlocked");
+    return e ? JSON.parse(e) || {} : {};
+  } catch {
+    return {};
+  }
+}
+function mgSyncCharUnlocks(n) {
+  try {
+    let e = mgCharsUnlocked(),
+      t = !1;
+    mgChars.forEach((c) => {
+      c.unlock > 0 && (n || 0) >= c.unlock && !e[c.id] && ((e[c.id] = !0), (t = !0));
+    });
+    t && window.__mgRaw && window.__mgRaw.set("mg_chars_unlocked", JSON.stringify(e));
+    return e;
+  } catch {
+    return {};
+  }
+}
+function mgCharIsUnlocked(c, n) {
+  return 0 === c.unlock || (n || 0) >= c.unlock || !!mgCharsUnlocked()[c.id];
+}
+function mgCountDone(e) {
+  try {
+    let t = JSON.parse(e || "{}"),
+      n = 0;
+    for (let a in t) t[a] && t[a].done && n++;
+    return n;
+  } catch {
+    return 0;
+  }
+}
+// Siembra al arrancar: recorre el progreso de TODOS los perfiles (y el
+// legado sin perfil) para que lo ya ganado por un hermano cuente para
+// toda la familia desde el primer render.
+function mgSeedCharUnlocks() {
+  try {
+    let raw = window.__mgRaw;
+    if (!raw) return;
+    let profs = [];
+    try {
+      profs = JSON.parse(raw.get("mg_profiles")) || [];
+    } catch {}
+    let best = mgCountDone(raw.get("mg_path")) + mgCountDone(raw.get("mg_little_path"));
+    profs.forEach((p) => {
+      let n =
+        mgCountDone(raw.get("mg_" + p.id + "__mg_path")) +
+        mgCountDone(raw.get("mg_" + p.id + "__mg_little_path"));
+      n > best && (best = n);
+    });
+    mgSyncCharUnlocks(best);
+  } catch {}
 }
 // Enemigos menores (secuaces) que aparecen en niveles normales: se
 // derrotan con pocos aciertos, a diferencia del jefe de fin de mundo.
@@ -13030,11 +13095,14 @@ function mgCharSkin(ch) {
       outline: "#4a4e56",
       snout: "#c99aa2",
       nose: "#e86a7a",
+      // Orejas erguidas con la base sobre el arco de la cabeza. El path va
+      // SIN cerrar: el trazo dibuja solo los dos bordes visibles y el
+      // relleno se cierra solo, así la base no raya la frente.
       ears: [
-        MG_H("path", { key: "e1", d: "M30 30 L23 9 L45 27 Z", fill: "#a9aeb6", stroke: "#4a4e56", strokeWidth: "1.5" }),
-        MG_H("path", { key: "e2", d: "M70 30 L77 9 L55 27 Z", fill: "#a9aeb6", stroke: "#4a4e56", strokeWidth: "1.5" }),
-        MG_H("path", { key: "e3", d: "M32 27 L28 15 L41 26 Z", fill: "#e8a0b0" }),
-        MG_H("path", { key: "e4", d: "M68 27 L72 15 L59 26 Z", fill: "#e8a0b0" }),
+        MG_H("path", { key: "e1", d: "M26 27 L32 5 L45 19", fill: "#a9aeb6", stroke: "#4a4e56", strokeWidth: "1.5", strokeLinejoin: "round" }),
+        MG_H("path", { key: "e2", d: "M74 27 L68 5 L55 19", fill: "#a9aeb6", stroke: "#4a4e56", strokeWidth: "1.5", strokeLinejoin: "round" }),
+        MG_H("path", { key: "e3", d: "M30.5 23.5 L33 10 L41.5 18.5 Z", fill: "#e8a0b0" }),
+        MG_H("path", { key: "e4", d: "M69.5 23.5 L67 10 L58.5 18.5 Z", fill: "#e8a0b0" }),
       ],
       extras: [
         MG_H("path", { key: "w1", d: "M42 60 L20 56", stroke: "#7a7f87", strokeWidth: "1.2", strokeLinecap: "round" }),
@@ -13068,12 +13136,17 @@ function mgCharSkin(ch) {
       MG_H("path", { key: "e1", d: "M23 28 Q13 42 23 54 Q29 40 35 32 Z", fill: "#3a2a1e" }),
       MG_H("path", { key: "e2", d: "M77 28 Q87 42 77 54 Q71 40 65 32 Z", fill: "#3a2a1e" }),
     ],
-    extras: [],
+    // Las arrugas de la frente son del pug: el gato y Bruno no las llevan.
+    extras: [
+      MG_H("path", { key: "w1", d: "M38 24 Q50 18 62 24", fill: "none", stroke: "#c9a36a", strokeWidth: "2", strokeLinecap: "round" }),
+      MG_H("path", { key: "w2", d: "M40 31 Q50 26 60 31", fill: "none", stroke: "#c9a36a", strokeWidth: "2", strokeLinecap: "round" }),
+    ],
   };
 }
 function d({ mood: e = "happy", size: t = 80, outfit: n, extra: ec, char: chOv }) {
   let a = void 0 === n ? u : n,
-    sk = mgCharSkin(chOv || mgChar),
+    chId = chOv || mgChar,
+    sk = mgCharSkin(chId),
     r = sk.fur,
     l = sk.line,
     i = "#1a120c",
@@ -13082,7 +13155,7 @@ function d({ mood: e = "happy", size: t = 80, outfit: n, extra: ec, char: chOv }
     width: t,
     height: t,
     viewBox: "0 0 100 100",
-    className: `pug pug-${e}${ec ? " " + ec : ""}`,
+    className: `pug pug-${e} pug-char-${chId}${ec ? " " + ec : ""}`,
     "aria-hidden": "true",
     children: [
       (0, s.jsx)("circle", {
@@ -13132,20 +13205,6 @@ function d({ mood: e = "happy", size: t = 80, outfit: n, extra: ec, char: chOv }
         strokeWidth: "1.5",
       }),
       ...sk.ears,
-      (0, s.jsx)("path", {
-        d: "M38 24 Q50 18 62 24",
-        fill: "none",
-        stroke: l,
-        strokeWidth: "2",
-        strokeLinecap: "round",
-      }),
-      (0, s.jsx)("path", {
-        d: "M40 31 Q50 26 60 31",
-        fill: "none",
-        stroke: l,
-        strokeWidth: "2",
-        strokeLinecap: "round",
-      }),
       (0, s.jsx)("ellipse", {
         cx: "50",
         cy: "61",
@@ -13688,7 +13747,7 @@ function N({ success: e, coins: t, onRetry: n, onHub: a }) {
             (0, s.jsx)("button", {
               className: "btn-pixel",
               onClick: a,
-              children: "◀ Poder cerebral",
+              children: "◀\ufe0e Poder cerebral",
             }),
           ],
         }),
@@ -14363,7 +14422,7 @@ function q({ levels: e, onReward: t, onBack: n }) {
               (0, s.jsx)("button", {
                 className: "link-back",
                 onClick: n,
-                children: "◀ Camino",
+                children: "◀\ufe0e Camino",
               }),
               (0, s.jsx)("h2", {
                 className: "panel-title",
@@ -14423,7 +14482,7 @@ function q({ levels: e, onReward: t, onBack: n }) {
                   (0, s.jsx)("button", {
                     className: "link-back",
                     onClick: f,
-                    children: "◀ Volver",
+                    children: "◀\ufe0e Volver",
                   }),
                   (0, s.jsxs)("span", {
                     className: "brain-title-line",
@@ -14594,7 +14653,10 @@ let B = [
   ["⚽", "🏀"],
   ["🚗", "🚕"],
   ["🙂", "🙃"],
-  ["🌟", "⭐"],
+  // Par espejo (🌛/🌜) en lugar de 🌟/⭐: aquel dependía de que la fuente
+  // emoji de la plataforma dibujara distinto el brillo; este es difícil
+  // por percepción y se ve igual de distinto en todas.
+  ["🌛", "🌜"],
   ["🍩", "🍪"],
   ["🦋", "🐛"],
 ];
@@ -15039,7 +15101,7 @@ function X({ levels: e, onWin: t, onBack: n }) {
               (0, s.jsx)("button", {
                 className: "link-back",
                 onClick: n,
-                children: "◀ Mi aventura",
+                children: "◀\ufe0e Mi aventura",
               }),
               (0, s.jsx)("h2", {
                 className: "panel-title",
@@ -15100,7 +15162,7 @@ function X({ levels: e, onWin: t, onBack: n }) {
                   (0, s.jsx)("button", {
                     className: "link-back",
                     onClick: v,
-                    children: "◀ Volver",
+                    children: "◀\ufe0e Volver",
                   }),
                   (0, s.jsxs)("span", {
                     className: "brain-title-line",
@@ -15176,12 +15238,12 @@ function X({ levels: e, onWin: t, onBack: n }) {
                     onClick: () => {
                       (o(0), m(!1), h((e) => e + 1));
                     },
-                    children: "▶ Seguir jugando",
+                    children: "▶\ufe0e Seguir jugando",
                   }),
                   (0, s.jsx)("button", {
                     className: "btn-pixel",
                     onClick: v,
-                    children: "◀ Salir",
+                    children: "◀\ufe0e Salir",
                   }),
                 ],
               }),
@@ -16685,6 +16747,9 @@ let ei = [
       emoji: "⚔️",
       sticker: "🎠",
       stickerName: "Carrusel real",
+      // Sin pool caía al trío por defecto (contar/sumar/comparar) y este
+      // nivel llamado "Suma y resta" jamás generaba una resta.
+      pool: ["sumar", "restar"],
     },
     {
       id: 24,
@@ -16896,6 +16961,93 @@ let ei = [
     },
   ],
   ec = ["💍", "🟦", "⭐", "🍎", "💎", "🪙"];
+// Práctica intercalada: todo nivel del camino pequeño lleva un pool de
+// modos para variar sus preguntas. Si no define uno propio, hereda lo ya
+// enseñado hasta ese punto del camino (esto corrige también que los
+// "Reto" de los mundos 0-2 usaran sumar antes de enseñarlo). Los modos
+// nuevos (vf y tocar) entran del mundo 6 en adelante.
+(() => {
+  let e = [];
+  eo.forEach((t) => {
+    "mix" !== t.mode && !e.includes(t.mode) && e.push(t.mode);
+    t.pool && t.pool.length
+      ? t.pool.forEach((n) => {
+          e.includes(n) || e.push(n);
+        })
+      : (t.pool = e.slice());
+    t.world >= 6 &&
+      (t.pool.includes("vf") || t.pool.push("vf"),
+      t.pool.includes("tocar") || t.pool.push("tocar"));
+  });
+})();
+// Frases rotativas por modo: se eligen al crear cada pregunta (quedan en
+// q.frase) para que el mismo texto no se repita 8 veces seguidas.
+const MG_LITTLE_FRASES = {
+  contar: ["¿Cuántos hay?", "¡Cuéntalos todos!", "¿Cuántos ves aquí?"],
+  sumar: ["¿Cuántos hay en total?", "¡Júntalos! ¿Cuántos son?", "¿Cuántos son entre todos?"],
+  restar: ["¿Cuántos quedan?", "¡Se fueron algunos! ¿Cuántos quedan?", "¿Cuántos quedan ahora?"],
+  comparar: ["Toca el grupo con más", "¿Dónde hay más? ¡Tócalo!", "Elige el grupo con más"],
+  palitos: ["¿Cuántos palitos hay?", "¡Cuenta los palitos!", "¿Cuántos palitos ves?"],
+  puntos: ["¿Cuántos puntos ves?", "¡Cuenta los puntos!", "¿Cuántos puntos hay?"],
+  patron: ["¿Qué sigue?", "¿Qué viene después?", "Completa el patrón"],
+  falta: ["¿Qué número falta?", "¡Falta un número! ¿Cuál es?", "Encuentra el número perdido"],
+  orden: ["Toca los números en orden: 1, 2, 3...", "¡Del más chico al más grande!", "Toca los números de menor a mayor"],
+  figura: ["Toca la figura igual a esta", "¡Busca la figura gemela!", "¿Cuál es igual a esta?"],
+  depar: ["¿Cuántos hay? ¡Cuenta de 2 en 2!", "¡De 2 en 2! ¿Cuántos son?", "Cuenta los pares: ¿cuántos hay?"],
+  para5: ["¿Cuántos faltan para llenar los 5?", "¿Cuántos más para llegar a 5?", "¿Cuántos faltan para tener 5?"],
+  vf: ["Mira bien: ¿sí o no?", "¿Es verdad?", "¿Cierto o no?"],
+  tocar: ["¡Toca cada uno para contarlos!", "¡Cuéntalos con tu dedo!", "Toca todos, uno por uno"],
+};
+let mgLittleLastFrase = "";
+function mgLittleFrase(e) {
+  let t = MG_LITTLE_FRASES[e];
+  if (!t) return null;
+  let n = ee(t);
+  if (t.length > 1) for (let e = 0; e < 3 && n === mgLittleLastFrase; e++) n = ee(t);
+  return ((mgLittleLastFrase = n), n);
+}
+// Variedad del camino pequeño (espejo del warmup del camino grande):
+// desde la pregunta 4 de un nivel de modo fijo, ~28% de las preguntas
+// salen del pool del nivel; y un memo evita que salga dos veces seguidas
+// exactamente la misma pregunta.
+let mgLittleLastSig = "";
+function mgLittleSig(e) {
+  return e
+    ? [e.kind, e.n, e.a, e.b, e.answer, e.pairs, e.filled, e.target, e.left, e.right, e.claim, e.obj].join("|")
+    : "";
+}
+function mgLittleNext(e, t) {
+  let n = e.mode;
+  "mix" !== n && e.pool && e.pool.length > 1 && t >= 3 && Math.random() < 0.28 && (n = "mix");
+  let a = ef(n, e.max, e.pool);
+  for (let r = 0; r < 3 && mgLittleSig(a) === mgLittleLastSig; r++)
+    a = ef(n, e.max, e.pool);
+  return ((mgLittleLastSig = mgLittleSig(a)), (a.frase = mgLittleFrase(a.kind)), a);
+}
+// Figuras del modo "figura" dibujadas en SVG propio: los emojis
+// geométricos son el bloque que más cambia entre plataformas, y aquí el
+// dibujo ES la pregunta. Los valores del juego son los ids (strings), la
+// comparación de respuestas no cambia.
+const MG_FIGURAS = {
+  "circulo-rojo": ["circle", { cx: 24, cy: 24, r: 17, fill: "#e53935" }],
+  "triangulo-rojo": ["path", { d: "M24 7 L41 39 L7 39 Z", fill: "#e53935" }],
+  "cuadrado-azul": ["rect", { x: 8, y: 8, width: 32, height: 32, rx: 5, fill: "#1e88e5" }],
+  "estrella-amarilla": ["path", { d: "M24 5 L29.6 17.6 L43.4 19 L33.2 28.4 L36.2 42 L24 34.8 L11.8 42 L14.8 28.4 L4.6 19 L18.4 17.6 Z", fill: "#fdd835" }],
+  "circulo-verde": ["circle", { cx: 24, cy: 24, r: 17, fill: "#43a047" }],
+  "cuadrado-amarillo": ["rect", { x: 8, y: 8, width: 32, height: 32, rx: 5, fill: "#fdd835" }],
+  "corazon-morado": ["path", { d: "M24 41 C10 30 6 22 10 14 C13 8 21 8 24 15 C27 8 35 8 38 14 C42 22 38 30 24 41 Z", fill: "#8e24aa" }],
+  "rombo-naranja": ["path", { d: "M24 6 L40 24 L24 42 L8 24 Z", fill: "#fb8c00" }],
+};
+function mgShapeSVG(id, size = 44) {
+  let f = MG_FIGURAS[id];
+  return f
+    ? MG_H(
+        "svg",
+        { width: size, height: size, viewBox: "0 0 48 48", "aria-hidden": "true", style: { display: "block", margin: "0 auto" } },
+        MG_H(f[0], { ...f[1], stroke: "rgba(0,0,0,0.3)", strokeWidth: 2, strokeLinejoin: "round" }),
+      )
+    : id;
+}
 function eu(e, t) {
   let n = new Set([e]);
   for (; n.size < 3;) n.add(Z(1, Math.max(3, t)));
@@ -16953,7 +17105,7 @@ function ef(e, t, n) {
       ),
     };
   if ("figura" === r) {
-    let e = J(["🔴", "🔺", "🟦", "⭐", "🟢", "🟨", "💜", "🔶"]).slice(0, 4);
+    let e = J(Object.keys(MG_FIGURAS)).slice(0, 4);
     return { kind: "figura", target: ee(e), choices: J(e) };
   }
   if ("depar" === r) {
@@ -16986,6 +17138,18 @@ function ef(e, t, n) {
       answer: r,
       choices: s.sort(() => Math.random() - 0.5),
     };
+  }
+  if ("vf" === r) {
+    let e = Z(1, Math.max(3, Math.min(6, t))),
+      n =
+        Math.random() < 0.5
+          ? e
+          : Math.max(1, e + (Math.random() < 0.5 ? -1 : 1) * Z(1, 2));
+    return { kind: "vf", obj: a, n: e, claim: n, truth: n === e };
+  }
+  if ("tocar" === r) {
+    let e = Z(3, Math.max(4, Math.min(8, t)));
+    return { kind: "tocar", obj: a, n: e };
   }
   if ("contar" === r) {
     let e = Z(1, t);
@@ -17966,10 +18130,23 @@ function eU() {
   return { date: eV(), path: 0, practice: 0, brain: 0, claimed: !1 };
 }
 let eB = {};
+// La caché en memoria y el respaldo window.storage deben separar por
+// perfil igual que el shim de localStorage; sin esto, al cambiar de
+// perfil el nuevo "heredaba" datos del anterior (mascota, monedas...).
+const MG_STORE_GLOBAL = { mg_profiles: 1, mg_active: 1, mg_sound: 1, mg_chars_unlocked: 1 };
+function mgStoreKey(e) {
+  if ("string" != typeof e || "mg_" !== e.slice(0, 3) || MG_STORE_GLOBAL[e]) return e;
+  let t = null;
+  try {
+    t = window.__mgRaw && window.__mgRaw.get("mg_active");
+  } catch {}
+  return t ? "mg_" + t + "__" + e : e;
+}
 async function eQ(e, t) {
-  let n = JSON.stringify(t);
+  let n = JSON.stringify(t),
+    k = mgStoreKey(e);
   if (
-    ((eB[e] = n),
+    ((eB[k] = n),
     !(function (e, t) {
       try {
         return (window.localStorage.setItem(e, t), !0);
@@ -17979,7 +18156,7 @@ async function eQ(e, t) {
     })(e, n))
   )
     try {
-      window.storage && (await window.storage.set(e, n, !1));
+      window.storage && (await window.storage.set(k, n, !1));
     } catch {}
 }
 async function eH(e, t) {
@@ -17994,15 +18171,16 @@ async function eH(e, t) {
     try {
       return JSON.parse(n);
     } catch {}
+  let k = mgStoreKey(e);
   try {
     if (window.storage) {
-      let t = await window.storage.get(e, !1);
+      let t = await window.storage.get(k, !1);
       if (t && t.value) return JSON.parse(t.value);
     }
   } catch {}
-  if (eB[e])
+  if (eB[k])
     try {
-      return JSON.parse(eB[e]);
+      return JSON.parse(eB[k]);
     } catch {}
   return t;
 }
@@ -18191,7 +18369,7 @@ function MgHub({ kind: k, name: nm, coins: c, streak: st, onBack: bk, items: it 
   return MG_H("div", { className: "screen world-starwars hub-screen" },
     s.jsx(eX, {}),
     MG_H("div", { className: "hub-top" },
-      MG_H("button", { className: "link-back", onClick: bk }, "◀"),
+      MG_H("button", { className: "link-back", onClick: bk }, "◀\ufe0e"),
       MG_H("span", { className: "hub-name" }, (k === "little" ? "🧒 " : "🧑‍🚀 ") + (nm || "")),
       k === "big" ? MG_H("span", { className: "coin-pill" }, "🪙 " + c) : null,
       k === "big" ? MG_H("span", { className: "fire-pill" }, "🔥 " + st) : null),
@@ -18205,16 +18383,19 @@ function MgHub({ kind: k, name: nm, coins: c, streak: st, onBack: bk, items: it 
 }
 function MgCharScreen({ charDone: dq, onBack: bk }) {
   const [selChar, setSelChar] = i.useState(mgChar);
+  i.useEffect(() => {
+    mgSyncCharUnlocks(dq);
+  }, [dq]);
   return MG_H("div", { className: "screen world-starwars hub-screen" },
     s.jsx(eX, {}),
     MG_H("div", { className: "hub-top" },
-      MG_H("button", { className: "link-back", onClick: bk }, "◀ Volver")),
+      MG_H("button", { className: "link-back", onClick: bk }, "◀\ufe0e Volver")),
     s.jsx(f, { mood: "excited", text: "¡Elige quién te acompaña en tus juegos!", size: 64, char: selChar }),
     MG_H("div", { className: "char-picker char-picker-full" },
       MG_H("div", { className: "char-picker-title" }, "🐾 Elige tu compañero"),
       MG_H("div", { className: "char-grid" },
         ...mgChars.map((cc) => {
-          let unlocked = (dq || 0) >= cc.unlock,
+          let unlocked = mgCharIsUnlocked(cc, dq),
             sel = selChar === cc.id;
           return MG_H("button",
             {
@@ -18228,7 +18409,7 @@ function MgCharScreen({ charDone: dq, onBack: bk }) {
             unlocked
               ? MG_H(d, { mood: sel ? "excited" : "happy", size: 64, char: cc.id })
               : MG_H("div", { className: "char-lock" }, "🔒"),
-            MG_H("div", { className: "char-name" }, unlocked ? cc.name : "Nivel " + cc.unlock),
+            MG_H("div", { className: "char-name" }, unlocked ? cc.name : "Completa " + cc.unlock + " niveles"),
             unlocked ? MG_H("div", { className: "char-desc" }, cc.desc) : null,
             sel && MG_H("div", { className: "char-badge" }, "✓ elegido"));
         }))));
@@ -18433,7 +18614,7 @@ function MgLeccion({ concept: concept, bg: bg, onDone: onDone, onSkip: onSkip })
     MG_H(
       "div",
       { className: "panel leccion" },
-      MG_H("button", { className: "link-back", onClick: onSkip }, "Saltar ▶"),
+      MG_H("button", { className: "link-back", onClick: onSkip }, "Saltar ▶\ufe0e"),
       MG_H("div", { className: "lec-title" }, title),
       MG_H(f, { mood: last ? "excited" : "happy", text: cur.turbo, size: 60 }),
       MG_H("div", { className: "lec-visual" }, cur.visual),
@@ -18452,14 +18633,14 @@ function MgLeccion({ concept: concept, bg: bg, onDone: onDone, onSkip: onSkip })
           MG_H(
             "button",
             { className: "btn-pixel", onClick: () => setStep(step - 1) },
-            "◀ Atrás",
+            "◀\ufe0e Atrás",
           ),
         last
           ? MG_H("button", { className: "btn-pixel btn-go", onClick: onDone }, "🚀 ¡A jugar!")
           : MG_H(
               "button",
               { className: "btn-pixel btn-go", onClick: () => setStep(step + 1) },
-              "Siguiente ▶",
+              "Siguiente ▶\ufe0e",
             ),
       ),
     ),
@@ -18604,7 +18785,7 @@ function eZ({ progress: e, onLevel: t, onStickers: n, onBrain: a, onBack: r }) {
           (0, s.jsx)("button", {
             className: "link-back",
             onClick: r,
-            children: "◀",
+            children: "◀\ufe0e",
           }),
           (0, s.jsxs)("span", {
             className: "coin-pill sticker-pill",
@@ -18721,7 +18902,7 @@ function eZ({ progress: e, onLevel: t, onStickers: n, onBrain: a, onBack: r }) {
                                 o &&
                                   (0, s.jsx)("span", {
                                     className: "nl-next",
-                                    children: "▶ ¡juega!",
+                                    children: "▶\ufe0e ¡juega!",
                                   }),
                               ],
                             }),
@@ -18759,7 +18940,7 @@ function e0({ progress: e, onBack: t }) {
           (0, s.jsx)("button", {
             className: "btn-pixel back-btn",
             onClick: t,
-            children: "◀ Volver",
+            children: "◀\ufe0e Volver",
           }),
           (0, s.jsxs)("span", {
             className: "topbar-title",
@@ -18799,15 +18980,19 @@ function e0({ progress: e, onBack: t }) {
 function e1({ level: e, onDone: t }) {
   let n,
     [a, r] = (0, i.useState)(0),
-    [l, o] = (0, i.useState)(() => ef(e.mode, e.max, e.pool)),
+    [l, o] = (0, i.useState)(() => mgLittleNext(e, 0)),
     [c, u] = (0, i.useState)("ask"),
     [f, m] = (0, i.useState)(0),
     [p, h] = (0, i.useState)(null),
     [g, b] = (0, i.useState)([]),
+    [mgLS, mgSetLS] = (0, i.useState)(0),
+    [mgLCheer, mgSetLCheer] = (0, i.useState)(null),
+    mgLCheerT = (0, i.useRef)(null),
     y = (0, i.useRef)(null);
   (0, i.useEffect)(
     () => () => {
-      y.current && clearTimeout(y.current);
+      (y.current && clearTimeout(y.current),
+        mgLCheerT.current && clearTimeout(mgLCheerT.current));
     },
     [],
   );
@@ -18830,13 +19015,25 @@ function e1({ level: e, onDone: t }) {
           return 2 * e.pairs;
         case "para5":
           return 5 - e.filled;
+        case "vf":
+          return e.truth;
         case "orden":
+        case "tocar":
           return -1;
       }
     },
     k = (n) => {
       if ("ask" !== c) return;
       let s = "orden-ok" === n || ("orden-fail" !== n && n === x(l));
+      if (s) {
+        let e = mgLS + 1;
+        mgSetLS(e);
+        let t = mgStreakCheer(e);
+        t &&
+          (mgSetLCheer(t),
+          mgLCheerT.current && clearTimeout(mgLCheerT.current),
+          (mgLCheerT.current = setTimeout(() => mgSetLCheer(null), 1600)));
+      } else mgSetLS(0);
       (s ? v.ok() : v.no(),
         h(n),
         u(s ? "right" : "wrong"),
@@ -18846,7 +19043,7 @@ function e1({ level: e, onDone: t }) {
             let n = a + 1;
             n >= e.questions
               ? t(f + +!!s)
-              : (r(n), o(ef(e.mode, e.max, e.pool)), u("ask"), h(null), b([]));
+              : (r(n), o(mgLittleNext(e, n)), u("ask"), h(null), b([]));
           },
           s ? 1100 : 1900,
         )));
@@ -18870,11 +19067,14 @@ function e1({ level: e, onDone: t }) {
       "comparar" !== l.kind &&
       "patron" !== l.kind &&
       "orden" !== l.kind &&
-      "figura" !== l.kind;
+      "figura" !== l.kind &&
+      "vf" !== l.kind &&
+      "tocar" !== l.kind;
   return (0, s.jsxs)("div", {
     className: "screen world-sonic",
     children: [
       (0, s.jsx)(eX, {}),
+      mgLCheer && MG_H("div", { className: "streak-cheer" }, mgLCheer),
       (0, s.jsxs)("div", {
         className: "little-hud",
         children: [
@@ -18892,7 +19092,7 @@ function e1({ level: e, onDone: t }) {
               children: [
                 (0, s.jsx)("div", {
                   className: "little-question",
-                  children: "¿Cuántos hay?",
+                  children: l.frase || "¿Cuántos hay?",
                 }),
                 j(l.n, l.obj),
               ],
@@ -18902,7 +19102,7 @@ function e1({ level: e, onDone: t }) {
               children: [
                 (0, s.jsx)("div", {
                   className: "little-question",
-                  children: "¿Cuántos palitos hay?",
+                  children: l.frase || "¿Cuántos palitos hay?",
                 }),
                 ((e) => {
                   let t = [],
@@ -18944,7 +19144,7 @@ function e1({ level: e, onDone: t }) {
               children: [
                 (0, s.jsx)("div", {
                   className: "little-question",
-                  children: "¿Cuántos puntos ves?",
+                  children: l.frase || "¿Cuántos puntos ves?",
                 }),
                 ((n = l.n),
                 (0, s.jsx)("div", {
@@ -18972,7 +19172,7 @@ function e1({ level: e, onDone: t }) {
               children: [
                 (0, s.jsx)("div", {
                   className: "little-question",
-                  children: "¿Cuántos hay en total?",
+                  children: l.frase || "¿Cuántos hay en total?",
                 }),
                 (0, s.jsxs)("div", {
                   className: "sum-visual",
@@ -18992,7 +19192,7 @@ function e1({ level: e, onDone: t }) {
               children: [
                 (0, s.jsx)("div", {
                   className: "little-question",
-                  children: "¿Cuántos quedan?",
+                  children: l.frase || "¿Cuántos quedan?",
                 }),
                 j(l.a, l.obj, "", l.a - l.b),
               ],
@@ -19002,7 +19202,7 @@ function e1({ level: e, onDone: t }) {
               children: [
                 (0, s.jsx)("div", {
                   className: "little-question",
-                  children: "¿Qué número falta?",
+                  children: l.frase || "¿Qué número falta?",
                 }),
                 (0, s.jsx)("div", {
                   className: "pattern-row",
@@ -19025,7 +19225,7 @@ function e1({ level: e, onDone: t }) {
               children: [
                 (0, s.jsx)("div", {
                   className: "little-question",
-                  children: "Toca los números en orden: 1, 2, 3...",
+                  children: l.frase || "Toca los números en orden: 1, 2, 3...",
                 }),
                 (0, s.jsx)("div", {
                   className: "bubbles-zone kid-bubbles",
@@ -19063,11 +19263,77 @@ function e1({ level: e, onDone: t }) {
               children: [
                 (0, s.jsx)("div", {
                   className: "little-question",
-                  children: "Toca la figura igual a esta",
+                  children: l.frase || "Toca la figura igual a esta",
                 }),
                 (0, s.jsx)("div", {
                   className: "figura-target",
-                  children: l.target,
+                  children: mgShapeSVG(l.target, 72),
+                }),
+              ],
+            }),
+          "vf" === l.kind &&
+            (0, s.jsxs)(s.Fragment, {
+              children: [
+                (0, s.jsx)("div", {
+                  className: "little-question",
+                  children: l.frase || "Mira bien: ¿sí o no?",
+                }),
+                j(l.n, l.obj),
+                (0, s.jsxs)("div", {
+                  className: "vf-claim",
+                  children: ["¿Hay ", l.claim, "?"],
+                }),
+                (0, s.jsxs)("div", {
+                  className: "little-choices",
+                  children: [
+                    (0, s.jsx)("button", {
+                      className: `little-choice vf-btn ${!0 === p ? ("right" === c ? "ok" : "no") : ""} ${"wrong" === c && !0 === x(l) ? "reveal" : ""}`,
+                      onClick: () => k(!0),
+                      disabled: "ask" !== c,
+                      children: "✅ Sí",
+                    }),
+                    (0, s.jsx)("button", {
+                      className: `little-choice vf-btn ${!1 === p ? ("right" === c ? "ok" : "no") : ""} ${"wrong" === c && !1 === x(l) ? "reveal" : ""}`,
+                      onClick: () => k(!1),
+                      disabled: "ask" !== c,
+                      children: "❌ No",
+                    }),
+                  ],
+                }),
+              ],
+            }),
+          "tocar" === l.kind &&
+            (0, s.jsxs)(s.Fragment, {
+              children: [
+                (0, s.jsx)("div", {
+                  className: "little-question",
+                  children: l.frase || "¡Toca cada uno para contarlos!",
+                }),
+                (0, s.jsx)("div", {
+                  className: "tocar-grid",
+                  children: Array.from({ length: l.n }).map((e, t) => {
+                    let n = g.indexOf(t);
+                    return (0, s.jsx)(
+                      "button",
+                      {
+                        className: `tocar-item ${n >= 0 ? "tocado" : ""}`,
+                        disabled: "ask" !== c || n >= 0,
+                        onClick: () => {
+                          let e = [...g, t];
+                          (SFX.pop(), b(e), e.length >= l.n && k("orden-ok"));
+                        },
+                        children:
+                          n >= 0
+                            ? (0, s.jsx)("span", { className: "tocar-num", children: n + 1 })
+                            : l.obj,
+                      },
+                      t,
+                    );
+                  }),
+                }),
+                (0, s.jsxs)("div", {
+                  className: "tocar-count",
+                  children: [g.length, " de ", l.n],
                 }),
               ],
             }),
@@ -19076,7 +19342,7 @@ function e1({ level: e, onDone: t }) {
               children: [
                 (0, s.jsx)("div", {
                   className: "little-question",
-                  children: "¿Cuántos hay? ¡Cuenta de 2 en 2!",
+                  children: l.frase || "¿Cuántos hay? ¡Cuenta de 2 en 2!",
                 }),
                 (0, s.jsx)("div", {
                   className: "pares-zone",
@@ -19099,7 +19365,7 @@ function e1({ level: e, onDone: t }) {
               children: [
                 (0, s.jsx)("div", {
                   className: "little-question",
-                  children: "¿Cuántos faltan para llenar los 5?",
+                  children: l.frase || "¿Cuántos faltan para llenar los 5?",
                 }),
                 (0, s.jsx)("div", {
                   className: "five-frame",
@@ -19126,7 +19392,7 @@ function e1({ level: e, onDone: t }) {
               children: [
                 (0, s.jsx)("div", {
                   className: "little-question",
-                  children: "¿Qué sigue?",
+                  children: l.frase || "¿Qué sigue?",
                 }),
                 (0, s.jsx)("div", {
                   className: "pattern-row",
@@ -19149,7 +19415,7 @@ function e1({ level: e, onDone: t }) {
               children: [
                 (0, s.jsx)("div", {
                   className: "little-question",
-                  children: "Toca el grupo con más",
+                  children: l.frase || "Toca el grupo con más",
                 }),
                 (0, s.jsxs)("div", {
                   className: "compare-row",
@@ -19196,7 +19462,7 @@ function e1({ level: e, onDone: t }) {
                     className: `little-choice pattern-choice ${p === e ? ("right" === c ? "ok" : "no") : ""} ${"wrong" === c && e === x(l) ? "reveal" : ""}`,
                     onClick: () => k(e),
                     disabled: "ask" !== c,
-                    children: e,
+                    children: "figura" === l.kind ? mgShapeSVG(e, 46) : e,
                   },
                   e,
                 ),
@@ -19223,6 +19489,17 @@ function e1({ level: e, onDone: t }) {
     ],
   });
 }
+// Ronda sorpresa: al terminar un nivel, a veces (~1/3) se ofrece UNA
+// ronda de un minijuego de lógica, para que el propio camino varíe.
+// Los componentes son los mismos de "Juegos de lógica".
+const MG_BONUS_GAMES = [
+  ["luces", O],
+  ["parejitas", U],
+  ["diferente", Q],
+  ["sombras", W],
+  ["tren", K],
+  ["cajas", Y],
+];
 function e2({
   level: e,
   correct: t,
@@ -19235,7 +19512,12 @@ function e2({
   (0, i.useEffect)(() => {
     v.win();
   }, []);
-  let [c, u] = (0, i.useState)(!a);
+  let [c, u] = (0, i.useState)(!a),
+    [mgBn, mgSetBn] = (0, i.useState)(() =>
+      Math.random() < 0.34 ? ee(MG_BONUS_GAMES) : null,
+    ),
+    [mgBnOn, mgSetBnOn] = (0, i.useState)(!1),
+    [mgBnFlash, mgSetBnFlash] = (0, i.useState)(null);
   return (0, s.jsxs)("div", {
     className: "screen world-sonic",
     children: [
@@ -19289,11 +19571,36 @@ function e2({
                   let t = e.currentTarget.closest(".chest-overlay");
                   t && (t.style.display = "none");
                 },
-                children: "¡A mi álbum! ▶",
+                children: "¡A mi álbum! ▶\ufe0e",
               }),
             ],
           }),
         }),
+      mgBnOn &&
+        mgBn &&
+        (0, s.jsx)("div", {
+          className: "chest-overlay",
+          children: (0, s.jsxs)("div", {
+            className: "panel brain-panel",
+            children: [
+              (0, s.jsx)("div", {
+                className: "brain-title-line",
+                children: "\ud83e\udde9 \u00a1Ronda sorpresa!",
+              }),
+              MG_H(mgBn[1], {
+                level: 2,
+                onFinish: (e) => {
+                  (mgSetBnOn(!1),
+                    mgSetBn(null),
+                    mgSetBnFlash(e ? "\u2b50 \u00a1Genial!" : "\u00a1Buen intento!"),
+                    e ? v.win() : v.no(),
+                    setTimeout(() => mgSetBnFlash(null), 1500));
+                },
+              }),
+            ],
+          }),
+        }),
+      mgBnFlash && MG_H("div", { className: "streak-cheer" }, mgBnFlash),
       (0, s.jsxs)("div", {
         className: "stack center",
         children: [
@@ -19323,11 +19630,17 @@ function e2({
           (0, s.jsxs)("div", {
             className: "btn-row",
             children: [
+              mgBn &&
+                (0, s.jsx)("button", {
+                  className: "btn-pixel btn-bonus",
+                  onClick: () => mgSetBnOn(!0),
+                  children: "\ud83e\udde9 \u00a1Ronda sorpresa!",
+                }),
               o &&
                 (0, s.jsx)("button", {
                   className: "btn-pixel btn-go",
                   onClick: r,
-                  children: "Siguiente ▶",
+                  children: "Siguiente ▶\ufe0e",
                 }),
               (0, s.jsx)("button", {
                 className: "btn-pixel",
@@ -19369,7 +19682,7 @@ function e3({
           (0, s.jsx)("button", {
             className: "link-back",
             onClick: b,
-            children: "◀",
+            children: "◀\ufe0e",
           }),
           (0, s.jsxs)("span", { className: "coin-pill", children: ["🪙 ", t] }),
           (0, s.jsxs)("span", {
@@ -19524,7 +19837,7 @@ function e3({
                                 l &&
                                   (0, s.jsx)("span", {
                                     className: "nl-next",
-                                    children: "▶ ¡siguiente!",
+                                    children: "▶\ufe0e ¡siguiente!",
                                   }),
                               ],
                             }),
@@ -19576,7 +19889,7 @@ function e5({ level: e, progress: t, inv: n, onStart: a, onBack: r }) {
           (0, s.jsx)("button", {
             className: "link-back",
             onClick: r,
-            children: "◀ Camino",
+            children: "◀\ufe0e Camino",
           }),
           (0, s.jsx)("div", { className: "pl-emoji", children: e.emoji }),
           (0, s.jsxs)("h2", {
@@ -19847,25 +20160,25 @@ function e8({
             l = (e) => e[Math.floor(Math.random() * e.length)];
           return "multiplication" === e
             ? l([
-                `Turbo esconde ${a} huesos en cada caja y tiene ${r} cajas. \xbfCu\xe1ntos huesos hay en total?`,
+                `${mgCharName()} esconde ${a} ${mgTreat()} en cada caja y tiene ${r} cajas. \xbfCu\xe1ntos ${mgTreat()} hay en total?`,
                 `Cada nave lleva ${a} tripulantes y despegan ${r} naves. \xbfCu\xe1ntos tripulantes viajan?`,
                 `Sonic junta ${a} anillos en cada vuelta y da ${r} vueltas. \xbfCu\xe1ntos anillos junta?`,
                 `Steve construye ${r} torres con ${a} bloques cada una. \xbfCu\xe1ntos bloques usa?`,
               ])
             : "division" === e
               ? l([
-                  `Turbo reparte ${a} galletas entre ${r} amigos por igual. \xbfCu\xe1ntas le tocan a cada uno?`,
+                  `${mgCharName()} reparte ${a} galletas entre ${r} amigos por igual. \xbfCu\xe1ntas le tocan a cada uno?`,
                   `Hay ${a} diamantes para guardar en ${r} cofres iguales. \xbfCu\xe1ntos van en cada cofre?`,
                   `${a} clones se forman en ${r} filas iguales. \xbfCu\xe1ntos hay por fila?`,
                 ])
               : "addition" === e
                 ? l([
-                    `Turbo tiene ${a} huesos y encuentra ${r} m\xe1s. \xbfCu\xe1ntos tiene ahora?`,
+                    `${mgCharName()} tiene ${a} ${mgTreat()} y encuentra ${r} m\xe1s. \xbfCu\xe1ntos tiene ahora?`,
                     `Sonic ten\xeda ${a} anillos y gan\xf3 ${r} en el nivel. \xbfCu\xe1ntos anillos tiene?`,
                   ])
                 : "subtraction" === e
                   ? l([
-                      `Turbo ten\xeda ${a} croquetas y se comi\xf3 ${r}. \xbfCu\xe1ntas quedan?`,
+                      `${mgCharName()} ten\xeda ${a} croquetas y se comi\xf3 ${r}. \xbfCu\xe1ntas quedan?`,
                       `Hab\xeda ${a} bloques y un creeper explot\xf3 ${r}. \xbfCu\xe1ntos quedan?`,
                     ])
                   : null;
@@ -19911,9 +20224,9 @@ function e8({
         r < 10;
       )
         ((l = e_(e, k.current, 0)), r++);
-      l.answer === t.answer
-        ? S("write")
-        : (S("mayor"), P({ prompt: l.prompt, value: l.answer }));
+      "number" == typeof l.answer && "prompt" in l && l.answer !== t.answer
+        ? (S("mayor"), P({ prompt: l.prompt, value: l.answer }))
+        : S("write");
     };
   (0, i.useEffect)(() => {
     es(j);
@@ -19940,9 +20253,7 @@ function e8({
         return (
           Z(mgMax),
           (ee.current = setInterval(() => {
-            Z((e) =>
-              e <= 1 ? (clearInterval(ee.current), em(!1, !0), 0) : e - 1,
-            );
+            Z((e) => (e <= 1 ? (clearInterval(ee.current), 0) : e - 1));
           }, 1e3)),
           () => {
             ee.current && clearInterval(ee.current);
@@ -19950,6 +20261,17 @@ function e8({
         );
       }
     }, [y, D, U, mgFrozen, mgMax]));
+  // Tiempo agotado: nunca cuenta como respuesta incorrecta (el tiempo no
+  // resta corazones). Si lo tecleado es correcto se acredita; si no, pasa
+  // al estado "timeout" sin castigo.
+  (0, i.useEffect)(() => {
+    if (0 !== J || "ask" !== U || mgFrozen || ea.current) return;
+    let e =
+      ("write" === N || "problema" === N) &&
+      O.length > 0 &&
+      parseInt(O, 10) === eo;
+    em(e, !0);
+  }, [J]);
   let ed = (0, i.useCallback)(
       (n, a, l, s) => {
         let i = n >= e.passAt && s > 0,
@@ -19997,7 +20319,7 @@ function e8({
   function mgApplyMiss() {
     f ? (m(!1), B("shielded")) : (u((e) => e - 1), B("wrong"));
   }
-  function em(e, t = !1) {
+  function em(e, mgIsTimeout = !1) {
     if ((e ? v.ok() : v.no(), ea.current)) return;
     ((ea.current = !0), eu());
     let n = Y;
@@ -20054,7 +20376,9 @@ function e8({
         let e = Q + 1;
         (H(e), (en.current = setTimeout(() => ef(e, a, n, c), 950)));
       }
-    } else
+    } else if (mgIsTimeout)
+      (mgSetStreak(0), (mgSinceFreeze.current = 0), B("timeout"));
+    else
       (mgSetStreak(0),
         (mgSinceFreeze.current = 0),
         mgStar > 0
@@ -20087,7 +20411,9 @@ function e8({
       "parity" === N && ev
         ? `${ev.prompt} es ${0 === ev.answer ? "par" : "impar"}`
         : "tf" === N && ev
-          ? `${ev.prompt} = ${ev.answer}${$ !== ev.answer ? `, no ${$}` : ""}`
+          ? $ === ev.answer
+            ? `¡Era verdadero! ${ev.prompt} = ${ev.answer}`
+            : `Era falso: ${ev.prompt} = ${ev.answer}, no ${$}`
           : "mayor" === N && ev && _
             ? `${ev.prompt} = ${ev.answer} y ${_.prompt} = ${_.value}`
             : `La respuesta es ${eo}`;
@@ -20400,7 +20726,7 @@ function e8({
               children: [
                 (0, s.jsx)("div", {
                   className: "pres-label",
-                  children: "📖 Problema de Turbo",
+                  children: "📖 Problema de " + mgCharName(),
                 }),
                 (0, s.jsx)("div", { className: "problema-text", children: T }),
                 (0, s.jsx)("div", {
@@ -20515,6 +20841,21 @@ function e8({
                   }),
               ],
             }),
+          "timeout" === U &&
+            (0, s.jsxs)("div", {
+              className: "q-feedback shieldmsg",
+              children: [
+                (0, s.jsxs)("div", {
+                  className: "wrong-answer",
+                  children: ["⏰ ¡Se acabó el tiempo! ", ey()],
+                }),
+                ec &&
+                  (0, s.jsxs)("div", {
+                    className: "hint-box",
+                    children: ["💡 ", ec],
+                  }),
+              ],
+            }),
         ],
       }),
       "retryoffer" === U
@@ -20538,7 +20879,10 @@ function e8({
               }),
             ],
           })
-        : "wrong" === U || "shielded" === U || "starred" === U
+        : "wrong" === U ||
+            "shielded" === U ||
+            "starred" === U ||
+            "timeout" === U
           ? (0, s.jsx)("button", {
               className: "btn-pixel btn-go next-btn",
               onClick: () => {
@@ -20546,7 +20890,7 @@ function e8({
                   ? (F((e) => e + 1), I(""), B("ask"), b(!1), (ea.current = !1))
                   : ef(Q, W, Y, c);
               },
-              children: "Entendido ▶",
+              children: "Entendido ▶\ufe0e",
             })
           : (0, s.jsxs)(s.Fragment, {
             children: [
@@ -20677,7 +21021,7 @@ function e7({ chest: e, onClose: t }) {
               (0, s.jsx)("button", {
                 className: "btn-pixel btn-go",
                 onClick: t,
-                children: "¡Genial! ▶",
+                children: "¡Genial! ▶\ufe0e",
               }),
             ],
           })
@@ -20828,7 +21172,7 @@ function e9({
                     (0, s.jsx)("button", {
                       className: "btn-pixel btn-go",
                       onClick: o,
-                      children: "Siguiente nivel ▶",
+                      children: "Siguiente nivel ▶\ufe0e",
                     }),
                   (0, s.jsx)("button", {
                     className: "btn-pixel",
@@ -21244,7 +21588,7 @@ function tn({ facts: e, setFacts: t, onDone: n, onQuit: a }) {
         ? (0, s.jsx)("button", {
             className: "btn-pixel btn-go next-btn",
             onClick: () => j(b),
-            children: "Entendido ▶",
+            children: "Entendido ▶\ufe0e",
           })
         : (0, s.jsx)(e4, {
             value: m,
@@ -21360,7 +21704,7 @@ function tr({
           (0, s.jsx)("button", {
             className: "btn-pixel back-btn",
             onClick: c,
-            children: "◀ Volver",
+            children: "◀\ufe0e Volver",
           }),
           (0, s.jsx)("span", {
             className: "topbar-title",
@@ -21375,7 +21719,7 @@ function tr({
             MG_H("div", { key: pf.id, className: "pm-row" },
               MG_H("span", { className: "pm-emoji" }, pf.emoji),
               MG_H("span", { className: "pm-name" }, pf.name + " · " + pf.age + " años"),
-              pmActive === pf.id ? MG_H("span", { className: "pm-active" }, "▶ jugando") : null,
+              pmActive === pf.id ? MG_H("span", { className: "pm-active" }, "▶\ufe0e jugando") : null,
               MG_H("button", { className: "pm-edit", onClick: () => pmEdit(pf) }, "✏️ Editar")))),
         pmProfiles.length < 4
           ? MG_H("button", { className: "pm-add", onClick: pmAdd }, "➕ Agregar jugador")
@@ -21712,7 +22056,7 @@ function ts({ onStart: e, onBack: t }) {
         (0, s.jsx)("button", {
           className: "link-back",
           onClick: t,
-          children: "◀ Camino",
+          children: "◀\ufe0e Camino",
         }),
         (0, s.jsx)("h2", {
           className: "panel-title",
@@ -21858,7 +22202,7 @@ function ti({ op: e, diff: t, facts: n, setFacts: a, onDone: r, onQuit: l }) {
         ? (0, s.jsx)("button", {
             className: "btn-pixel btn-go next-btn",
             onClick: () => w(y),
-            children: "Entendido ▶",
+            children: "Entendido ▶\ufe0e",
           })
         : (0, s.jsx)(e4, {
             value: p,
@@ -21892,6 +22236,9 @@ function to({
 }) {
   let [u, m] = (0, i.useState)(null),
     [selChar, setSelChar] = (0, i.useState)(mgChar);
+  (0, i.useEffect)(() => {
+    mgSyncCharUnlocks(dq);
+  }, [dq]);
   return (0, s.jsxs)("div", {
     className: "screen world-minecraft",
     children: [
@@ -21902,7 +22249,7 @@ function to({
           (0, s.jsx)("button", {
             className: "link-back",
             onClick: o,
-            children: "◀ Volver",
+            children: "◀\ufe0e Volver",
           }),
           (0, s.jsx)("h2", {
             className: "panel-title",
@@ -21975,7 +22322,7 @@ function to({
               "div",
               { className: "char-grid" },
               ...mgChars.map((cc) => {
-                let unlocked = (dq || 0) >= cc.unlock,
+                let unlocked = mgCharIsUnlocked(cc, dq),
                   sel = selChar === cc.id;
                 return MG_H(
                   "button",
@@ -21995,7 +22342,7 @@ function to({
                   unlocked
                     ? MG_H(d, { mood: sel ? "excited" : "happy", size: 60, char: cc.id })
                     : MG_H("div", { className: "char-lock" }, "🔒"),
-                  MG_H("div", { className: "char-name" }, unlocked ? cc.name : "Nivel " + cc.unlock),
+                  MG_H("div", { className: "char-name" }, unlocked ? cc.name : "Completa " + cc.unlock + " niveles"),
                   sel && MG_H("div", { className: "char-badge" }, "✓ elegido"),
                 );
               }),
@@ -22056,10 +22403,10 @@ function to({
                         (0, s.jsx)("span", {
                           className: "si-desc",
                           children: i
-                            ? "¡Turbo lo lleva puesto!"
+                            ? "¡" + mgCharName() + " lo lleva puesto!"
                             : a
                               ? "Ya es tuyo"
-                              : "Accesorio para Turbo",
+                              : "Accesorio para " + mgCharName(),
                         }),
                       ],
                     }),
@@ -22111,7 +22458,7 @@ function tc({ facts: e, onBack: t, onReset: n }) {
           (0, s.jsx)("button", {
             className: "link-back",
             onClick: t,
-            children: "◀ Volver",
+            children: "◀\ufe0e Volver",
           }),
           (0, s.jsx)("h2", {
             className: "panel-title",
@@ -22247,6 +22594,9 @@ function tc({ facts: e, onBack: t, onReset: n }) {
         [mgA, mgSetA] = (0, i.useState)(mgGetActive()),
         [mgEd, mgSetEd] = (0, i.useState)(null);
       (0, i.useEffect)(() => {
+        mgSeedCharUnlocks();
+      }, []);
+      (0, i.useEffect)(() => {
         if (!mgA) return;
         (async () => {
           (a(await eH("mg_facts", {})),
@@ -22307,10 +22657,17 @@ function tc({ facts: e, onBack: t, onReset: n }) {
           }
           (W({ ...y, ...(await eH("mg_brain", { ...y })) }),
             K({ ...R, ...(await eH("mg_lbrain", { ...R })) }));
+          // El compañero se restaura ANTES del outfit: Y(e) siempre recibe
+          // un objeto nuevo y garantiza un re-render con el mgChar correcto
+          // (mgChar es global de módulo, asignarlo no repinta por sí solo).
+          let ch = await eH("mg_char", { id: "turbo" }),
+            chId = ch.id || "turbo",
+            chDef = mgChars.find((c) => c.id === chId);
+          ((!chDef || (chDef.unlock > 0 && !mgCharsUnlocked()[chId])) &&
+            (chId = "turbo"),
+            (mgChar = chId));
           let e = await eH("mg_outfit", { owned: [], equipped: null });
           (Y(e), (u = e.equipped));
-          let ch = await eH("mg_char", { id: "turbo" });
-          mgChar = ch.id || "turbo";
           let t = await eH("mg_sound", { on: !0 });
           (et(t.on), (g = !t.on));
         })();
@@ -22413,7 +22770,7 @@ function tc({ facts: e, onBack: t, onReset: n }) {
                 { emoji: "⚡", title: "Reto relámpago", sub: "60 segundos", onClick: () => t("reto") },
                 { emoji: "🧠", title: "Repaso inteligente", sub: "tus datos difíciles", onClick: () => t("practice") },
                 { emoji: "🏆", title: "Colección", sub: "mapa de dominio", onClick: () => t("mastery") },
-                { emoji: "🏪", title: "Tienda", sub: "gorros para Turbo", onClick: () => t("shop") },
+                { emoji: "🏪", title: "Tienda", sub: "gorros para " + mgCharName(), onClick: () => t("shop") },
               ],
             }),
           "little-hub" === e &&
