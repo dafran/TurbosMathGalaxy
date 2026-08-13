@@ -388,20 +388,39 @@
       }
     } catch(e){}
   }
-  var PUG = '<svg class="wp-pug" width="96" height="96" viewBox="0 0 100 100">' +
-    '<circle cx="78" cy="80" r="6" fill="none" stroke="#3a2a1e" stroke-width="4" stroke-dasharray="26 12" stroke-linecap="round"/>' +
-    '<ellipse cx="50" cy="88" rx="25" ry="15" fill="#e9c98f" stroke="#3a2a1e" stroke-width="1.5"/>' +
-    '<ellipse cx="39" cy="97" rx="7" ry="4" fill="#e9c98f" stroke="#3a2a1e" stroke-width="1.5"/>' +
-    '<ellipse cx="61" cy="97" rx="7" ry="4" fill="#e9c98f" stroke="#3a2a1e" stroke-width="1.5"/>' +
-    '<ellipse cx="50" cy="46" rx="31" ry="29" fill="#e9c98f" stroke="#3a2a1e" stroke-width="1.5"/>' +
-    '<path d="M23 28 Q13 42 23 54 Q29 40 35 32 Z" fill="#3a2a1e"/>' +
-    '<path d="M77 28 Q87 42 77 54 Q71 40 65 32 Z" fill="#3a2a1e"/>' +
-    '<ellipse cx="50" cy="61" rx="16" ry="13" fill="#4a3426"/>' +
-    '<ellipse cx="50" cy="55" rx="5.5" ry="4" fill="#1a120c"/>' +
-    '<circle cx="35" cy="46" r="7" fill="#1a120c"/><circle cx="65" cy="46" r="7" fill="#1a120c"/>' +
-    '<circle cx="37" cy="44" r="2.5" fill="#fff"/><circle cx="67" cy="44" r="2.5" fill="#fff"/>' +
-    '<circle cx="24" cy="57" r="5" fill="#f0a0a0" opacity="0.55"/><circle cx="76" cy="57" r="5" fill="#f0a0a0" opacity="0.55"/>' +
-    '<ellipse cx="50" cy="67.5" rx="7" ry="5" fill="#1a120c"/><ellipse cx="50" cy="70.5" rx="4.5" ry="3.6" fill="#e86a7a"/></svg>';
+  /* El compañero del perfil activo también protagoniza la celebración.
+     Colores y orejas espejo de mgCharSkin (app.js). */
+  var PET_SKINS = {
+    turbo: { name: 'Turbo', fur: '#e9c98f', outline: '#3a2a1e', snout: '#4a3426', nose: '#1a120c',
+      ears: '<path d="M23 28 Q13 42 23 54 Q29 40 35 32 Z" fill="#3a2a1e"/><path d="M77 28 Q87 42 77 54 Q71 40 65 32 Z" fill="#3a2a1e"/>', extras: '' },
+    gato: { name: 'Michi', fur: '#a9aeb6', outline: '#4a4e56', snout: '#c99aa2', nose: '#e86a7a',
+      ears: '<path d="M26 27 L32 5 L45 19" fill="#a9aeb6" stroke="#4a4e56" stroke-width="1.5"/><path d="M74 27 L68 5 L55 19" fill="#a9aeb6" stroke="#4a4e56" stroke-width="1.5"/><path d="M30.5 23.5 L33 10 L41.5 18.5 Z" fill="#e8a0b0"/><path d="M69.5 23.5 L67 10 L58.5 18.5 Z" fill="#e8a0b0"/>',
+      extras: '<path d="M42 60 L20 56" stroke="#7a7f87" stroke-width="1.2" stroke-linecap="round"/><path d="M42 63 L20 66" stroke="#7a7f87" stroke-width="1.2" stroke-linecap="round"/><path d="M58 60 L80 56" stroke="#7a7f87" stroke-width="1.2" stroke-linecap="round"/><path d="M58 63 L80 66" stroke="#7a7f87" stroke-width="1.2" stroke-linecap="round"/>' },
+    perro2: { name: 'Bruno', fur: '#3d3d47', outline: '#15151d', snout: '#26262e', nose: '#08080c',
+      ears: '<path d="M22 29 Q9 43 19 58 Q24 47 35 33 Z" fill="#2b2b33" stroke="#15151d" stroke-width="1.5"/><path d="M78 29 Q91 43 81 58 Q76 47 65 33 Z" fill="#2b2b33" stroke="#15151d" stroke-width="1.5"/>',
+      extras: '<path d="M33 25 L37 11 L42 22 L48 9 L53 22 L58 11 L63 22 L67 12 Q50 15 33 25 Z" fill="#3d3d47" stroke="#15151d" stroke-width="1"/>' }
+  };
+  function activePetId(){
+    try { var v = localStorage.getItem('mg_char'); if (v) { var id = JSON.parse(v).id; if (PET_SKINS[id]) return id; } } catch(e){}
+    return 'turbo';
+  }
+  function petSVG(id){
+    var s = PET_SKINS[id] || PET_SKINS.turbo;
+    return '<svg class="wp-pug pug-char-' + id + '" width="96" height="96" viewBox="0 0 100 100">' +
+      '<circle cx="78" cy="80" r="6" fill="none" stroke="' + s.outline + '" stroke-width="4" stroke-dasharray="26 12" stroke-linecap="round"/>' +
+      '<ellipse cx="50" cy="88" rx="25" ry="15" fill="' + s.fur + '" stroke="' + s.outline + '" stroke-width="1.5"/>' +
+      '<ellipse cx="39" cy="97" rx="7" ry="4" fill="' + s.fur + '" stroke="' + s.outline + '" stroke-width="1.5"/>' +
+      '<ellipse cx="61" cy="97" rx="7" ry="4" fill="' + s.fur + '" stroke="' + s.outline + '" stroke-width="1.5"/>' +
+      '<ellipse cx="50" cy="46" rx="31" ry="29" fill="' + s.fur + '" stroke="' + s.outline + '" stroke-width="1.5"/>' +
+      s.ears +
+      '<ellipse cx="50" cy="61" rx="16" ry="13" fill="' + s.snout + '"/>' +
+      '<ellipse cx="50" cy="55" rx="5.5" ry="4" fill="' + s.nose + '"/>' +
+      '<circle cx="35" cy="46" r="7" fill="#1a120c"/><circle cx="65" cy="46" r="7" fill="#1a120c"/>' +
+      '<circle cx="37" cy="44" r="2.5" fill="#fff"/><circle cx="67" cy="44" r="2.5" fill="#fff"/>' +
+      '<circle cx="24" cy="57" r="5" fill="#f0a0a0" opacity="0.55"/><circle cx="76" cy="57" r="5" fill="#f0a0a0" opacity="0.55"/>' +
+      '<ellipse cx="50" cy="67.5" rx="7" ry="5" fill="#1a120c"/><ellipse cx="50" cy="70.5" rx="4.5" ry="3.6" fill="#e86a7a"/>' +
+      (s.extras || '') + '</svg>';
+  }
   function celebrate(name, emoji){
     jingle();
     var ov = document.createElement('div');
@@ -414,11 +433,12 @@
         'px;background:' + colors[i % colors.length] + ';animation-duration:' + (2.4 + Math.random()*2.2) +
         's;animation-delay:' + (Math.random()*1.6) + 's"></span>';
     }
+    var pid = activePetId();
     ov.innerHTML = conf +
-      '<div class="wp-panel">' + PUG +
+      '<div class="wp-panel">' + petSVG(pid) +
       '<div class="wp-emoji">' + emoji + '</div>' +
       '<div class="wp-title">\u00a1Mundo completado!</div>' +
-      '<div class="wp-sub">Terminaste todos los niveles de <b>' + name + '</b>. \u00a1Turbo est\u00e1 orgulloso de ti! \ud83d\udc3e</div>' +
+      '<div class="wp-sub">Terminaste todos los niveles de <b>' + name + '</b>. \u00a1' + PET_SKINS[pid].name + ' est\u00e1 orgulloso de ti! \ud83d\udc3e</div>' +
       '<button class="wp-btn">\ud83d\ude80 \u00a1Seguir la aventura!</button></div>';
     ov.querySelector('.wp-btn').addEventListener('click', function(){ ov.remove(); });
     document.body.appendChild(ov);
@@ -579,14 +599,43 @@ svg.pug.pug-walk, svg.wp-pug.pug-walk { animation: pugWalk 0.62s ease-in-out inf
       }
     } catch(e){}
   }
-  var WORDS = ['\u00a1GUAU!', '\u00a1GUAU GUAU!', '\ud83d\udc3e', '\u00a1WOOF!', '\u00a1GRRR... GUAU!'];
+  function meowSound(){
+    try {
+      var snd = readJSON('mg_sound', { on: true });
+      if (!snd.on) return;
+      var AC = window.AudioContext || window.webkitAudioContext;
+      var a = new AC();
+      var o = a.createOscillator(), g = a.createGain();
+      var t = a.currentTime;
+      o.type = 'triangle';
+      o.frequency.setValueAtTime(430, t);
+      o.frequency.exponentialRampToValueAtTime(740, t + 0.12);
+      o.frequency.exponentialRampToValueAtTime(320, t + 0.42);
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(0.18, t + 0.03);
+      g.gain.setValueAtTime(0.18, t + 0.3);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.45);
+      o.connect(g); g.connect(a.destination);
+      o.start(t); o.stop(t + 0.5);
+    } catch(e){}
+  }
+  var WORDS = {
+    dog: ['\u00a1GUAU!', '\u00a1GUAU GUAU!', '\ud83d\udc3e', '\u00a1WOOF!', '\u00a1GRRR... GUAU!'],
+    cat: ['\u00a1MIAU!', '\u00a1MIAU MIAU!', '\ud83d\udc3e', '\u00a1PRRR!', '\u00a1MIAAAU!']
+  };
+  // La especie sale de la clase que app.js pinta en cada SVG (pug-char-*):
+  // as\u00ed el gato ma\u00falla tambi\u00e9n en previews, overlay y pantallas sueltas.
+  function petKind(svg){
+    return svg.classList.contains('pug-char-gato') ? 'cat' : 'dog';
+  }
   function onTap(e){
     var svg = e.target && e.target.closest ? e.target.closest('svg.pug, svg.wp-pug') : null;
     if (!svg) return;
     var now = Date.now();
     if (now - lastBark < 650) return;
     lastBark = now;
-    barkSound();
+    var kind = petKind(svg);
+    (kind === 'cat' ? meowSound : barkSound)();
     svg.classList.remove('pug-barking');
     void svg.getBoundingClientRect();
     svg.classList.add('pug-barking');
@@ -597,7 +646,8 @@ svg.pug.pug-walk, svg.wp-pug.pug-walk { animation: pugWalk 0.62s ease-in-out inf
     var r = svg.getBoundingClientRect();
     var pop = document.createElement('div');
     pop.className = 'guau-pop';
-    pop.textContent = WORDS[Math.floor(Math.random() * WORDS.length)];
+    var words = WORDS[kind];
+    pop.textContent = words[Math.floor(Math.random() * words.length)];
     pop.style.left = (r.left + r.width / 2) + 'px';
     pop.style.top = (r.top - 6) + 'px';
     document.body.appendChild(pop);

@@ -12996,20 +12996,26 @@ let c = [
   u = null;
 let mgChar = "turbo";
 let mgChars = [
-  { id: "turbo", name: "Turbo", emoji: "🐶", unlock: 0, desc: "El pug de siempre" },
-  { id: "gato", name: "Michi", emoji: "🐱", unlock: 12, desc: "Gatito curioso" },
-  { id: "perro2", name: "Bruno", emoji: "🐕", unlock: 30, desc: "Perro negro despeinado" },
+  { id: "turbo", name: "Turbo", emoji: "🐶", unlock: 0, desc: "El pug de siempre", voice: "¡Guau!", voiceLow: "guau", sound: "bark", treat: "huesitos" },
+  { id: "gato", name: "Michi", emoji: "🐱", unlock: 12, desc: "Gatito curioso", voice: "¡Miau!", voiceLow: "miau", sound: "meow", treat: "pescaditos" },
+  { id: "perro2", name: "Bruno", emoji: "🐕", unlock: 30, desc: "Perro negro despeinado", voice: "¡Guau!", voiceLow: "guau", sound: "bark", treat: "huesitos" },
 ];
-function mgCharName() {
-  let c = mgChars.find((x) => x.id === mgChar);
-  return c ? c.name : "Turbo";
+function mgCharDef() {
+  return mgChars.find((x) => x.id === mgChar) || mgChars[0];
 }
-// Voz del compañero activo: el gato maúlla, los perros ladran.
+function mgCharName() {
+  return mgCharDef().name;
+}
+// Voz, sonido y golosina del compañero activo, tomados del roster: una
+// mascota nueva solo necesita definir ahí sus campos para sonar bien.
 function mgVoz() {
-  return "gato" === mgChar ? "¡Miau!" : "¡Guau!";
+  return mgCharDef().voice || "¡Guau!";
 }
 function mgVozLow() {
-  return "gato" === mgChar ? "miau" : "guau";
+  return mgCharDef().voiceLow || "guau";
+}
+function mgTreat() {
+  return mgCharDef().treat || "huesitos";
 }
 // Desbloqueo FAMILIAR de compañeros: si cualquier perfil del dispositivo
 // alcanza el umbral, el compañero queda disponible para todos (llave
@@ -13089,11 +13095,14 @@ function mgCharSkin(ch) {
       outline: "#4a4e56",
       snout: "#c99aa2",
       nose: "#e86a7a",
+      // Orejas erguidas con la base sobre el arco de la cabeza. El path va
+      // SIN cerrar: el trazo dibuja solo los dos bordes visibles y el
+      // relleno se cierra solo, así la base no raya la frente.
       ears: [
-        MG_H("path", { key: "e1", d: "M30 30 L23 9 L45 27 Z", fill: "#a9aeb6", stroke: "#4a4e56", strokeWidth: "1.5" }),
-        MG_H("path", { key: "e2", d: "M70 30 L77 9 L55 27 Z", fill: "#a9aeb6", stroke: "#4a4e56", strokeWidth: "1.5" }),
-        MG_H("path", { key: "e3", d: "M32 27 L28 15 L41 26 Z", fill: "#e8a0b0" }),
-        MG_H("path", { key: "e4", d: "M68 27 L72 15 L59 26 Z", fill: "#e8a0b0" }),
+        MG_H("path", { key: "e1", d: "M26 27 L32 5 L45 19", fill: "#a9aeb6", stroke: "#4a4e56", strokeWidth: "1.5", strokeLinejoin: "round" }),
+        MG_H("path", { key: "e2", d: "M74 27 L68 5 L55 19", fill: "#a9aeb6", stroke: "#4a4e56", strokeWidth: "1.5", strokeLinejoin: "round" }),
+        MG_H("path", { key: "e3", d: "M30.5 23.5 L33 10 L41.5 18.5 Z", fill: "#e8a0b0" }),
+        MG_H("path", { key: "e4", d: "M69.5 23.5 L67 10 L58.5 18.5 Z", fill: "#e8a0b0" }),
       ],
       extras: [
         MG_H("path", { key: "w1", d: "M42 60 L20 56", stroke: "#7a7f87", strokeWidth: "1.2", strokeLinecap: "round" }),
@@ -13127,12 +13136,17 @@ function mgCharSkin(ch) {
       MG_H("path", { key: "e1", d: "M23 28 Q13 42 23 54 Q29 40 35 32 Z", fill: "#3a2a1e" }),
       MG_H("path", { key: "e2", d: "M77 28 Q87 42 77 54 Q71 40 65 32 Z", fill: "#3a2a1e" }),
     ],
-    extras: [],
+    // Las arrugas de la frente son del pug: el gato y Bruno no las llevan.
+    extras: [
+      MG_H("path", { key: "w1", d: "M38 24 Q50 18 62 24", fill: "none", stroke: "#c9a36a", strokeWidth: "2", strokeLinecap: "round" }),
+      MG_H("path", { key: "w2", d: "M40 31 Q50 26 60 31", fill: "none", stroke: "#c9a36a", strokeWidth: "2", strokeLinecap: "round" }),
+    ],
   };
 }
 function d({ mood: e = "happy", size: t = 80, outfit: n, extra: ec, char: chOv }) {
   let a = void 0 === n ? u : n,
-    sk = mgCharSkin(chOv || mgChar),
+    chId = chOv || mgChar,
+    sk = mgCharSkin(chId),
     r = sk.fur,
     l = sk.line,
     i = "#1a120c",
@@ -13141,7 +13155,7 @@ function d({ mood: e = "happy", size: t = 80, outfit: n, extra: ec, char: chOv }
     width: t,
     height: t,
     viewBox: "0 0 100 100",
-    className: `pug pug-${e}${ec ? " " + ec : ""}`,
+    className: `pug pug-${e} pug-char-${chId}${ec ? " " + ec : ""}`,
     "aria-hidden": "true",
     children: [
       (0, s.jsx)("circle", {
@@ -13191,20 +13205,6 @@ function d({ mood: e = "happy", size: t = 80, outfit: n, extra: ec, char: chOv }
         strokeWidth: "1.5",
       }),
       ...sk.ears,
-      (0, s.jsx)("path", {
-        d: "M38 24 Q50 18 62 24",
-        fill: "none",
-        stroke: l,
-        strokeWidth: "2",
-        strokeLinecap: "round",
-      }),
-      (0, s.jsx)("path", {
-        d: "M40 31 Q50 26 60 31",
-        fill: "none",
-        stroke: l,
-        strokeWidth: "2",
-        strokeLinecap: "round",
-      }),
       (0, s.jsx)("ellipse", {
         cx: "50",
         cy: "61",
@@ -19923,25 +19923,25 @@ function e8({
             l = (e) => e[Math.floor(Math.random() * e.length)];
           return "multiplication" === e
             ? l([
-                `Turbo esconde ${a} huesos en cada caja y tiene ${r} cajas. \xbfCu\xe1ntos huesos hay en total?`,
+                `${mgCharName()} esconde ${a} ${mgTreat()} en cada caja y tiene ${r} cajas. \xbfCu\xe1ntos ${mgTreat()} hay en total?`,
                 `Cada nave lleva ${a} tripulantes y despegan ${r} naves. \xbfCu\xe1ntos tripulantes viajan?`,
                 `Sonic junta ${a} anillos en cada vuelta y da ${r} vueltas. \xbfCu\xe1ntos anillos junta?`,
                 `Steve construye ${r} torres con ${a} bloques cada una. \xbfCu\xe1ntos bloques usa?`,
               ])
             : "division" === e
               ? l([
-                  `Turbo reparte ${a} galletas entre ${r} amigos por igual. \xbfCu\xe1ntas le tocan a cada uno?`,
+                  `${mgCharName()} reparte ${a} galletas entre ${r} amigos por igual. \xbfCu\xe1ntas le tocan a cada uno?`,
                   `Hay ${a} diamantes para guardar en ${r} cofres iguales. \xbfCu\xe1ntos van en cada cofre?`,
                   `${a} clones se forman en ${r} filas iguales. \xbfCu\xe1ntos hay por fila?`,
                 ])
               : "addition" === e
                 ? l([
-                    `Turbo tiene ${a} huesos y encuentra ${r} m\xe1s. \xbfCu\xe1ntos tiene ahora?`,
+                    `${mgCharName()} tiene ${a} ${mgTreat()} y encuentra ${r} m\xe1s. \xbfCu\xe1ntos tiene ahora?`,
                     `Sonic ten\xeda ${a} anillos y gan\xf3 ${r} en el nivel. \xbfCu\xe1ntos anillos tiene?`,
                   ])
                 : "subtraction" === e
                   ? l([
-                      `Turbo ten\xeda ${a} croquetas y se comi\xf3 ${r}. \xbfCu\xe1ntas quedan?`,
+                      `${mgCharName()} ten\xeda ${a} croquetas y se comi\xf3 ${r}. \xbfCu\xe1ntas quedan?`,
                       `Hab\xeda ${a} bloques y un creeper explot\xf3 ${r}. \xbfCu\xe1ntos quedan?`,
                     ])
                   : null;
@@ -20489,7 +20489,7 @@ function e8({
               children: [
                 (0, s.jsx)("div", {
                   className: "pres-label",
-                  children: "📖 Problema de Turbo",
+                  children: "📖 Problema de " + mgCharName(),
                 }),
                 (0, s.jsx)("div", { className: "problema-text", children: T }),
                 (0, s.jsx)("div", {
@@ -22166,10 +22166,10 @@ function to({
                         (0, s.jsx)("span", {
                           className: "si-desc",
                           children: i
-                            ? "¡Turbo lo lleva puesto!"
+                            ? "¡" + mgCharName() + " lo lleva puesto!"
                             : a
                               ? "Ya es tuyo"
-                              : "Accesorio para Turbo",
+                              : "Accesorio para " + mgCharName(),
                         }),
                       ],
                     }),
@@ -22533,7 +22533,7 @@ function tc({ facts: e, onBack: t, onReset: n }) {
                 { emoji: "⚡", title: "Reto relámpago", sub: "60 segundos", onClick: () => t("reto") },
                 { emoji: "🧠", title: "Repaso inteligente", sub: "tus datos difíciles", onClick: () => t("practice") },
                 { emoji: "🏆", title: "Colección", sub: "mapa de dominio", onClick: () => t("mastery") },
-                { emoji: "🏪", title: "Tienda", sub: "gorros para Turbo", onClick: () => t("shop") },
+                { emoji: "🏪", title: "Tienda", sub: "gorros para " + mgCharName(), onClick: () => t("shop") },
               ],
             }),
           "little-hub" === e &&
