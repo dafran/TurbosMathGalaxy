@@ -19911,9 +19911,9 @@ function e8({
         r < 10;
       )
         ((l = e_(e, k.current, 0)), r++);
-      l.answer === t.answer
-        ? S("write")
-        : (S("mayor"), P({ prompt: l.prompt, value: l.answer }));
+      "number" == typeof l.answer && "prompt" in l && l.answer !== t.answer
+        ? (S("mayor"), P({ prompt: l.prompt, value: l.answer }))
+        : S("write");
     };
   (0, i.useEffect)(() => {
     es(j);
@@ -19940,9 +19940,7 @@ function e8({
         return (
           Z(mgMax),
           (ee.current = setInterval(() => {
-            Z((e) =>
-              e <= 1 ? (clearInterval(ee.current), em(!1, !0), 0) : e - 1,
-            );
+            Z((e) => (e <= 1 ? (clearInterval(ee.current), 0) : e - 1));
           }, 1e3)),
           () => {
             ee.current && clearInterval(ee.current);
@@ -19950,6 +19948,17 @@ function e8({
         );
       }
     }, [y, D, U, mgFrozen, mgMax]));
+  // Tiempo agotado: nunca cuenta como respuesta incorrecta (el tiempo no
+  // resta corazones). Si lo tecleado es correcto se acredita; si no, pasa
+  // al estado "timeout" sin castigo.
+  (0, i.useEffect)(() => {
+    if (0 !== J || "ask" !== U || mgFrozen || ea.current) return;
+    let e =
+      ("write" === N || "problema" === N) &&
+      O.length > 0 &&
+      parseInt(O, 10) === eo;
+    em(e, !0);
+  }, [J]);
   let ed = (0, i.useCallback)(
       (n, a, l, s) => {
         let i = n >= e.passAt && s > 0,
@@ -19997,7 +20006,7 @@ function e8({
   function mgApplyMiss() {
     f ? (m(!1), B("shielded")) : (u((e) => e - 1), B("wrong"));
   }
-  function em(e, t = !1) {
+  function em(e, mgIsTimeout = !1) {
     if ((e ? v.ok() : v.no(), ea.current)) return;
     ((ea.current = !0), eu());
     let n = Y;
@@ -20054,7 +20063,9 @@ function e8({
         let e = Q + 1;
         (H(e), (en.current = setTimeout(() => ef(e, a, n, c), 950)));
       }
-    } else
+    } else if (mgIsTimeout)
+      (mgSetStreak(0), (mgSinceFreeze.current = 0), B("timeout"));
+    else
       (mgSetStreak(0),
         (mgSinceFreeze.current = 0),
         mgStar > 0
@@ -20087,7 +20098,9 @@ function e8({
       "parity" === N && ev
         ? `${ev.prompt} es ${0 === ev.answer ? "par" : "impar"}`
         : "tf" === N && ev
-          ? `${ev.prompt} = ${ev.answer}${$ !== ev.answer ? `, no ${$}` : ""}`
+          ? $ === ev.answer
+            ? `¡Era verdadero! ${ev.prompt} = ${ev.answer}`
+            : `Era falso: ${ev.prompt} = ${ev.answer}, no ${$}`
           : "mayor" === N && ev && _
             ? `${ev.prompt} = ${ev.answer} y ${_.prompt} = ${_.value}`
             : `La respuesta es ${eo}`;
@@ -20515,6 +20528,21 @@ function e8({
                   }),
               ],
             }),
+          "timeout" === U &&
+            (0, s.jsxs)("div", {
+              className: "q-feedback shieldmsg",
+              children: [
+                (0, s.jsxs)("div", {
+                  className: "wrong-answer",
+                  children: ["⏰ ¡Se acabó el tiempo! ", ey()],
+                }),
+                ec &&
+                  (0, s.jsxs)("div", {
+                    className: "hint-box",
+                    children: ["💡 ", ec],
+                  }),
+              ],
+            }),
         ],
       }),
       "retryoffer" === U
@@ -20538,7 +20566,10 @@ function e8({
               }),
             ],
           })
-        : "wrong" === U || "shielded" === U || "starred" === U
+        : "wrong" === U ||
+            "shielded" === U ||
+            "starred" === U ||
+            "timeout" === U
           ? (0, s.jsx)("button", {
               className: "btn-pixel btn-go next-btn",
               onClick: () => {
