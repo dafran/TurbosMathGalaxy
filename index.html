@@ -572,6 +572,21 @@ svg.pug.pug-walk, svg.wp-pug.pug-walk { animation: pugWalk 0.62s ease-in-out inf
   25% { transform: translate(-50%, -14px) scale(1.15); opacity: 1; }
   100% { transform: translate(-50%, -46px) scale(1); opacity: 0; }
 }
+
+/* ── Camino pequeño: modos "tocar" y "vf", y ronda sorpresa ── */
+.tocar-grid { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;
+  max-width: 340px; margin: 10px auto; }
+button.tocar-item { background: rgba(255,255,255,.10); border: 3px solid rgba(255,255,255,.28);
+  border-radius: 14px; cursor: pointer; padding: 8px 10px; font-size: 2.1rem; line-height: 1;
+  min-width: 58px; min-height: 58px; transition: transform .12s, background .12s, border-color .12s; }
+button.tocar-item:disabled { cursor: default; }
+button.tocar-item.tocado { background: #2e7d32; border-color: #a5d6a7; transform: scale(.94); }
+button.tocar-item .tocar-num { color: #fff; font-family: var(--pixel); font-size: 1.25rem; }
+.tocar-count { text-align: center; font-weight: 800; font-size: 1.15rem; color: #ffd447; margin-top: 6px; }
+.vf-claim { text-align: center; font-family: var(--pixel); font-size: 1.05rem; color: #ffd447;
+  margin: 10px auto 4px; text-shadow: 2px 2px 0 rgba(0,0,0,.4); }
+.little-choice.vf-btn { min-width: 108px; }
+.btn-pixel.btn-bonus { background: #7ec8ff; border-color: #2a6faf; color: #0b2540; }
 </style>
 <script>
 (function(){

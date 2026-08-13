@@ -16747,6 +16747,9 @@ let ei = [
       emoji: "⚔️",
       sticker: "🎠",
       stickerName: "Carrusel real",
+      // Sin pool caía al trío por defecto (contar/sumar/comparar) y este
+      // nivel llamado "Suma y resta" jamás generaba una resta.
+      pool: ["sumar", "restar"],
     },
     {
       id: 24,
@@ -16958,6 +16961,69 @@ let ei = [
     },
   ],
   ec = ["💍", "🟦", "⭐", "🍎", "💎", "🪙"];
+// Práctica intercalada: todo nivel del camino pequeño lleva un pool de
+// modos para variar sus preguntas. Si no define uno propio, hereda lo ya
+// enseñado hasta ese punto del camino (esto corrige también que los
+// "Reto" de los mundos 0-2 usaran sumar antes de enseñarlo). Los modos
+// nuevos (vf y tocar) entran del mundo 6 en adelante.
+(() => {
+  let e = [];
+  eo.forEach((t) => {
+    "mix" !== t.mode && !e.includes(t.mode) && e.push(t.mode);
+    t.pool && t.pool.length
+      ? t.pool.forEach((n) => {
+          e.includes(n) || e.push(n);
+        })
+      : (t.pool = e.slice());
+    t.world >= 6 &&
+      (t.pool.includes("vf") || t.pool.push("vf"),
+      t.pool.includes("tocar") || t.pool.push("tocar"));
+  });
+})();
+// Frases rotativas por modo: se eligen al crear cada pregunta (quedan en
+// q.frase) para que el mismo texto no se repita 8 veces seguidas.
+const MG_LITTLE_FRASES = {
+  contar: ["¿Cuántos hay?", "¡Cuéntalos todos!", "¿Cuántos ves aquí?"],
+  sumar: ["¿Cuántos hay en total?", "¡Júntalos! ¿Cuántos son?", "¿Cuántos son entre todos?"],
+  restar: ["¿Cuántos quedan?", "¡Se fueron algunos! ¿Cuántos quedan?", "¿Cuántos quedan ahora?"],
+  comparar: ["Toca el grupo con más", "¿Dónde hay más? ¡Tócalo!", "Elige el grupo con más"],
+  palitos: ["¿Cuántos palitos hay?", "¡Cuenta los palitos!", "¿Cuántos palitos ves?"],
+  puntos: ["¿Cuántos puntos ves?", "¡Cuenta los puntos!", "¿Cuántos puntos hay?"],
+  patron: ["¿Qué sigue?", "¿Qué viene después?", "Completa el patrón"],
+  falta: ["¿Qué número falta?", "¡Falta un número! ¿Cuál es?", "Encuentra el número perdido"],
+  orden: ["Toca los números en orden: 1, 2, 3...", "¡Del más chico al más grande!", "Toca los números de menor a mayor"],
+  figura: ["Toca la figura igual a esta", "¡Busca la figura gemela!", "¿Cuál es igual a esta?"],
+  depar: ["¿Cuántos hay? ¡Cuenta de 2 en 2!", "¡De 2 en 2! ¿Cuántos son?", "Cuenta los pares: ¿cuántos hay?"],
+  para5: ["¿Cuántos faltan para llenar los 5?", "¿Cuántos más para llegar a 5?", "¿Cuántos faltan para tener 5?"],
+  vf: ["Mira bien: ¿sí o no?", "¿Es verdad?", "¿Cierto o no?"],
+  tocar: ["¡Toca cada uno para contarlos!", "¡Cuéntalos con tu dedo!", "Toca todos, uno por uno"],
+};
+let mgLittleLastFrase = "";
+function mgLittleFrase(e) {
+  let t = MG_LITTLE_FRASES[e];
+  if (!t) return null;
+  let n = ee(t);
+  if (t.length > 1) for (let e = 0; e < 3 && n === mgLittleLastFrase; e++) n = ee(t);
+  return ((mgLittleLastFrase = n), n);
+}
+// Variedad del camino pequeño (espejo del warmup del camino grande):
+// desde la pregunta 4 de un nivel de modo fijo, ~28% de las preguntas
+// salen del pool del nivel; y un memo evita que salga dos veces seguidas
+// exactamente la misma pregunta.
+let mgLittleLastSig = "";
+function mgLittleSig(e) {
+  return e
+    ? [e.kind, e.n, e.a, e.b, e.answer, e.pairs, e.filled, e.target, e.left, e.right, e.claim, e.obj].join("|")
+    : "";
+}
+function mgLittleNext(e, t) {
+  let n = e.mode;
+  "mix" !== n && e.pool && e.pool.length > 1 && t >= 3 && Math.random() < 0.28 && (n = "mix");
+  let a = ef(n, e.max, e.pool);
+  for (let r = 0; r < 3 && mgLittleSig(a) === mgLittleLastSig; r++)
+    a = ef(n, e.max, e.pool);
+  return ((mgLittleLastSig = mgLittleSig(a)), (a.frase = mgLittleFrase(a.kind)), a);
+}
 // Figuras del modo "figura" dibujadas en SVG propio: los emojis
 // geométricos son el bloque que más cambia entre plataformas, y aquí el
 // dibujo ES la pregunta. Los valores del juego son los ids (strings), la
@@ -17072,6 +17138,18 @@ function ef(e, t, n) {
       answer: r,
       choices: s.sort(() => Math.random() - 0.5),
     };
+  }
+  if ("vf" === r) {
+    let e = Z(1, Math.max(3, Math.min(6, t))),
+      n =
+        Math.random() < 0.5
+          ? e
+          : Math.max(1, e + (Math.random() < 0.5 ? -1 : 1) * Z(1, 2));
+    return { kind: "vf", obj: a, n: e, claim: n, truth: n === e };
+  }
+  if ("tocar" === r) {
+    let e = Z(3, Math.max(4, Math.min(8, t)));
+    return { kind: "tocar", obj: a, n: e };
   }
   if ("contar" === r) {
     let e = Z(1, t);
@@ -18902,15 +18980,19 @@ function e0({ progress: e, onBack: t }) {
 function e1({ level: e, onDone: t }) {
   let n,
     [a, r] = (0, i.useState)(0),
-    [l, o] = (0, i.useState)(() => ef(e.mode, e.max, e.pool)),
+    [l, o] = (0, i.useState)(() => mgLittleNext(e, 0)),
     [c, u] = (0, i.useState)("ask"),
     [f, m] = (0, i.useState)(0),
     [p, h] = (0, i.useState)(null),
     [g, b] = (0, i.useState)([]),
+    [mgLS, mgSetLS] = (0, i.useState)(0),
+    [mgLCheer, mgSetLCheer] = (0, i.useState)(null),
+    mgLCheerT = (0, i.useRef)(null),
     y = (0, i.useRef)(null);
   (0, i.useEffect)(
     () => () => {
-      y.current && clearTimeout(y.current);
+      (y.current && clearTimeout(y.current),
+        mgLCheerT.current && clearTimeout(mgLCheerT.current));
     },
     [],
   );
@@ -18933,13 +19015,25 @@ function e1({ level: e, onDone: t }) {
           return 2 * e.pairs;
         case "para5":
           return 5 - e.filled;
+        case "vf":
+          return e.truth;
         case "orden":
+        case "tocar":
           return -1;
       }
     },
     k = (n) => {
       if ("ask" !== c) return;
       let s = "orden-ok" === n || ("orden-fail" !== n && n === x(l));
+      if (s) {
+        let e = mgLS + 1;
+        mgSetLS(e);
+        let t = mgStreakCheer(e);
+        t &&
+          (mgSetLCheer(t),
+          mgLCheerT.current && clearTimeout(mgLCheerT.current),
+          (mgLCheerT.current = setTimeout(() => mgSetLCheer(null), 1600)));
+      } else mgSetLS(0);
       (s ? v.ok() : v.no(),
         h(n),
         u(s ? "right" : "wrong"),
@@ -18949,7 +19043,7 @@ function e1({ level: e, onDone: t }) {
             let n = a + 1;
             n >= e.questions
               ? t(f + +!!s)
-              : (r(n), o(ef(e.mode, e.max, e.pool)), u("ask"), h(null), b([]));
+              : (r(n), o(mgLittleNext(e, n)), u("ask"), h(null), b([]));
           },
           s ? 1100 : 1900,
         )));
@@ -18973,11 +19067,14 @@ function e1({ level: e, onDone: t }) {
       "comparar" !== l.kind &&
       "patron" !== l.kind &&
       "orden" !== l.kind &&
-      "figura" !== l.kind;
+      "figura" !== l.kind &&
+      "vf" !== l.kind &&
+      "tocar" !== l.kind;
   return (0, s.jsxs)("div", {
     className: "screen world-sonic",
     children: [
       (0, s.jsx)(eX, {}),
+      mgLCheer && MG_H("div", { className: "streak-cheer" }, mgLCheer),
       (0, s.jsxs)("div", {
         className: "little-hud",
         children: [
@@ -18995,7 +19092,7 @@ function e1({ level: e, onDone: t }) {
               children: [
                 (0, s.jsx)("div", {
                   className: "little-question",
-                  children: "¿Cuántos hay?",
+                  children: l.frase || "¿Cuántos hay?",
                 }),
                 j(l.n, l.obj),
               ],
@@ -19005,7 +19102,7 @@ function e1({ level: e, onDone: t }) {
               children: [
                 (0, s.jsx)("div", {
                   className: "little-question",
-                  children: "¿Cuántos palitos hay?",
+                  children: l.frase || "¿Cuántos palitos hay?",
                 }),
                 ((e) => {
                   let t = [],
@@ -19047,7 +19144,7 @@ function e1({ level: e, onDone: t }) {
               children: [
                 (0, s.jsx)("div", {
                   className: "little-question",
-                  children: "¿Cuántos puntos ves?",
+                  children: l.frase || "¿Cuántos puntos ves?",
                 }),
                 ((n = l.n),
                 (0, s.jsx)("div", {
@@ -19075,7 +19172,7 @@ function e1({ level: e, onDone: t }) {
               children: [
                 (0, s.jsx)("div", {
                   className: "little-question",
-                  children: "¿Cuántos hay en total?",
+                  children: l.frase || "¿Cuántos hay en total?",
                 }),
                 (0, s.jsxs)("div", {
                   className: "sum-visual",
@@ -19095,7 +19192,7 @@ function e1({ level: e, onDone: t }) {
               children: [
                 (0, s.jsx)("div", {
                   className: "little-question",
-                  children: "¿Cuántos quedan?",
+                  children: l.frase || "¿Cuántos quedan?",
                 }),
                 j(l.a, l.obj, "", l.a - l.b),
               ],
@@ -19105,7 +19202,7 @@ function e1({ level: e, onDone: t }) {
               children: [
                 (0, s.jsx)("div", {
                   className: "little-question",
-                  children: "¿Qué número falta?",
+                  children: l.frase || "¿Qué número falta?",
                 }),
                 (0, s.jsx)("div", {
                   className: "pattern-row",
@@ -19128,7 +19225,7 @@ function e1({ level: e, onDone: t }) {
               children: [
                 (0, s.jsx)("div", {
                   className: "little-question",
-                  children: "Toca los números en orden: 1, 2, 3...",
+                  children: l.frase || "Toca los números en orden: 1, 2, 3...",
                 }),
                 (0, s.jsx)("div", {
                   className: "bubbles-zone kid-bubbles",
@@ -19166,11 +19263,77 @@ function e1({ level: e, onDone: t }) {
               children: [
                 (0, s.jsx)("div", {
                   className: "little-question",
-                  children: "Toca la figura igual a esta",
+                  children: l.frase || "Toca la figura igual a esta",
                 }),
                 (0, s.jsx)("div", {
                   className: "figura-target",
                   children: mgShapeSVG(l.target, 72),
+                }),
+              ],
+            }),
+          "vf" === l.kind &&
+            (0, s.jsxs)(s.Fragment, {
+              children: [
+                (0, s.jsx)("div", {
+                  className: "little-question",
+                  children: l.frase || "Mira bien: ¿sí o no?",
+                }),
+                j(l.n, l.obj),
+                (0, s.jsxs)("div", {
+                  className: "vf-claim",
+                  children: ["¿Hay ", l.claim, "?"],
+                }),
+                (0, s.jsxs)("div", {
+                  className: "little-choices",
+                  children: [
+                    (0, s.jsx)("button", {
+                      className: `little-choice vf-btn ${!0 === p ? ("right" === c ? "ok" : "no") : ""} ${"wrong" === c && !0 === x(l) ? "reveal" : ""}`,
+                      onClick: () => k(!0),
+                      disabled: "ask" !== c,
+                      children: "✅ Sí",
+                    }),
+                    (0, s.jsx)("button", {
+                      className: `little-choice vf-btn ${!1 === p ? ("right" === c ? "ok" : "no") : ""} ${"wrong" === c && !1 === x(l) ? "reveal" : ""}`,
+                      onClick: () => k(!1),
+                      disabled: "ask" !== c,
+                      children: "❌ No",
+                    }),
+                  ],
+                }),
+              ],
+            }),
+          "tocar" === l.kind &&
+            (0, s.jsxs)(s.Fragment, {
+              children: [
+                (0, s.jsx)("div", {
+                  className: "little-question",
+                  children: l.frase || "¡Toca cada uno para contarlos!",
+                }),
+                (0, s.jsx)("div", {
+                  className: "tocar-grid",
+                  children: Array.from({ length: l.n }).map((e, t) => {
+                    let n = g.indexOf(t);
+                    return (0, s.jsx)(
+                      "button",
+                      {
+                        className: `tocar-item ${n >= 0 ? "tocado" : ""}`,
+                        disabled: "ask" !== c || n >= 0,
+                        onClick: () => {
+                          let e = [...g, t];
+                          (SFX.pop(), b(e), e.length >= l.n && k("orden-ok"));
+                        },
+                        children:
+                          n >= 0
+                            ? (0, s.jsx)("span", { className: "tocar-num", children: n + 1 })
+                            : l.obj,
+                      },
+                      t,
+                    );
+                  }),
+                }),
+                (0, s.jsxs)("div", {
+                  className: "tocar-count",
+                  children: [g.length, " de ", l.n],
                 }),
               ],
             }),
@@ -19179,7 +19342,7 @@ function e1({ level: e, onDone: t }) {
               children: [
                 (0, s.jsx)("div", {
                   className: "little-question",
-                  children: "¿Cuántos hay? ¡Cuenta de 2 en 2!",
+                  children: l.frase || "¿Cuántos hay? ¡Cuenta de 2 en 2!",
                 }),
                 (0, s.jsx)("div", {
                   className: "pares-zone",
@@ -19202,7 +19365,7 @@ function e1({ level: e, onDone: t }) {
               children: [
                 (0, s.jsx)("div", {
                   className: "little-question",
-                  children: "¿Cuántos faltan para llenar los 5?",
+                  children: l.frase || "¿Cuántos faltan para llenar los 5?",
                 }),
                 (0, s.jsx)("div", {
                   className: "five-frame",
@@ -19229,7 +19392,7 @@ function e1({ level: e, onDone: t }) {
               children: [
                 (0, s.jsx)("div", {
                   className: "little-question",
-                  children: "¿Qué sigue?",
+                  children: l.frase || "¿Qué sigue?",
                 }),
                 (0, s.jsx)("div", {
                   className: "pattern-row",
@@ -19252,7 +19415,7 @@ function e1({ level: e, onDone: t }) {
               children: [
                 (0, s.jsx)("div", {
                   className: "little-question",
-                  children: "Toca el grupo con más",
+                  children: l.frase || "Toca el grupo con más",
                 }),
                 (0, s.jsxs)("div", {
                   className: "compare-row",
@@ -19326,6 +19489,17 @@ function e1({ level: e, onDone: t }) {
     ],
   });
 }
+// Ronda sorpresa: al terminar un nivel, a veces (~1/3) se ofrece UNA
+// ronda de un minijuego de lógica, para que el propio camino varíe.
+// Los componentes son los mismos de "Juegos de lógica".
+const MG_BONUS_GAMES = [
+  ["luces", O],
+  ["parejitas", U],
+  ["diferente", Q],
+  ["sombras", W],
+  ["tren", K],
+  ["cajas", Y],
+];
 function e2({
   level: e,
   correct: t,
@@ -19338,7 +19512,12 @@ function e2({
   (0, i.useEffect)(() => {
     v.win();
   }, []);
-  let [c, u] = (0, i.useState)(!a);
+  let [c, u] = (0, i.useState)(!a),
+    [mgBn, mgSetBn] = (0, i.useState)(() =>
+      Math.random() < 0.34 ? ee(MG_BONUS_GAMES) : null,
+    ),
+    [mgBnOn, mgSetBnOn] = (0, i.useState)(!1),
+    [mgBnFlash, mgSetBnFlash] = (0, i.useState)(null);
   return (0, s.jsxs)("div", {
     className: "screen world-sonic",
     children: [
@@ -19397,6 +19576,31 @@ function e2({
             ],
           }),
         }),
+      mgBnOn &&
+        mgBn &&
+        (0, s.jsx)("div", {
+          className: "chest-overlay",
+          children: (0, s.jsxs)("div", {
+            className: "panel brain-panel",
+            children: [
+              (0, s.jsx)("div", {
+                className: "brain-title-line",
+                children: "\ud83e\udde9 \u00a1Ronda sorpresa!",
+              }),
+              MG_H(mgBn[1], {
+                level: 2,
+                onFinish: (e) => {
+                  (mgSetBnOn(!1),
+                    mgSetBn(null),
+                    mgSetBnFlash(e ? "\u2b50 \u00a1Genial!" : "\u00a1Buen intento!"),
+                    e ? v.win() : v.no(),
+                    setTimeout(() => mgSetBnFlash(null), 1500));
+                },
+              }),
+            ],
+          }),
+        }),
+      mgBnFlash && MG_H("div", { className: "streak-cheer" }, mgBnFlash),
       (0, s.jsxs)("div", {
         className: "stack center",
         children: [
@@ -19426,6 +19630,12 @@ function e2({
           (0, s.jsxs)("div", {
             className: "btn-row",
             children: [
+              mgBn &&
+                (0, s.jsx)("button", {
+                  className: "btn-pixel btn-bonus",
+                  onClick: () => mgSetBnOn(!0),
+                  children: "\ud83e\udde9 \u00a1Ronda sorpresa!",
+                }),
               o &&
                 (0, s.jsx)("button", {
                   className: "btn-pixel btn-go",
