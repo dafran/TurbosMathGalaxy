@@ -18333,7 +18333,11 @@ function MgProfileSelector({ profiles: e, soundOn: t, onToggleSound: n, onParent
         MG_H("div", { className: "title-pixel" }, "🌌 Math"),
         MG_H("div", { className: "title-pixel accent" }, "Galaxy"),
         MG_H("div", { className: "subtitle" }, "¿Quién va a jugar?")),
-      s.jsx(f, { mood: "excited", text: "¡Guau! Soy Turbo. ¿Quién juega hoy?", size: 78 }),
+      // char fijo en "turbo": sin esto, f() cae al mgChar global, que
+      // puede haber quedado en la mascota del último perfil activo (p.
+      // ej. el hermano jugó con Michi) — el saludo debe ser siempre de
+      // Turbo aquí, antes de elegir perfil.
+      s.jsx(f, { mood: "excited", text: "¡Guau! Soy Turbo. ¿Quién juega hoy?", size: 78, char: "turbo" }),
       MG_H("div", { className: "profile-row" },
         e.map((pf) => MG_H("button", { key: pf.id, className: "profile-card " + (pf.age <= 5 ? "little" : "big"), onClick: () => r(pf) },
           MG_H("span", { className: "profile-emoji" }, pf.emoji),
