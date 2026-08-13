@@ -13011,6 +13011,65 @@ function mgVoz() {
 function mgVozLow() {
   return "gato" === mgChar ? "miau" : "guau";
 }
+// Desbloqueo FAMILIAR de compañeros: si cualquier perfil del dispositivo
+// alcanza el umbral, el compañero queda disponible para todos (llave
+// global mg_chars_unlocked, fuera del prefijo por perfil). El compañero
+// ELEGIDO (mg_char) sigue siendo por perfil.
+function mgCharsUnlocked() {
+  try {
+    let e = window.__mgRaw && window.__mgRaw.get("mg_chars_unlocked");
+    return e ? JSON.parse(e) || {} : {};
+  } catch {
+    return {};
+  }
+}
+function mgSyncCharUnlocks(n) {
+  try {
+    let e = mgCharsUnlocked(),
+      t = !1;
+    mgChars.forEach((c) => {
+      c.unlock > 0 && (n || 0) >= c.unlock && !e[c.id] && ((e[c.id] = !0), (t = !0));
+    });
+    t && window.__mgRaw && window.__mgRaw.set("mg_chars_unlocked", JSON.stringify(e));
+    return e;
+  } catch {
+    return {};
+  }
+}
+function mgCharIsUnlocked(c, n) {
+  return 0 === c.unlock || (n || 0) >= c.unlock || !!mgCharsUnlocked()[c.id];
+}
+function mgCountDone(e) {
+  try {
+    let t = JSON.parse(e || "{}"),
+      n = 0;
+    for (let a in t) t[a] && t[a].done && n++;
+    return n;
+  } catch {
+    return 0;
+  }
+}
+// Siembra al arrancar: recorre el progreso de TODOS los perfiles (y el
+// legado sin perfil) para que lo ya ganado por un hermano cuente para
+// toda la familia desde el primer render.
+function mgSeedCharUnlocks() {
+  try {
+    let raw = window.__mgRaw;
+    if (!raw) return;
+    let profs = [];
+    try {
+      profs = JSON.parse(raw.get("mg_profiles")) || [];
+    } catch {}
+    let best = mgCountDone(raw.get("mg_path")) + mgCountDone(raw.get("mg_little_path"));
+    profs.forEach((p) => {
+      let n =
+        mgCountDone(raw.get("mg_" + p.id + "__mg_path")) +
+        mgCountDone(raw.get("mg_" + p.id + "__mg_little_path"));
+      n > best && (best = n);
+    });
+    mgSyncCharUnlocks(best);
+  } catch {}
+}
 // Enemigos menores (secuaces) que aparecen en niveles normales: se
 // derrotan con pocos aciertos, a diferencia del jefe de fin de mundo.
 let mgMinions = [
@@ -17966,10 +18025,23 @@ function eU() {
   return { date: eV(), path: 0, practice: 0, brain: 0, claimed: !1 };
 }
 let eB = {};
+// La caché en memoria y el respaldo window.storage deben separar por
+// perfil igual que el shim de localStorage; sin esto, al cambiar de
+// perfil el nuevo "heredaba" datos del anterior (mascota, monedas...).
+const MG_STORE_GLOBAL = { mg_profiles: 1, mg_active: 1, mg_sound: 1, mg_chars_unlocked: 1 };
+function mgStoreKey(e) {
+  if ("string" != typeof e || "mg_" !== e.slice(0, 3) || MG_STORE_GLOBAL[e]) return e;
+  let t = null;
+  try {
+    t = window.__mgRaw && window.__mgRaw.get("mg_active");
+  } catch {}
+  return t ? "mg_" + t + "__" + e : e;
+}
 async function eQ(e, t) {
-  let n = JSON.stringify(t);
+  let n = JSON.stringify(t),
+    k = mgStoreKey(e);
   if (
-    ((eB[e] = n),
+    ((eB[k] = n),
     !(function (e, t) {
       try {
         return (window.localStorage.setItem(e, t), !0);
@@ -17979,7 +18051,7 @@ async function eQ(e, t) {
     })(e, n))
   )
     try {
-      window.storage && (await window.storage.set(e, n, !1));
+      window.storage && (await window.storage.set(k, n, !1));
     } catch {}
 }
 async function eH(e, t) {
@@ -17994,15 +18066,16 @@ async function eH(e, t) {
     try {
       return JSON.parse(n);
     } catch {}
+  let k = mgStoreKey(e);
   try {
     if (window.storage) {
-      let t = await window.storage.get(e, !1);
+      let t = await window.storage.get(k, !1);
       if (t && t.value) return JSON.parse(t.value);
     }
   } catch {}
-  if (eB[e])
+  if (eB[k])
     try {
-      return JSON.parse(eB[e]);
+      return JSON.parse(eB[k]);
     } catch {}
   return t;
 }
@@ -18205,6 +18278,9 @@ function MgHub({ kind: k, name: nm, coins: c, streak: st, onBack: bk, items: it 
 }
 function MgCharScreen({ charDone: dq, onBack: bk }) {
   const [selChar, setSelChar] = i.useState(mgChar);
+  i.useEffect(() => {
+    mgSyncCharUnlocks(dq);
+  }, [dq]);
   return MG_H("div", { className: "screen world-starwars hub-screen" },
     s.jsx(eX, {}),
     MG_H("div", { className: "hub-top" },
@@ -18214,7 +18290,7 @@ function MgCharScreen({ charDone: dq, onBack: bk }) {
       MG_H("div", { className: "char-picker-title" }, "🐾 Elige tu compañero"),
       MG_H("div", { className: "char-grid" },
         ...mgChars.map((cc) => {
-          let unlocked = (dq || 0) >= cc.unlock,
+          let unlocked = mgCharIsUnlocked(cc, dq),
             sel = selChar === cc.id;
           return MG_H("button",
             {
@@ -18228,7 +18304,7 @@ function MgCharScreen({ charDone: dq, onBack: bk }) {
             unlocked
               ? MG_H(d, { mood: sel ? "excited" : "happy", size: 64, char: cc.id })
               : MG_H("div", { className: "char-lock" }, "🔒"),
-            MG_H("div", { className: "char-name" }, unlocked ? cc.name : "Nivel " + cc.unlock),
+            MG_H("div", { className: "char-name" }, unlocked ? cc.name : "Completa " + cc.unlock + " niveles"),
             unlocked ? MG_H("div", { className: "char-desc" }, cc.desc) : null,
             sel && MG_H("div", { className: "char-badge" }, "✓ elegido"));
         }))));
@@ -21923,6 +21999,9 @@ function to({
 }) {
   let [u, m] = (0, i.useState)(null),
     [selChar, setSelChar] = (0, i.useState)(mgChar);
+  (0, i.useEffect)(() => {
+    mgSyncCharUnlocks(dq);
+  }, [dq]);
   return (0, s.jsxs)("div", {
     className: "screen world-minecraft",
     children: [
@@ -22006,7 +22085,7 @@ function to({
               "div",
               { className: "char-grid" },
               ...mgChars.map((cc) => {
-                let unlocked = (dq || 0) >= cc.unlock,
+                let unlocked = mgCharIsUnlocked(cc, dq),
                   sel = selChar === cc.id;
                 return MG_H(
                   "button",
@@ -22026,7 +22105,7 @@ function to({
                   unlocked
                     ? MG_H(d, { mood: sel ? "excited" : "happy", size: 60, char: cc.id })
                     : MG_H("div", { className: "char-lock" }, "🔒"),
-                  MG_H("div", { className: "char-name" }, unlocked ? cc.name : "Nivel " + cc.unlock),
+                  MG_H("div", { className: "char-name" }, unlocked ? cc.name : "Completa " + cc.unlock + " niveles"),
                   sel && MG_H("div", { className: "char-badge" }, "✓ elegido"),
                 );
               }),
@@ -22278,6 +22357,9 @@ function tc({ facts: e, onBack: t, onReset: n }) {
         [mgA, mgSetA] = (0, i.useState)(mgGetActive()),
         [mgEd, mgSetEd] = (0, i.useState)(null);
       (0, i.useEffect)(() => {
+        mgSeedCharUnlocks();
+      }, []);
+      (0, i.useEffect)(() => {
         if (!mgA) return;
         (async () => {
           (a(await eH("mg_facts", {})),
@@ -22338,10 +22420,17 @@ function tc({ facts: e, onBack: t, onReset: n }) {
           }
           (W({ ...y, ...(await eH("mg_brain", { ...y })) }),
             K({ ...R, ...(await eH("mg_lbrain", { ...R })) }));
+          // El compañero se restaura ANTES del outfit: Y(e) siempre recibe
+          // un objeto nuevo y garantiza un re-render con el mgChar correcto
+          // (mgChar es global de módulo, asignarlo no repinta por sí solo).
+          let ch = await eH("mg_char", { id: "turbo" }),
+            chId = ch.id || "turbo",
+            chDef = mgChars.find((c) => c.id === chId);
+          ((!chDef || (chDef.unlock > 0 && !mgCharsUnlocked()[chId])) &&
+            (chId = "turbo"),
+            (mgChar = chId));
           let e = await eH("mg_outfit", { owned: [], equipped: null });
           (Y(e), (u = e.equipped));
-          let ch = await eH("mg_char", { id: "turbo" });
-          mgChar = ch.id || "turbo";
           let t = await eH("mg_sound", { on: !0 });
           (et(t.on), (g = !t.on));
         })();

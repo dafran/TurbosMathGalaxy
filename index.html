@@ -5,7 +5,7 @@
        Redirige las llaves de progreso mg_* al espacio del perfil activo,
        dejando globales solo el roster, el perfil activo y el sonido. */
     (function () {
-      var GLOBAL = { mg_profiles: 1, mg_active: 1, mg_sound: 1 };
+      var GLOBAL = { mg_profiles: 1, mg_active: 1, mg_sound: 1, mg_chars_unlocked: 1 };
       var proto;
       try { proto = Object.getPrototypeOf(window.localStorage); } catch (e) { return; }
       var rawGet = proto.getItem, rawSet = proto.setItem, rawRemove = proto.removeItem;
@@ -426,20 +426,21 @@
   // El mapa real mundo\u2192ids lo expone app.js (window.__mgAdvWorlds / __mgLitWorlds)
   // tras renumerar los niveles. Los ADV_LEVELS/LIT_LEVELS de arriba quedan solo
   // como respaldo por si app.js a\u00fan no carg\u00f3.
-  var seen = readJSON(SEEN_KEY, null);
-  var seedNeeded = !seen || seen.v !== 2;
   setInterval(function(){
     if (document.querySelector('.wp-overlay')) return;
     var advMap = window.__mgAdvWorlds, litMap = window.__mgLitWorlds;
     if (!advMap || !litMap) return; // esperar a que app.js exponga el mapa real
     var a = doneWorlds('mg_path', advMap);
     var l = doneWorlds('mg_little_path', litMap);
-    if (seedNeeded){
+    // Se relee en cada tick: la llave va prefijada por perfil (shim), y
+    // cachearla en memoria hac\u00eda que al cambiar de perfil se dispararan
+    // celebraciones viejas del perfil reci\u00e9n cargado.
+    var seen = readJSON(SEEN_KEY, null);
+    if (!seen || seen.v !== 2){
       // Migraci\u00f3n: marcar como "ya visto" solo lo que de verdad est\u00e1 completo
       // ahora, para no lanzar celebraciones falsas del mapa viejo.
       seen = { v: 2, a: a.slice(), l: l.slice() };
       try { localStorage.setItem(SEEN_KEY, JSON.stringify(seen)); } catch(e){}
-      seedNeeded = false;
       return;
     }
     for (var i = 0; i < a.length; i++){
