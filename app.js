@@ -17006,6 +17006,93 @@ function mgLittleFrase(e) {
   if (t.length > 1) for (let e = 0; e < 3 && n === mgLittleLastFrase; e++) n = ee(t);
   return ((mgLittleLastFrase = n), n);
 }
+/* ── Dificultad escalada por niño (camino pequeño) ────────────────────
+   La dificultad es una dimensión ORTOGONAL al progreso: lo guardado dice
+   QUÉ niveles completó el niño; la banda dice QUÉ TAN GRANDES son los
+   números dentro de un nivel. Por eso vive en su propia llave (mg_skill)
+   y no toca mg_little_path ni los ids de nivel, que son fijos.
+
+   Las bandas se anclan a estándares curriculares (Common Core K-2 y el
+   sentido numérico de LOMLOE); la banda 1 reproduce EXACTAMENTE el juego
+   previo a esta función, así que un perfil en banda 1 no nota cambio.
+   El ajuste automático busca ~75-85% de aciertos, el rango que reportan
+   tanto Math Garden (selección de ítems con p(éxito)=.75) como la regla
+   del 85% de Wilson et al. — ni aburrido ni frustrante. */
+const MG_BANDS = [
+  { id: 0, factor: 0.6, cap: 5, label: "Cantidades hasta 5" },
+  { id: 1, factor: 1, cap: 10, label: "Cantidades hasta 10" },
+  { id: 2, factor: 1.5, cap: 20, label: "Cantidades hasta 20" },
+  { id: 3, factor: 2, cap: 30, label: "Cantidades hasta 30" },
+];
+const MG_SKILL_WINDOW = 12; // respuestas que mira el ajuste automático
+let mgSkill = null; // { v, band, hist:[], manual }
+function mgSkillSeed(age) {
+  // La edad SOLO siembra la conjetura inicial; el desempeño manda después.
+  return age <= 4 ? 0 : 1;
+}
+function mgSkillGet() {
+  return mgSkill || { v: 1, band: 1, hist: [], manual: null };
+}
+function mgSkillBand() {
+  let s = mgSkillGet();
+  return MG_BANDS[null != s.manual ? s.manual : s.band] || MG_BANDS[1];
+}
+// Máximo efectivo para un nivel. NO muta el nivel: solo devuelve otro
+// número para el generador. Piso de 3 para que ningún modo degenere.
+function mgSkillMax(lvl) {
+  let b = mgSkillBand();
+  return Math.max(3, Math.min(b.cap, Math.round((lvl.max || 5) * b.factor)));
+}
+// Nombre honesto: 17 de los 40 niveles llevan el número en el nombre
+// ("Cuenta hasta 3"), así que al escalar hay que reescribirlo o el
+// rótulo miente. Seguro porque el avance pequeño se indexa por id fijo
+// (a diferencia del camino grande, que migra por nombre).
+function mgLevelName(lvl) {
+  let m = mgSkillMax(lvl);
+  return m === lvl.max ? lvl.name : lvl.name.replace(/\d+/, m);
+}
+// Lectura/escritura de la banda de CUALQUIER perfil (para el informe de
+// papás, que lista a todos). Va por __mgRaw porque el shim solo mapea al
+// perfil activo.
+function mgSkillReadFor(id, age) {
+  try {
+    let v = window.__mgRaw && window.__mgRaw.get("mg_" + id + "__mg_skill");
+    if (v) {
+      let s = JSON.parse(v);
+      if (s && null != s.band) return s;
+    }
+  } catch {}
+  return { v: 1, band: mgSkillSeed(age), hist: [], manual: null };
+}
+function mgSkillSetManualFor(id, age, band) {
+  let s = { ...mgSkillReadFor(id, age), manual: band };
+  null != band && (s.band = band);
+  try {
+    window.__mgRaw && window.__mgRaw.set("mg_" + id + "__mg_skill", JSON.stringify(s));
+  } catch {}
+  // Si es el perfil que está jugando, refrescar también la copia viva.
+  try {
+    window.__mgRaw && window.__mgRaw.get("mg_active") === id && (mgSkill = s);
+  } catch {}
+  return s;
+}
+// Registro de aciertos que alimenta el ajuste automático. La banda nunca
+// bloquea niveles ni revoca estrellas: solo cambia el tamaño de los
+// números de las próximas preguntas, y en silencio para el niño.
+function mgSkillRecord(ok, save) {
+  let s = mgSkillGet();
+  if (null != s.manual) return; // el papá fijó la banda: no tocarla
+  let h = [...(s.hist || []), ok ? 1 : 0].slice(-MG_SKILL_WINDOW),
+    band = s.band;
+  if (h.length >= MG_SKILL_WINDOW) {
+    let acc = h.reduce((a, b) => a + b, 0) / h.length;
+    // Histéresis: al mover la banda se vacía la ventana, así que hacen
+    // falta otras 12 respuestas antes del siguiente movimiento.
+    if (acc >= 0.85 && band < MG_BANDS.length - 1) ((band += 1), (h = []));
+    else if (acc <= 0.6 && band > 0) ((band -= 1), (h = []));
+  }
+  ((mgSkill = { ...s, v: 1, band: band, hist: h }), save && save(mgSkill));
+}
 // Variedad del camino pequeño (espejo del warmup del camino grande):
 // desde la pregunta 4 de un nivel de modo fijo, ~28% de las preguntas
 // salen del pool del nivel; y un memo evita que salga dos veces seguidas
@@ -17017,11 +17104,12 @@ function mgLittleSig(e) {
     : "";
 }
 function mgLittleNext(e, t) {
-  let n = e.mode;
+  let n = e.mode,
+    mx = mgSkillMax(e); // banda del niño, sin mutar el nivel
   "mix" !== n && e.pool && e.pool.length > 1 && t >= 3 && Math.random() < 0.28 && (n = "mix");
-  let a = ef(n, e.max, e.pool);
+  let a = ef(n, mx, e.pool);
   for (let r = 0; r < 3 && mgLittleSig(a) === mgLittleLastSig; r++)
-    a = ef(n, e.max, e.pool);
+    a = ef(n, mx, e.pool);
   return ((mgLittleLastSig = mgLittleSig(a)), (a.frase = mgLittleFrase(a.kind)), a);
 }
 // Figuras del modo "figura" dibujadas en SVG propio: los emojis
@@ -18259,7 +18347,7 @@ const MG_H = (tag, props, ...kids) => {
   if (kids.length) p.children = kids.length === 1 ? kids[0] : kids;
   return (Array.isArray(p.children) ? s.jsxs : s.jsx)(tag, p, key);
 };
-const MG_PROFILE_KEYS = ["mg_facts", "mg_daily", "mg_little", "mg_little_path", "mg_path", "mg_coins", "mg_inv", "mg_reto", "mg_practice", "mg_brain", "mg_lbrain", "mg_outfit", "mg_pathver", "mg_goals", "mg_worlds_celebrated", "mg_lessons", "mg_char"];
+const MG_PROFILE_KEYS = ["mg_facts", "mg_daily", "mg_little", "mg_little_path", "mg_path", "mg_coins", "mg_inv", "mg_reto", "mg_practice", "mg_brain", "mg_lbrain", "mg_outfit", "mg_pathver", "mg_goals", "mg_worlds_celebrated", "mg_lessons", "mg_char", "mg_skill"];
 const MG_AVATARS = ["🦄", "🐯", "🦖", "🐸", "🦊", "🐼", "🐧", "🦁", "🐙", "🐨", "🦉", "🐢", "🐝", "🦋", "🐬", "🦕", "🚀", "🌟"];
 const mgRaw = () => window.__mgRaw || { get: () => null, set: () => {}, remove: () => {} };
 function mgNewId() { return "p" + Math.random().toString(36).slice(2, 8); }
@@ -18893,7 +18981,7 @@ function eZ({ progress: e, onLevel: t, onStickers: n, onBrain: a, onBack: r }) {
                               children: [
                                 (0, s.jsx)("span", {
                                   className: "nl-name",
-                                  children: n.name,
+                                  children: mgLevelName(n),
                                 }),
                                 l?.done &&
                                   (0, s.jsxs)("span", {
@@ -18981,7 +19069,7 @@ function e0({ progress: e, onBack: t }) {
     ],
   });
 }
-function e1({ level: e, onDone: t }) {
+function e1({ level: e, onDone: t, onSkill: onSkill }) {
   let n,
     [a, r] = (0, i.useState)(0),
     [l, o] = (0, i.useState)(() => mgLittleNext(e, 0)),
@@ -19038,6 +19126,7 @@ function e1({ level: e, onDone: t }) {
           mgLCheerT.current && clearTimeout(mgLCheerT.current),
           (mgLCheerT.current = setTimeout(() => mgSetLCheer(null), 1600)));
       } else mgSetLS(0);
+      mgSkillRecord(s, onSkill);
       (s ? v.ok() : v.no(),
         h(n),
         u(s ? "right" : "wrong"),
@@ -21679,7 +21768,9 @@ function tr({
   onEditProfile: pmEdit = () => {},
   onAddProfile: pmAdd = () => {},
 }) {
-  let [u, d] = (0, i.useState)(""),
+  let [pmTick, pmSetTick] = (0, i.useState)(0),
+    pmRefresh = () => pmSetTick((v) => v + 1),
+    [u, d] = (0, i.useState)(""),
     f = Array.from({ length: 9 }, (e, t) => t + 2).map((t) => {
       let n = 0,
         a = 0;
@@ -21728,6 +21819,39 @@ function tr({
         pmProfiles.length < 4
           ? MG_H("button", { className: "pm-add", onClick: pmAdd }, "➕ Agregar jugador")
           : null),
+      // Dificultad por niño. El juego la ajusta solo buscando que acierte
+      // ~3 de cada 4; aquí el papá puede fijarla si cree que se equivocó.
+      pmProfiles.some((pf) => pf.age <= 5)
+        ? MG_H("div", { className: "panel", style: { marginBottom: 12 } },
+            MG_H("h3", { className: "rs-title" }, "📈 Dificultad"),
+            MG_H("p", { className: "pm-hint" },
+              "El juego ajusta solo el tamaño de los números para que tu hijo acierte alrededor de 3 de cada 4. Si crees que se equivocó, fíjala tú."),
+            MG_H("div", { className: "pm-list" },
+              pmProfiles.filter((pf) => pf.age <= 5).map((pf) => {
+                let sk = mgSkillReadFor(pf.id, pf.age),
+                  cur = null != sk.manual ? sk.manual : sk.band;
+                return MG_H("div", { key: pf.id, className: "pm-row pm-skill-row" },
+                  MG_H("span", { className: "pm-emoji" }, pf.emoji),
+                  MG_H("span", { className: "pm-name" },
+                    pf.name + " · " + (MG_BANDS[cur] || MG_BANDS[1]).label +
+                      (null == sk.manual ? " (automático)" : " (fijado)")),
+                  MG_H("div", { className: "pm-bands" },
+                    MG_H("button",
+                      {
+                        className: "pm-band" + (null == sk.manual ? " sel" : ""),
+                        onClick: () => (mgSkillSetManualFor(pf.id, pf.age, null), pmRefresh()),
+                      },
+                      "Auto"),
+                    ...MG_BANDS.map((b) =>
+                      MG_H("button",
+                        {
+                          key: b.id,
+                          className: "pm-band" + (null != sk.manual && sk.manual === b.id ? " sel" : ""),
+                          onClick: () => (mgSkillSetManualFor(pf.id, pf.age, b.id), pmRefresh()),
+                        },
+                        b.cap))));
+              })))
+        : null,
       (0, s.jsxs)("div", {
         className: "panel album-panel report-panel",
         children: [
@@ -22596,7 +22720,13 @@ function tc({ facts: e, onBack: t, onReset: n }) {
         [ec, eu] = (0, i.useState)(eU()),
         [mgP, mgSetP] = (0, i.useState)(mgLoadProfiles()),
         [mgA, mgSetA] = (0, i.useState)(mgGetActive()),
-        [mgEd, mgSetEd] = (0, i.useState)(null);
+        [mgEd, mgSetEd] = (0, i.useState)(null),
+        // mgSkill es global de módulo (como mgChar): este contador fuerza
+        // el repintado cuando cambia de banda o de perfil.
+        [mgSkillV, mgSetSkillV] = (0, i.useState)(0),
+        mgSaveSkill = (0, i.useCallback)((s) => {
+          (eQ("mg_skill", s), mgSetSkillV((v) => v + 1));
+        }, []);
       (0, i.useEffect)(() => {
         mgSeedCharUnlocks();
       }, []);
@@ -22670,6 +22800,18 @@ function tc({ facts: e, onBack: t, onReset: n }) {
           ((!chDef || (chDef.unlock > 0 && !mgCharsUnlocked()[chId])) &&
             (chId = "turbo"),
             (mgChar = chId));
+          // Dificultad del niño. Si la llave no existe (todo perfil previo
+          // a esta función), se siembra por edad y ya: no hay migración ni
+          // se toca el avance guardado.
+          {
+            let pf = mgLoadProfiles().find((p) => p.id === mgA),
+              sk = await eH("mg_skill", null);
+            mgSkill =
+              sk && null != sk.band
+                ? { v: 1, band: sk.band, hist: sk.hist || [], manual: null != sk.manual ? sk.manual : null }
+                : { v: 1, band: mgSkillSeed(pf ? pf.age : 6), hist: [], manual: null };
+            mgSetSkillV((v) => v + 1);
+          }
           let e = await eH("mg_outfit", { owned: [], equipped: null });
           (Y(e), (u = e.equipped));
           let t = await eH("mg_sound", { on: !0 });
@@ -22823,6 +22965,7 @@ function tc({ facts: e, onBack: t, onReset: n }) {
           "little-play" === e &&
             (0, s.jsx)(e1, {
               level: f,
+              onSkill: mgSaveSkill,
               onDone: (e) => {
                 let n = eG(e / f.questions);
                 h({ correct: e, stars: n, newSticker: !o[f.id]?.done });
