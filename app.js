@@ -13095,6 +13095,8 @@ function mgCharSkin(ch) {
       outline: "#4a4e56",
       snout: "#c99aa2",
       nose: "#e86a7a",
+      // Los gatos no jadean: usan boca de gato (ω) en vez de la lengua del pug.
+      mouth: "cat",
       // Orejas erguidas con la base sobre el arco de la cabeza. El path va
       // SIN cerrar: el trazo dibuja solo los dos bordes visibles y el
       // relleno se cierra solo, así la base no raya la frente.
@@ -13343,6 +13345,7 @@ function d({ mood: e = "happy", size: t = 80, outfit: n, extra: ec, char: chOv }
           ],
         }),
       "happy" === e &&
+        "cat" !== sk.mouth &&
         (0, s.jsx)("path", {
           d: "M43 65 Q50 71 57 65",
           fill: "none",
@@ -13351,6 +13354,7 @@ function d({ mood: e = "happy", size: t = 80, outfit: n, extra: ec, char: chOv }
           strokeLinecap: "round",
         }),
       "excited" === e &&
+        "cat" !== sk.mouth &&
         (0, s.jsxs)(s.Fragment, {
           children: [
             (0, s.jsx)("ellipse", {
@@ -13367,6 +13371,40 @@ function d({ mood: e = "happy", size: t = 80, outfit: n, extra: ec, char: chOv }
               ry: "3.6",
               fill: "#e86a7a",
             }),
+          ],
+        }),
+      // Boca de gato (ω): trazo suave, sin lengua colgando. "excited" abre
+      // apenas la boca (un pequeño hocico) para dar vida sin parecer jadeo.
+      "cat" === sk.mouth &&
+        ("happy" === e || "excited" === e) &&
+        (0, s.jsxs)(s.Fragment, {
+          children: [
+            (0, s.jsx)("path", {
+              d: "M50 58 L50 61.5",
+              fill: "none",
+              stroke: i,
+              strokeWidth: "2",
+              strokeLinecap: "round",
+            }),
+            (0, s.jsx)("path", {
+              d: "M50 61.5 Q45 66 40.5 63",
+              fill: "none",
+              stroke: i,
+              strokeWidth: "2",
+              strokeLinecap: "round",
+            }),
+            (0, s.jsx)("path", {
+              d: "M50 61.5 Q55 66 59.5 63",
+              fill: "none",
+              stroke: i,
+              strokeWidth: "2",
+              strokeLinecap: "round",
+            }),
+            "excited" === e &&
+              (0, s.jsx)("path", {
+                d: "M46 62 Q50 65.5 54 62 Q50 63 46 62 Z",
+                fill: "#e86a7a",
+              }),
           ],
         }),
       "sad" === e &&
