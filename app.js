@@ -18385,6 +18385,84 @@ const MG_H = (tag, props, ...kids) => {
   if (kids.length) p.children = kids.length === 1 ? kids[0] : kids;
   return (Array.isArray(p.children) ? s.jsxs : s.jsx)(tag, p, key);
 };
+/* ─── Iconos de interfaz (SVG geométrico, paleta del juego) ───────────────
+   Reemplazan a los emojis en la UI para un look más pro y consistente.
+   Cada icono es una función que devuelve los hijos del <svg> 0 0 24 24. */
+const MG_ICONS = {
+  coin: () => [
+    MG_H("circle", { key: "a", cx: 12, cy: 12, r: 10, fill: "#ffcf3f", stroke: "#c98f16", strokeWidth: 1.5 }),
+    MG_H("circle", { key: "b", cx: 12, cy: 12, r: 6.4, fill: "none", stroke: "#e0a81b", strokeWidth: 1.4 }),
+    MG_H("path", { key: "c", d: "M12 8.4v7.2M10.2 10.1h3a1.6 1.6 0 010 3.2h-2.6", fill: "none", stroke: "#e0a81b", strokeWidth: 1.5, strokeLinecap: "round", strokeLinejoin: "round" }),
+  ],
+  star: (c) => [MG_H("path", { key: "a", d: "M12 2.2l2.85 6.03 6.6.83-4.85 4.55 1.25 6.52L12 17.4l-5.85 3.25 1.25-6.52L2.55 9.06l6.6-.83z", fill: c || "#ffcf3f", stroke: "#d99e14", strokeWidth: 1.2, strokeLinejoin: "round" })],
+  trophy: () => [
+    MG_H("path", { key: "a", d: "M7 4h10v4a5 5 0 01-10 0z", fill: "#ffcf3f", stroke: "#c98f16", strokeWidth: 1.3, strokeLinejoin: "round" }),
+    MG_H("path", { key: "b", d: "M7 5H4v1.5A3.2 3.2 0 007 9.7M17 5h3v1.5A3.2 3.2 0 0117 9.7", fill: "none", stroke: "#c98f16", strokeWidth: 1.4, strokeLinecap: "round" }),
+    MG_H("rect", { key: "c", x: 10, y: 12.5, width: 4, height: 3.2, fill: "#c98f16" }),
+    MG_H("rect", { key: "d", x: 7.5, y: 18, width: 9, height: 2.4, rx: 1, fill: "#ffcf3f", stroke: "#c98f16", strokeWidth: 1.1 }),
+    MG_H("rect", { key: "e", x: 9.5, y: 15.4, width: 5, height: 2.4, fill: "#e0a81b" }),
+  ],
+  fire: () => [
+    MG_H("path", { key: "a", d: "M12 2.5c.6 3 3.7 4 3.7 8.2a3.7 3.7 0 01-7.4 0c0-1.4.6-2.3 1.4-3.2-.2 1.6.6 2.4 1.3 2.4.9 0 1.2-.9.6-2.2C11.4 6.4 12 4.4 12 2.5z", fill: "#ff8a2a", stroke: "#e0631a", strokeWidth: 1.1, strokeLinejoin: "round" }),
+    MG_H("path", { key: "b", d: "M12 11c.9.7 1.4 1.6 1.4 2.6a1.9 1.9 0 01-3.8 0c0-.8.4-1.4 1-2 .1.9.5 1.2 1 1.2.6 0 .8-.5.4-1.8z", fill: "#ffd23f" }),
+  ],
+  shield: (c) => [
+    MG_H("path", { key: "a", d: "M12 2.4l8 2.8v5.6c0 5-3.5 8.4-8 10.8-4.5-2.4-8-5.8-8-10.8V5.2z", fill: c || "#7fb4e6", stroke: "#3f6ea0", strokeWidth: 1.3, strokeLinejoin: "round" }),
+    MG_H("path", { key: "b", d: "M8.5 11.8l2.6 2.5 4.4-4.6", fill: "none", stroke: "#fff", strokeWidth: 1.8, strokeLinecap: "round", strokeLinejoin: "round" }),
+  ],
+  heart: (c) => [MG_H("path", { key: "a", d: "M12 20.7C5.5 15.6 3.5 12.2 3.5 8.9 3.5 6.4 5.4 4.6 7.7 4.6c1.6 0 3 .9 4.3 2.5 1.3-1.6 2.7-2.5 4.3-2.5 2.3 0 4.2 1.8 4.2 4.3 0 3.3-2 6.7-8.5 11.8z", fill: c || "#ff5a6a", stroke: "#c23947", strokeWidth: 1.1, strokeLinejoin: "round" })],
+  heartEmpty: () => [MG_H("path", { key: "a", d: "M12 20.7C5.5 15.6 3.5 12.2 3.5 8.9 3.5 6.4 5.4 4.6 7.7 4.6c1.6 0 3 .9 4.3 2.5 1.3-1.6 2.7-2.5 4.3-2.5 2.3 0 4.2 1.8 4.2 4.3 0 3.3-2 6.7-8.5 11.8z", fill: "#3a3550", stroke: "#5a5478", strokeWidth: 1.3, strokeLinejoin: "round" })],
+  bolt: () => [MG_H("path", { key: "a", d: "M13.5 2L5 13.2h5l-1.6 8.8L19 10.2h-5.2z", fill: "#ffd23f", stroke: "#e0a81b", strokeWidth: 1.1, strokeLinejoin: "round" })],
+  bulb: () => [
+    MG_H("path", { key: "a", d: "M12 3a6 6 0 00-3.6 10.8c.6.5 1 1.1 1.1 1.9h5c.1-.8.5-1.4 1.1-1.9A6 6 0 0012 3z", fill: "#ffe07a", stroke: "#d9a814", strokeWidth: 1.2, strokeLinejoin: "round" }),
+    MG_H("rect", { key: "b", x: 9.5, y: 16.4, width: 5, height: 1.8, rx: .9, fill: "#c98f16" }),
+    MG_H("rect", { key: "c", x: 10.2, y: 19, width: 3.6, height: 1.6, rx: .8, fill: "#c98f16" }),
+  ],
+  lens: () => [
+    MG_H("circle", { key: "a", cx: 10.5, cy: 10.5, r: 6.2, fill: "#bfe3ff", stroke: "#3f6ea0", strokeWidth: 1.6 }),
+    MG_H("circle", { key: "b", cx: 10.5, cy: 10.5, r: 3.4, fill: "#fff", opacity: .5 }),
+    MG_H("path", { key: "c", d: "M15.3 15.3L21 21", stroke: "#3f6ea0", strokeWidth: 2.4, strokeLinecap: "round" }),
+  ],
+  target: () => [
+    MG_H("circle", { key: "a", cx: 12, cy: 12, r: 9.5, fill: "#ff5a6a", stroke: "#c23947", strokeWidth: 1.2 }),
+    MG_H("circle", { key: "b", cx: 12, cy: 12, r: 6, fill: "#fff" }),
+    MG_H("circle", { key: "c", cx: 12, cy: 12, r: 3, fill: "#ff5a6a" }),
+  ],
+  brain: () => [MG_H("path", { key: "a", d: "M9 4a2.6 2.6 0 00-2.6 2.6A2.7 2.7 0 004 9.4a2.7 2.7 0 001 5.2v1.2A2.9 2.9 0 009 18.6V4zM15 4a2.6 2.6 0 012.6 2.6A2.7 2.7 0 0120 9.4a2.7 2.7 0 01-1 5.2v1.2A2.9 2.9 0 0115 18.6V4z", fill: "#ff9ec7", stroke: "#d96aa0", strokeWidth: 1.1, strokeLinejoin: "round" }), MG_H("path", { key: "b", d: "M12 4v14.6", stroke: "#d96aa0", strokeWidth: 1, strokeLinecap: "round" })],
+  puzzle: () => [MG_H("path", { key: "a", d: "M10 3.5a2 2 0 014 0c0 .6.4 1 1 1h3v3c0 .6.4 1 1 1a2 2 0 010 4c-.6 0-1 .4-1 1v3h-3c-.6 0-1-.4-1-1a2 2 0 00-4 0c0 .6-.4 1-1 1H5v-3c0-.6-.4-1-1-1a2 2 0 010-4c.6 0 1-.4 1-1v-3h3c.6 0 1-.4 1-1z", fill: "#6ee089", stroke: "#3ca85c", strokeWidth: 1.2, strokeLinejoin: "round" })],
+  book: () => [
+    MG_H("path", { key: "a", d: "M12 5.5C10.4 4.3 8.3 3.8 5 4v13c3.3-.2 5.4.3 7 1.5V5.5z", fill: "#9ad9d0", stroke: "#3f8a80", strokeWidth: 1.2, strokeLinejoin: "round" }),
+    MG_H("path", { key: "b", d: "M12 5.5C13.6 4.3 15.7 3.8 19 4v13c-3.3-.2-5.4.3-7 1.5V5.5z", fill: "#c3ece6", stroke: "#3f8a80", strokeWidth: 1.2, strokeLinejoin: "round" }),
+  ],
+  map: () => [
+    MG_H("path", { key: "a", d: "M9 3.5L3.5 5.4v15.1L9 18.6l6 2 5.5-1.9V3.6L15 5.5l-6-2z", fill: "#7fd48a", stroke: "#3ca85c", strokeWidth: 1.2, strokeLinejoin: "round" }),
+    MG_H("path", { key: "b", d: "M9 3.5v15.1M15 5.5v15", stroke: "#3ca85c", strokeWidth: 1.1, strokeDasharray: "1.6 1.8", strokeLinecap: "round" }),
+  ],
+  check: () => [MG_H("path", { key: "a", d: "M4.5 12.5l5 5 10-11", fill: "none", stroke: "#4ade80", strokeWidth: 3, strokeLinecap: "round", strokeLinejoin: "round" })],
+  retry: () => [MG_H("path", { key: "a", d: "M19 12a7 7 0 11-2.1-5M19 4v4h-4", fill: "none", stroke: "#b79bff", strokeWidth: 2.2, strokeLinecap: "round", strokeLinejoin: "round" })],
+  lock: () => [
+    MG_H("rect", { key: "a", x: 5, y: 10.5, width: 14, height: 10, rx: 2.2, fill: "#8b84b0", stroke: "#5a5478", strokeWidth: 1.3 }),
+    MG_H("path", { key: "b", d: "M8 10.5V8a4 4 0 018 0v2.5", fill: "none", stroke: "#5a5478", strokeWidth: 1.8 }),
+    MG_H("circle", { key: "c", cx: 12, cy: 15, r: 1.7, fill: "#3a3550" }),
+  ],
+  rocket: () => [
+    MG_H("path", { key: "a", d: "M12 2c3 1.5 5 4.8 5 9 0 2-.6 3.6-1.3 5H8.3C7.6 14.6 7 13 7 11c0-4.2 2-7.5 5-9z", fill: "#e6ecf5", stroke: "#7a89a8", strokeWidth: 1.2, strokeLinejoin: "round" }),
+    MG_H("circle", { key: "b", cx: 12, cy: 9.5, r: 2, fill: "#7fb4e6", stroke: "#3f6ea0", strokeWidth: 1 }),
+    MG_H("path", { key: "c", d: "M8.3 16c-1.6.7-2.8 2-3 4 1.8 0 3-.5 3.7-1.4M15.7 16c1.6.7 2.8 2 3 4-1.8 0-3-.5-3.7-1.4", fill: "#ff8a2a", stroke: "#e0631a", strokeWidth: 1, strokeLinejoin: "round" }),
+    MG_H("path", { key: "d", d: "M10 20.5c.4 1.2 1 2 2 2.5.9-.5 1.5-1.3 2-2.5z", fill: "#ffd23f" }),
+  ],
+  chest: () => [
+    MG_H("path", { key: "a", d: "M4 9a3 3 0 013-3h10a3 3 0 013 3v1H4z", fill: "#c98f16", stroke: "#8a5f0e", strokeWidth: 1.2, strokeLinejoin: "round" }),
+    MG_H("rect", { key: "b", x: 4, y: 10, width: 16, height: 9, rx: 1.4, fill: "#e0a81b", stroke: "#8a5f0e", strokeWidth: 1.2 }),
+    MG_H("rect", { key: "c", x: 10.5, y: 12, width: 3, height: 5, rx: 1, fill: "#8a5f0e" }),
+    MG_H("circle", { key: "d", cx: 12, cy: 14.3, r: 1, fill: "#ffe07a" }),
+  ],
+};
+function mgIcon(name, size, color) {
+  const kids = MG_ICONS[name];
+  if (!kids) return null;
+  return MG_H("svg", { width: size || 22, height: size || 22, viewBox: "0 0 24 24", className: "mg-ic mg-ic-" + name, "aria-hidden": "true" }, ...kids(color));
+}
 const MG_PROFILE_KEYS = ["mg_facts", "mg_daily", "mg_little", "mg_little_path", "mg_path", "mg_coins", "mg_inv", "mg_reto", "mg_practice", "mg_brain", "mg_lbrain", "mg_outfit", "mg_pathver", "mg_goals", "mg_worlds_celebrated", "mg_lessons", "mg_char", "mg_skill"];
 const MG_AVATARS = ["🦄", "🐯", "🦖", "🐸", "🦊", "🐼", "🐧", "🦁", "🐙", "🐨", "🦉", "🐢", "🐝", "🦋", "🐬", "🦕", "🚀", "🌟"];
 const mgRaw = () => window.__mgRaw || { get: () => null, set: () => {}, remove: () => {} };
@@ -18501,13 +18579,13 @@ function MgHub({ kind: k, name: nm, coins: c, streak: st, onBack: bk, items: it 
     MG_H("div", { className: "hub-top" },
       MG_H("button", { className: "link-back", onClick: bk }, "◀\ufe0e"),
       MG_H("span", { className: "hub-name" }, (k === "little" ? "🧒 " : "🧑‍🚀 ") + (nm || "")),
-      k === "big" ? MG_H("span", { className: "coin-pill" }, "🪙 " + c) : null,
-      k === "big" ? MG_H("span", { className: "fire-pill" }, "🔥 " + st) : null),
+      k === "big" ? MG_H("span", { className: "coin-pill" }, mgIcon("coin", 16), " " + c) : null,
+      k === "big" ? MG_H("span", { className: "fire-pill" }, mgIcon("fire", 15), " " + st) : null),
     s.jsx(f, { mood: "excited", text: nm ? mgVoz() + " ¡Hola, " + nm + "! ¿Qué jugamos?" : "¿Qué jugamos hoy?", size: 64 }),
     MG_H("div", { className: "hub-grid" },
       it.map((item) =>
         MG_H("button", { key: item.title, className: "hub-card " + (item.cls || ""), onClick: item.onClick },
-          MG_H("span", { className: "hub-card-emoji" }, item.emoji),
+          MG_H("span", { className: "hub-card-emoji" }, item.icon ? mgIcon(item.icon, 40) : item.emoji),
           MG_H("span", { className: "hub-card-title" }, item.title),
           item.sub ? MG_H("span", { className: "hub-card-sub" }, item.sub) : null))));
 }
@@ -20565,24 +20643,24 @@ function e8({
             className: "hud-item",
             children: [e.emoji, " ", y + 1, "/", e.questions],
           }),
-          (0, s.jsxs)("span", {
-            className: "hud-item hearts",
-            children: ["❤️".repeat(c), "🖤".repeat(Math.max(0, o - c))],
-          }),
-          f && (0, s.jsx)("span", { className: "hud-item", children: "🛡️" }),
+          MG_H(
+            "span",
+            { className: "hud-item hearts" },
+            ...Array.from({ length: c }, (_, hi) => MG_H("span", { key: "h" + hi, className: "hud-ic" }, mgIcon("heart", 15))),
+            ...Array.from({ length: Math.max(0, o - c) }, (_, hi) => MG_H("span", { key: "e" + hi, className: "hud-ic" }, mgIcon("heartEmpty", 15))),
+          ),
+          f && MG_H("span", { className: "hud-item hud-ic" }, mgIcon("shield", 16)),
           mgStar > 0 &&
-            MG_H("span", { className: "hud-item star" }, "⭐ " + mgStar),
-          (0, s.jsxs)("span", {
-            className: "hud-item coins",
-            children: ["🪙 ", W],
-          }),
+            MG_H("span", { className: "hud-item star" }, mgIcon("star", 15), " " + mgStar),
+          MG_H("span", { className: "hud-item coins" }, mgIcon("coin", 16), " " + W),
           mgStreak >= 1 &&
             (() => {
               let ready = mgSinceFreeze.current + 1 >= mgFreezeGoal.current;
               return MG_H(
                 "span",
                 { className: "hud-item streak" + (ready ? " ready" : "") },
-                "🔥 " + mgStreak + (ready ? " ❄️" : ""),
+                mgIcon("fire", 15),
+                " " + mgStreak + (ready ? " ❄️" : ""),
               );
             })(),
         ],
@@ -20712,7 +20790,7 @@ function e8({
                   MG_H(
                     "span",
                     { key: i, className: "mini-pip" + (i < shownHp ? " full" : "") },
-                    i < shownHp ? "❤️" : "🤍",
+                    mgIcon(i < shownHp ? "heart" : "heartEmpty", 14),
                   ),
                 ),
               ),
@@ -22948,13 +23026,13 @@ function tc({ facts: e, onBack: t, onReset: n }) {
               streak: r.streak,
               onBack: () => t("profile"),
               items: [
-                { emoji: "🗺️", title: "Camino", sub: "tu aventura de niveles", cls: "wide", onClick: () => t("path") },
-                { emoji: "🧩", title: "Poder cerebral", sub: "sudoku · memoria · lógica", onClick: () => t("brain") },
-                { emoji: "🎯", title: "Práctica libre", sub: "elige la operación", onClick: () => t("libre") },
-                { emoji: "⚡", title: "Reto relámpago", sub: "60 segundos", onClick: () => t("reto") },
-                { emoji: "🧠", title: "Repaso inteligente", sub: "tus datos difíciles", onClick: () => t("practice") },
-                { emoji: "🏆", title: "Colección", sub: "mapa de dominio", onClick: () => t("mastery") },
-                { emoji: "🏪", title: "Tienda", sub: "gorros para " + mgCharName(), onClick: () => t("shop") },
+                { icon: "map", title: "Camino", sub: "tu aventura de niveles", cls: "wide", onClick: () => t("path") },
+                { icon: "puzzle", title: "Poder cerebral", sub: "sudoku · memoria · lógica", onClick: () => t("brain") },
+                { icon: "target", title: "Práctica libre", sub: "elige la operación", onClick: () => t("libre") },
+                { icon: "bolt", title: "Reto relámpago", sub: "60 segundos", onClick: () => t("reto") },
+                { icon: "brain", title: "Repaso inteligente", sub: "tus datos difíciles", onClick: () => t("practice") },
+                { icon: "trophy", title: "Colección", sub: "mapa de dominio", onClick: () => t("mastery") },
+                { icon: "chest", title: "Tienda", sub: "gorros para " + mgCharName(), onClick: () => t("shop") },
               ],
             }),
           "little-hub" === e &&
@@ -22963,9 +23041,9 @@ function tc({ facts: e, onBack: t, onReset: n }) {
               name: (mgP.find((p) => p.id === mgA) || {}).name,
               onBack: () => t("profile"),
               items: [
-                { emoji: "🗺️", title: "Mi aventura", sub: "niveles con calcomanías", cls: "wide", onClick: () => t("little-path") },
-                { emoji: "🧩", title: "Juegos de lógica", sub: "memoria · parejas · tren", onClick: () => t("little-brain") },
-                { emoji: "📖", title: "Mi álbum", sub: "tus calcomanías", onClick: () => t("stickers") },
+                { icon: "map", title: "Mi aventura", sub: "niveles con calcomanías", cls: "wide", onClick: () => t("little-path") },
+                { icon: "puzzle", title: "Juegos de lógica", sub: "memoria · parejas · tren", onClick: () => t("little-brain") },
+                { icon: "book", title: "Mi álbum", sub: "tus calcomanías", onClick: () => t("stickers") },
                 { emoji: "🐾", title: "Mi compañero", sub: "elige a Turbo, Michi...", onClick: () => t("charpick") },
               ],
             }),
