@@ -17117,20 +17117,67 @@ function mgSkillSetManualFor(id, age, band) {
 // Registro de aciertos que alimenta el ajuste automático. La banda nunca
 // bloquea niveles ni revoca estrellas: solo cambia el tamaño de los
 // números de las próximas preguntas, y en silencio para el niño.
-function mgSkillRecord(ok, save) {
+/* Señales de la sesión, comparadas contra el propio niño y NO contra un
+   estándar: un niño naturalmente lento no debe leerse como frustrado.
+   Viven en memoria (la sesión, no el historial), así que no se guardan. */
+let mgSessLat = [], // latencias de respuesta de esta sesión
+  mgSessCount = 0, // preguntas respondidas en esta sesión
+  mgSoothe = !1; // hay que responder con ánimo, no con menos dificultad
+function mgSessSeen(ms) {
+  (mgSessCount++, mgSessLat.push(ms), mgSessLat.length > 20 && mgSessLat.shift());
+}
+// Contexto de un fallo: ¿parece que no puede, o que ya no está disponible
+// para aprender? "slow" y "fatigue" se miden contra su propia mediana.
+function mgMissCtx(ms, streakAntes) {
+  let base = 0;
+  if (mgSessLat.length >= 4) {
+    let s = [...mgSessLat].sort((a, b) => a - b);
+    base = s[Math.floor(s.length / 2)];
+  }
+  return {
+    slow: base > 0 && ms > 2.5 * base,
+    fatigue: mgSessCount > 24,
+    afterStreak: streakAntes >= 3,
+  };
+}
+function mgSootheTake() {
+  let v = mgSoothe;
+  return ((mgSoothe = !1), v);
+}
+function mgSkillRecord(ok, save, ctx) {
   let s = mgSkillGet();
   if (null != s.manual) return; // el papá fijó la banda: no tocarla
-  let h = [...(s.hist || []), ok ? 1 : 0].slice(-MG_SKILL_WINDOW),
+  // Un fallo con señales de cansancio/frustración se marca aparte: cuenta
+  // para la precisión, pero no como evidencia de que el nivel le quede grande.
+  let aff = !ok && !!ctx && (ctx.slow || ctx.fatigue || ctx.afterStreak),
+    h = [...(s.hist || []), ok ? 1 : 0].slice(-MG_SKILL_WINDOW),
+    af = [...(s.aff || []), aff ? 1 : 0].slice(-MG_SKILL_WINDOW),
     band = s.band;
   if (h.length >= MG_SKILL_WINDOW) {
-    let acc = h.reduce((a, b) => a + b, 0) / h.length;
+    let aciertos = h.reduce((a, b) => a + b, 0),
+      acc = aciertos / h.length;
     // Histéresis: al mover la banda se vacía la ventana, así que hacen
     // falta otras 12 respuestas antes del siguiente movimiento.
-    if (acc >= 0.85 && band < MG_BANDS.length - 1) ((band += 1), (h = []));
-    else if (acc <= 0.6 && band > 0) ((band -= 1), (h = []));
+    if (acc >= 0.85 && band < MG_BANDS.length - 1) ((band += 1), (h = []), (af = []));
+    else if (acc <= 0.6 && band > 0) {
+      let fallos = h.length - aciertos,
+        fallosAfec = af.reduce((a, b) => a + b, 0);
+      // Si la mitad o más de los fallos parecen cansancio o frustración, el
+      // problema no es el tamaño de los números: bajarlos sería la respuesta
+      // equivocada. Se responde con ánimo y se reinicia la ventana.
+      fallos > 0 && 2 * fallosAfec >= fallos
+        ? ((mgSoothe = !0), (h = []), (af = []))
+        : ((band -= 1), (h = []), (af = []));
+    }
   }
-  ((mgSkill = { ...s, v: 1, band: band, hist: h }), save && save(mgSkill));
+  ((mgSkill = { ...s, v: 1, band: band, hist: h, aff: af }), save && save(mgSkill));
 }
+// Ánimo centrado en el esfuerzo, nunca en "estás cansado" ni en la capacidad.
+const MG_SOOTHE = [
+  "¡Qué bien que sigues intentando!",
+  "Respira y vamos otra vez. ¡Estoy contigo!",
+  "Los errores nos enseñan. ¡Sigamos!",
+];
 // Variedad del camino pequeño (espejo del warmup del camino grande):
 // desde la pregunta 4 de un nivel de modo fijo, ~28% de las preguntas
 // salen del pool del nivel; y un memo evita que salga dos veces seguidas
@@ -19196,6 +19243,7 @@ function e1({ level: e, onDone: t, onSkill: onSkill }) {
     [mgLS, mgSetLS] = (0, i.useState)(0),
     [mgLCheer, mgSetLCheer] = (0, i.useState)(null),
     mgLCheerT = (0, i.useRef)(null),
+    mgQT = (0, i.useRef)(Date.now()), // cuándo apareció la pregunta actual
     y = (0, i.useRef)(null);
   (0, i.useEffect)(
     () => () => {
@@ -19204,6 +19252,11 @@ function e1({ level: e, onDone: t, onSkill: onSkill }) {
     },
     [],
   );
+  // Reloj de la pregunta: se reinicia con cada pregunta nueva para medir
+  // cuánto tardó el niño (relativo a sí mismo, no a un estándar).
+  (0, i.useEffect)(() => {
+    mgQT.current = Date.now();
+  }, [a]);
   let x = (e) => {
       switch (e.kind) {
         case "contar":
@@ -19242,7 +19295,20 @@ function e1({ level: e, onDone: t, onSkill: onSkill }) {
           mgLCheerT.current && clearTimeout(mgLCheerT.current),
           (mgLCheerT.current = setTimeout(() => mgSetLCheer(null), 1600)));
       } else mgSetLS(0);
-      mgSkillRecord(s, onSkill);
+      // Señales de la sesión y lectura del fallo: ¿no puede, o ya no está
+      // disponible para aprender? Si es lo segundo, el controlador NO baja
+      // la dificultad; responde con ánimo (mgSoothe).
+      {
+        let lat = Date.now() - mgQT.current,
+          ctx = s ? null : mgMissCtx(lat, mgLS),
+          antes = mgSoothe;
+        (mgSessSeen(lat), mgSkillRecord(s, onSkill, ctx));
+        !antes &&
+          mgSoothe &&
+          (mgSetLCheer(ee(MG_SOOTHE)),
+          mgLCheerT.current && clearTimeout(mgLCheerT.current),
+          (mgLCheerT.current = setTimeout(() => mgSetLCheer(null), 2200)));
+      }
       (s ? v.ok() : v.no(),
         h(n),
         u(s ? "right" : "wrong"),
@@ -19723,7 +19789,10 @@ function e2({
   }, []);
   let [c, u] = (0, i.useState)(!a),
     [mgBn, mgSetBn] = (0, i.useState)(() =>
-      Math.random() < 0.34 ? ee(MG_BONUS_GAMES) : null,
+      // Si el nivel mostró señales de cansancio/frustración, la ronda
+      // sorpresa deja de ser azar y se ofrece siempre: cambiar de actividad
+      // es mejor respuesta que bajarle los números.
+      mgSootheTake() || Math.random() < 0.34 ? ee(MG_BONUS_GAMES) : null,
     ),
     [mgBnOn, mgSetBnOn] = (0, i.useState)(!1),
     [mgBnFlash, mgSetBnFlash] = (0, i.useState)(null);
