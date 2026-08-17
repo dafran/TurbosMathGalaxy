@@ -16521,6 +16521,12 @@ let ei = [
     { id: "arcoiris", name: "Isla arcoíris", emoji: "🌈" },
     { id: "helada", name: "Montaña helada", emoji: "🏔️" },
     { id: "jardin", name: "Jardín de formas", emoji: "🌷" },
+    // Mundos añadidos al final (nunca intercalados): `world` es el ÍNDICE en
+    // este arreglo, así que insertar en medio reasignaría el fondo y el
+    // banner de todos los niveles posteriores.
+    { id: "feria", name: "Feria de juegos", emoji: "🎪" },
+    { id: "mar", name: "Fondo del mar", emoji: "🐠" },
+    { id: "taller", name: "Taller de robots", emoji: "🤖" },
   ],
   /* Niveles del mundo pequeño. IMPORTANTE: sus `id` son FIJOS y NO se
      reasignan por posición (a diferencia de `en`, que sí lo hace en
@@ -16997,6 +17003,21 @@ let ei = [
       stickerName: "Pavo real",
       pool: ["figura", "depar", "para5", "patron", "sumar"],
     },
+    /* Mundos 10-12 (niveles 41-52), añadidos con ids nuevos al final según
+       la regla de arriba. Cada mundo trae un nivel dedicado a minijuegos
+       (mode "mini", más corto) para cambiar el ritmo. */
+    { id: 41, world: 10, name: "Feria de juegos", mode: "mini", max: 10, questions: 4, emoji: "🎪", sticker: "🎡", stickerName: "Rueda de la fortuna" },
+    { id: 42, world: 10, name: "Suma hasta 12", mode: "sumar", max: 12, questions: 8, emoji: "🍿", sticker: "🎢", stickerName: "Montaña rusa" },
+    { id: 43, world: 10, name: "Cuenta hasta 15", mode: "contar", max: 15, questions: 8, emoji: "🎈", sticker: "🤹", stickerName: "Malabarista" },
+    { id: 44, world: 10, name: "Gran reto de la feria", mode: "mix", max: 12, questions: 8, emoji: "🏆", sticker: "🎨", stickerName: "Pintacaritas" },
+    { id: 45, world: 11, name: "Cuenta los peces", mode: "contar", max: 15, questions: 8, emoji: "🐟", sticker: "🐙", stickerName: "Pulpo curioso" },
+    { id: 46, world: 11, name: "Quedan en el mar", mode: "restar", max: 12, questions: 8, emoji: "🌊", sticker: "🦈", stickerName: "Tiburón amistoso" },
+    { id: 47, world: 11, name: "Juegos del mar", mode: "mini", max: 12, questions: 4, emoji: "🫧", sticker: "🐡", stickerName: "Pez globo" },
+    { id: 48, world: 11, name: "Gran reto del mar", mode: "mix", max: 15, questions: 8, emoji: "🔱", sticker: "🐳", stickerName: "Ballena gigante" },
+    { id: 49, world: 12, name: "Patrones de robot", mode: "patron", max: 3, questions: 8, emoji: "🔩", sticker: "🦾", stickerName: "Brazo robot" },
+    { id: 50, world: 12, name: "Ordena hasta 6", mode: "orden", max: 6, questions: 6, emoji: "🔧", sticker: "🛰️", stickerName: "Satélite" },
+    { id: 51, world: 12, name: "Juegos del taller", mode: "mini", max: 15, questions: 4, emoji: "⚙️", sticker: "🚁", stickerName: "Helicóptero" },
+    { id: 52, world: 12, name: "Gran reto final", mode: "mix", max: 15, questions: 8, emoji: "🎖️", sticker: "🏆", stickerName: "Trofeo de campeón" },
   ],
   ec = ["💍", "🟦", "⭐", "🍎", "💎", "🪙"];
 // Práctica intercalada: todo nivel del camino pequeño lleva un pool de
@@ -17057,11 +17078,15 @@ function mgLittleFrase(e) {
    El ajuste automático busca ~75-85% de aciertos, el rango que reportan
    tanto Math Garden (selección de ítems con p(éxito)=.75) como la regla
    del 85% de Wilson et al. — ni aburrido ni frustrante. */
+/* El techo es solo una salvaguarda: la dificultad real la fija el `max` de
+   cada nivel multiplicado por el factor. El techo de la banda 1 tiene que
+   quedar POR ENCIMA del max más alto que traen los niveles (15), o recortaría
+   niveles escritos a mano y la banda 1 dejaría de ser el juego original. */
 const MG_BANDS = [
-  { id: 0, factor: 0.6, cap: 5, label: "Cantidades hasta 5" },
-  { id: 1, factor: 1, cap: 10, label: "Cantidades hasta 10" },
-  { id: 2, factor: 1.5, cap: 20, label: "Cantidades hasta 20" },
-  { id: 3, factor: 2, cap: 30, label: "Cantidades hasta 30" },
+  { id: 0, factor: 0.6, cap: 8, label: "Más suave", short: "Suave" },
+  { id: 1, factor: 1, cap: 15, label: "Normal (como está escrito)", short: "Normal" },
+  { id: 2, factor: 1.5, cap: 24, label: "Más reto", short: "Reto" },
+  { id: 3, factor: 2, cap: 32, label: "Reto máximo", short: "Máx" },
 ];
 const MG_SKILL_WINDOW = 12; // respuestas que mira el ajuste automático
 let mgSkill = null; // { v, band, hist:[], manual }
@@ -17079,8 +17104,13 @@ function mgSkillBand() {
 // Máximo efectivo para un nivel. NO muta el nivel: solo devuelve otro
 // número para el generador. Piso de 3 para que ningún modo degenere.
 function mgSkillMax(lvl) {
-  let b = mgSkillBand();
-  return Math.max(3, Math.min(b.cap, Math.round((lvl.max || 5) * b.factor)));
+  let b = mgSkillBand(),
+    base = lvl.max || 5,
+    // Piso para que ningún modo degenere, pero nunca por encima de lo que
+    // el nivel pide: con piso fijo en 3, un nivel de patrones escrito con
+    // max 2 pasaba a patrones de 3 elementos, más difícil que lo autoral.
+    piso = Math.min(3, base);
+  return Math.max(piso, Math.min(b.cap, Math.round(base * b.factor)));
 }
 // Nombre honesto: 17 de los 40 niveles llevan el número en el nombre
 // ("Cuenta hasta 3"), así que al escalar hay que reescribirlo o el
@@ -22123,7 +22153,7 @@ function tr({
                           className: "pm-band" + (null != sk.manual && sk.manual === b.id ? " sel" : ""),
                           onClick: () => (mgSkillSetManualFor(pf.id, pf.age, b.id), pmRefresh()),
                         },
-                        b.cap))));
+                        b.short))));
               })))
         : null,
       (0, s.jsxs)("div", {
