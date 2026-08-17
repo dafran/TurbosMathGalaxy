@@ -16521,6 +16521,12 @@ let ei = [
     { id: "arcoiris", name: "Isla arcoíris", emoji: "🌈" },
     { id: "helada", name: "Montaña helada", emoji: "🏔️" },
     { id: "jardin", name: "Jardín de formas", emoji: "🌷" },
+    // Mundos añadidos al final (nunca intercalados): `world` es el ÍNDICE en
+    // este arreglo, así que insertar en medio reasignaría el fondo y el
+    // banner de todos los niveles posteriores.
+    { id: "feria", name: "Feria de juegos", emoji: "🎪" },
+    { id: "mar", name: "Fondo del mar", emoji: "🐠" },
+    { id: "taller", name: "Taller de robots", emoji: "🤖" },
   ],
   /* Niveles del mundo pequeño. IMPORTANTE: sus `id` son FIJOS y NO se
      reasignan por posición (a diferencia de `en`, que sí lo hace en
@@ -16997,6 +17003,21 @@ let ei = [
       stickerName: "Pavo real",
       pool: ["figura", "depar", "para5", "patron", "sumar"],
     },
+    /* Mundos 10-12 (niveles 41-52), añadidos con ids nuevos al final según
+       la regla de arriba. Cada mundo trae un nivel dedicado a minijuegos
+       (mode "mini", más corto) para cambiar el ritmo. */
+    { id: 41, world: 10, name: "Feria de juegos", mode: "mini", max: 10, questions: 4, emoji: "🎪", sticker: "🎡", stickerName: "Rueda de la fortuna" },
+    { id: 42, world: 10, name: "Suma hasta 12", mode: "sumar", max: 12, questions: 8, emoji: "🍿", sticker: "🎢", stickerName: "Montaña rusa" },
+    { id: 43, world: 10, name: "Cuenta hasta 15", mode: "contar", max: 15, questions: 8, emoji: "🎈", sticker: "🤹", stickerName: "Malabarista" },
+    { id: 44, world: 10, name: "Gran reto de la feria", mode: "mix", max: 12, questions: 8, emoji: "🏆", sticker: "🎨", stickerName: "Pintacaritas" },
+    { id: 45, world: 11, name: "Cuenta los peces", mode: "contar", max: 15, questions: 8, emoji: "🐟", sticker: "🐙", stickerName: "Pulpo curioso" },
+    { id: 46, world: 11, name: "Quedan en el mar", mode: "restar", max: 12, questions: 8, emoji: "🌊", sticker: "🦈", stickerName: "Tiburón amistoso" },
+    { id: 47, world: 11, name: "Juegos del mar", mode: "mini", max: 12, questions: 4, emoji: "🫧", sticker: "🐡", stickerName: "Pez globo" },
+    { id: 48, world: 11, name: "Gran reto del mar", mode: "mix", max: 15, questions: 8, emoji: "🔱", sticker: "🐳", stickerName: "Ballena gigante" },
+    { id: 49, world: 12, name: "Patrones de robot", mode: "patron", max: 3, questions: 8, emoji: "🔩", sticker: "🦾", stickerName: "Brazo robot" },
+    { id: 50, world: 12, name: "Ordena hasta 6", mode: "orden", max: 6, questions: 6, emoji: "🔧", sticker: "🛰️", stickerName: "Satélite" },
+    { id: 51, world: 12, name: "Juegos del taller", mode: "mini", max: 15, questions: 4, emoji: "⚙️", sticker: "🚁", stickerName: "Helicóptero" },
+    { id: 52, world: 12, name: "Gran reto final", mode: "mix", max: 15, questions: 8, emoji: "🎖️", sticker: "🏆", stickerName: "Trofeo de campeón" },
   ],
   ec = ["💍", "🟦", "⭐", "🍎", "💎", "🪙"];
 // Práctica intercalada: todo nivel del camino pequeño lleva un pool de
@@ -17035,6 +17056,7 @@ const MG_LITTLE_FRASES = {
   para5: ["¿Cuántos faltan para llenar los 5?", "¿Cuántos más para llegar a 5?", "¿Cuántos faltan para tener 5?"],
   vf: ["Mira bien: ¿sí o no?", "¿Es verdad?", "¿Cierto o no?"],
   tocar: ["¡Toca cada uno para contarlos!", "¡Cuéntalos con tu dedo!", "Toca todos, uno por uno"],
+  mini: ["¡Momento de jugar!", "¡A jugar!", "¡Un jueguito!"],
 };
 let mgLittleLastFrase = "";
 function mgLittleFrase(e) {
@@ -17056,11 +17078,15 @@ function mgLittleFrase(e) {
    El ajuste automático busca ~75-85% de aciertos, el rango que reportan
    tanto Math Garden (selección de ítems con p(éxito)=.75) como la regla
    del 85% de Wilson et al. — ni aburrido ni frustrante. */
+/* El techo es solo una salvaguarda: la dificultad real la fija el `max` de
+   cada nivel multiplicado por el factor. El techo de la banda 1 tiene que
+   quedar POR ENCIMA del max más alto que traen los niveles (15), o recortaría
+   niveles escritos a mano y la banda 1 dejaría de ser el juego original. */
 const MG_BANDS = [
-  { id: 0, factor: 0.6, cap: 5, label: "Cantidades hasta 5" },
-  { id: 1, factor: 1, cap: 10, label: "Cantidades hasta 10" },
-  { id: 2, factor: 1.5, cap: 20, label: "Cantidades hasta 20" },
-  { id: 3, factor: 2, cap: 30, label: "Cantidades hasta 30" },
+  { id: 0, factor: 0.6, cap: 8, label: "Más suave", short: "Suave" },
+  { id: 1, factor: 1, cap: 15, label: "Normal (como está escrito)", short: "Normal" },
+  { id: 2, factor: 1.5, cap: 24, label: "Más reto", short: "Reto" },
+  { id: 3, factor: 2, cap: 32, label: "Reto máximo", short: "Máx" },
 ];
 const MG_SKILL_WINDOW = 12; // respuestas que mira el ajuste automático
 let mgSkill = null; // { v, band, hist:[], manual }
@@ -17078,8 +17104,13 @@ function mgSkillBand() {
 // Máximo efectivo para un nivel. NO muta el nivel: solo devuelve otro
 // número para el generador. Piso de 3 para que ningún modo degenere.
 function mgSkillMax(lvl) {
-  let b = mgSkillBand();
-  return Math.max(3, Math.min(b.cap, Math.round((lvl.max || 5) * b.factor)));
+  let b = mgSkillBand(),
+    base = lvl.max || 5,
+    // Piso para que ningún modo degenere, pero nunca por encima de lo que
+    // el nivel pide: con piso fijo en 3, un nivel de patrones escrito con
+    // max 2 pasaba a patrones de 3 elementos, más difícil que lo autoral.
+    piso = Math.min(3, base);
+  return Math.max(piso, Math.min(b.cap, Math.round(base * b.factor)));
 }
 // Nombre honesto: 17 de los 40 niveles llevan el número en el nombre
 // ("Cuenta hasta 3"), así que al escalar hay que reescribirlo o el
@@ -17117,38 +17148,139 @@ function mgSkillSetManualFor(id, age, band) {
 // Registro de aciertos que alimenta el ajuste automático. La banda nunca
 // bloquea niveles ni revoca estrellas: solo cambia el tamaño de los
 // números de las próximas preguntas, y en silencio para el niño.
-function mgSkillRecord(ok, save) {
+/* Señales de la sesión, comparadas contra el propio niño y NO contra un
+   estándar: un niño naturalmente lento no debe leerse como frustrado.
+   Viven en memoria (la sesión, no el historial), así que no se guardan. */
+let mgSessLat = [], // latencias de respuesta de esta sesión
+  mgSessCount = 0, // preguntas respondidas en esta sesión
+  mgSoothe = !1; // hay que responder con ánimo, no con menos dificultad
+function mgSessSeen(ms) {
+  (mgSessCount++, mgSessLat.push(ms), mgSessLat.length > 20 && mgSessLat.shift());
+}
+// Contexto de un fallo: ¿parece que no puede, o que ya no está disponible
+// para aprender? "slow" y "fatigue" se miden contra su propia mediana.
+function mgMissCtx(ms, streakAntes) {
+  let base = 0;
+  if (mgSessLat.length >= 4) {
+    let s = [...mgSessLat].sort((a, b) => a - b);
+    base = s[Math.floor(s.length / 2)];
+  }
+  return {
+    slow: base > 0 && ms > 2.5 * base,
+    fatigue: mgSessCount > 24,
+    afterStreak: streakAntes >= 3,
+  };
+}
+function mgSootheTake() {
+  let v = mgSoothe;
+  return ((mgSoothe = !1), v);
+}
+function mgSkillRecord(ok, save, ctx) {
   let s = mgSkillGet();
   if (null != s.manual) return; // el papá fijó la banda: no tocarla
-  let h = [...(s.hist || []), ok ? 1 : 0].slice(-MG_SKILL_WINDOW),
+  // Un fallo con señales de cansancio/frustración se marca aparte: cuenta
+  // para la precisión, pero no como evidencia de que el nivel le quede grande.
+  let aff = !ok && !!ctx && (ctx.slow || ctx.fatigue || ctx.afterStreak),
+    h = [...(s.hist || []), ok ? 1 : 0].slice(-MG_SKILL_WINDOW),
+    af = [...(s.aff || []), aff ? 1 : 0].slice(-MG_SKILL_WINDOW),
     band = s.band;
   if (h.length >= MG_SKILL_WINDOW) {
-    let acc = h.reduce((a, b) => a + b, 0) / h.length;
+    let aciertos = h.reduce((a, b) => a + b, 0),
+      acc = aciertos / h.length;
     // Histéresis: al mover la banda se vacía la ventana, así que hacen
     // falta otras 12 respuestas antes del siguiente movimiento.
-    if (acc >= 0.85 && band < MG_BANDS.length - 1) ((band += 1), (h = []));
-    else if (acc <= 0.6 && band > 0) ((band -= 1), (h = []));
+    if (acc >= 0.85 && band < MG_BANDS.length - 1) ((band += 1), (h = []), (af = []));
+    else if (acc <= 0.6 && band > 0) {
+      let fallos = h.length - aciertos,
+        fallosAfec = af.reduce((a, b) => a + b, 0);
+      // Si la mitad o más de los fallos parecen cansancio o frustración, el
+      // problema no es el tamaño de los números: bajarlos sería la respuesta
+      // equivocada. Se responde con ánimo y se reinicia la ventana.
+      fallos > 0 && 2 * fallosAfec >= fallos
+        ? ((mgSoothe = !0), (h = []), (af = []))
+        : ((band -= 1), (h = []), (af = []));
+    }
   }
-  ((mgSkill = { ...s, v: 1, band: band, hist: h }), save && save(mgSkill));
+  ((mgSkill = { ...s, v: 1, band: band, hist: h, aff: af }), save && save(mgSkill));
 }
+// Ánimo centrado en el esfuerzo, nunca en "estás cansado" ni en la capacidad.
+const MG_SOOTHE = [
+  "¡Qué bien que sigues intentando!",
+  "Respira y vamos otra vez. ¡Estoy contigo!",
+  "Los errores nos enseñan. ¡Sigamos!",
+];
+/* Minijuegos jugables DENTRO del camino. Los seis de "Juegos de lógica"
+   vivían escondidos en otra pestaña, y otros cuatro del camino grande
+   (contar cubos, recta numérica, ordenar y memoria) son perfectamente
+   apropiados para 4-5 años y no se veían nunca. Todos comparten la misma
+   firma ({ level, onFinish }) y no dependen de nada externo, así que se
+   montan tal cual como una pregunta más. */
+const MG_MINIS = [
+  { id: "luces", comp: O, name: "Memoria de luces" },
+  { id: "parejitas", comp: U, name: "Parejas" },
+  { id: "diferente", comp: Q, name: "El diferente" },
+  { id: "sombras", comp: W, name: "La sombra" },
+  { id: "tren", comp: K, name: "Vías del tren" },
+  { id: "cajas", comp: Y, name: "Guarda en su caja" },
+  { id: "cubos", comp: _, name: "Torre de cubos" },
+  { id: "recta", comp: L, name: "La recta numérica" },
+  { id: "ordena", comp: M, name: "Ordena los números" },
+  { id: "memoria", comp: T, name: "Memoria de flores" },
+];
 // Variedad del camino pequeño (espejo del warmup del camino grande):
 // desde la pregunta 4 de un nivel de modo fijo, ~28% de las preguntas
 // salen del pool del nivel; y un memo evita que salga dos veces seguidas
 // exactamente la misma pregunta.
-let mgLittleLastSig = "";
+let mgLittleLastSig = "",
+  mgLittleLastKind = "";
 function mgLittleSig(e) {
   return e
-    ? [e.kind, e.n, e.a, e.b, e.answer, e.pairs, e.filled, e.target, e.left, e.right, e.claim, e.obj].join("|")
+    ? [e.kind, e.n, e.a, e.b, e.answer, e.pairs, e.filled, e.target, e.left, e.right, e.claim, e.obj, e.game].join("|")
     : "";
 }
 function mgLittleNext(e, t) {
   let n = e.mode,
     mx = mgSkillMax(e); // banda del niño, sin mutar el nivel
+  /* Minijuego intercalado, con su propia probabilidad y NO como un modo más
+     del pool: metido en un pool de ~15 modos la posibilidad real caía a ~2%
+     por pregunta y el niño no llegaba a notar la variedad. Así casi todo
+     nivel de mundo 3+ trae uno, y nunca salen dos seguidos. */
+  if (e.world >= 3 && t >= 1 && "mini" !== mgLittleLastKind && Math.random() < 0.15) {
+    let q = ef("mini", mx, e.pool);
+    return (
+      (mgLittleLastKind = "mini"),
+      (mgLittleLastSig = mgLittleSig(q)),
+      (q.frase = mgLittleFrase("mini")),
+      q
+    );
+  }
+  return mgLittleQ(e, t, n, mx);
+}
+// "Otro juego": entrega OTRO minijuego (distinto al actual), que es lo que
+// promete el botón. Pasar por mgLittleNext daría una pregunta de matemáticas,
+// porque la regla de "nunca dos minijuegos seguidos" lo bloquearía.
+function mgMiniOtro(lvl, actual) {
+  let q = ef("mini", mgSkillMax(lvl), lvl.pool);
+  for (let i = 0; i < 6 && q.game === actual; i++)
+    q = ef("mini", mgSkillMax(lvl), lvl.pool);
+  return (
+    (mgLittleLastKind = "mini"),
+    (mgLittleLastSig = mgLittleSig(q)),
+    (q.frase = mgLittleFrase("mini")),
+    q
+  );
+}
+function mgLittleQ(e, t, n, mx) {
   "mix" !== n && e.pool && e.pool.length > 1 && t >= 3 && Math.random() < 0.28 && (n = "mix");
   let a = ef(n, mx, e.pool);
   for (let r = 0; r < 3 && mgLittleSig(a) === mgLittleLastSig; r++)
     a = ef(n, mx, e.pool);
-  return ((mgLittleLastSig = mgLittleSig(a)), (a.frase = mgLittleFrase(a.kind)), a);
+  return (
+    (mgLittleLastSig = mgLittleSig(a)),
+    (mgLittleLastKind = a.kind),
+    (a.frase = mgLittleFrase(a.kind)),
+    a
+  );
 }
 // Figuras del modo "figura" dibujadas en SVG propio: los emojis
 // geométricos son el bloque que más cambia entre plataformas, y aquí el
@@ -17265,6 +17397,7 @@ function ef(e, t, n) {
       choices: s.sort(() => Math.random() - 0.5),
     };
   }
+  if ("mini" === r) return { kind: "mini", game: ee(MG_MINIS).id };
   if ("vf" === r) {
     let e = Z(1, Math.max(3, Math.min(6, t))),
       n =
@@ -19196,6 +19329,7 @@ function e1({ level: e, onDone: t, onSkill: onSkill }) {
     [mgLS, mgSetLS] = (0, i.useState)(0),
     [mgLCheer, mgSetLCheer] = (0, i.useState)(null),
     mgLCheerT = (0, i.useRef)(null),
+    mgQT = (0, i.useRef)(Date.now()), // cuándo apareció la pregunta actual
     y = (0, i.useRef)(null);
   (0, i.useEffect)(
     () => () => {
@@ -19204,6 +19338,11 @@ function e1({ level: e, onDone: t, onSkill: onSkill }) {
     },
     [],
   );
+  // Reloj de la pregunta: se reinicia con cada pregunta nueva para medir
+  // cuánto tardó el niño (relativo a sí mismo, no a un estándar).
+  (0, i.useEffect)(() => {
+    mgQT.current = Date.now();
+  }, [a]);
   let x = (e) => {
       switch (e.kind) {
         case "contar":
@@ -19227,6 +19366,7 @@ function e1({ level: e, onDone: t, onSkill: onSkill }) {
           return e.truth;
         case "orden":
         case "tocar":
+        case "mini":
           return -1;
       }
     },
@@ -19242,7 +19382,20 @@ function e1({ level: e, onDone: t, onSkill: onSkill }) {
           mgLCheerT.current && clearTimeout(mgLCheerT.current),
           (mgLCheerT.current = setTimeout(() => mgSetLCheer(null), 1600)));
       } else mgSetLS(0);
-      mgSkillRecord(s, onSkill);
+      // Señales de la sesión y lectura del fallo: ¿no puede, o ya no está
+      // disponible para aprender? Si es lo segundo, el controlador NO baja
+      // la dificultad; responde con ánimo (mgSoothe).
+      {
+        let lat = Date.now() - mgQT.current,
+          ctx = s ? null : mgMissCtx(lat, mgLS),
+          antes = mgSoothe;
+        (mgSessSeen(lat), mgSkillRecord(s, onSkill, ctx));
+        !antes &&
+          mgSoothe &&
+          (mgSetLCheer(ee(MG_SOOTHE)),
+          mgLCheerT.current && clearTimeout(mgLCheerT.current),
+          (mgLCheerT.current = setTimeout(() => mgSetLCheer(null), 2200)));
+      }
       (s ? v.ok() : v.no(),
         h(n),
         u(s ? "right" : "wrong"),
@@ -19278,7 +19431,8 @@ function e1({ level: e, onDone: t, onSkill: onSkill }) {
       "orden" !== l.kind &&
       "figura" !== l.kind &&
       "vf" !== l.kind &&
-      "tocar" !== l.kind;
+      "tocar" !== l.kind &&
+      "mini" !== l.kind;
   return (0, s.jsxs)("div", {
     className: "screen world-sonic",
     children: [
@@ -19511,6 +19665,36 @@ function e1({ level: e, onDone: t, onSkill: onSkill }) {
                 }),
               ],
             }),
+          "mini" === l.kind &&
+            (() => {
+              let mn = MG_MINIS.find((x) => x.id === l.game) || MG_MINIS[0];
+              return MG_H(
+                "div",
+                { className: "mini-in-path", key: "mini-" + a },
+                MG_H("div", { className: "little-question" }, l.frase || "¡A jugar!"),
+                MG_H("div", { className: "mini-title" }, mn.name),
+                // El minijuego escala con la banda del niño y resuelve la
+                // pregunta él mismo vía onFinish.
+                MG_H(mn.comp, {
+                  level: mgSkillBand().id,
+                  onFinish: (ok) => k(ok ? "orden-ok" : "orden-fail"),
+                }),
+                /* Escape sin castigo. Tren, parejas y cajas solo terminan al
+                   ganar, y el nivel no tiene botón de salir: sin esto, un niño
+                   que no resuelva el puzzle queda atrapado. Cambiar de juego
+                   NO cuenta como error — reemplaza la pregunta por otra. */
+                "ask" === c
+                  ? MG_H(
+                      "button",
+                      {
+                        className: "btn-pixel mini-skip",
+                        onClick: () => (o(mgMiniOtro(e, l.game)), h(null), b([])),
+                      },
+                      "🔄 Otro juego",
+                    )
+                  : null,
+              );
+            })(),
           "tocar" === l.kind &&
             (0, s.jsxs)(s.Fragment, {
               children: [
@@ -19723,7 +19907,10 @@ function e2({
   }, []);
   let [c, u] = (0, i.useState)(!a),
     [mgBn, mgSetBn] = (0, i.useState)(() =>
-      Math.random() < 0.34 ? ee(MG_BONUS_GAMES) : null,
+      // Si el nivel mostró señales de cansancio/frustración, la ronda
+      // sorpresa deja de ser azar y se ofrece siempre: cambiar de actividad
+      // es mejor respuesta que bajarle los números.
+      mgSootheTake() || Math.random() < 0.34 ? ee(MG_BONUS_GAMES) : null,
     ),
     [mgBnOn, mgSetBnOn] = (0, i.useState)(!1),
     [mgBnFlash, mgSetBnFlash] = (0, i.useState)(null);
@@ -19797,7 +19984,8 @@ function e2({
                 children: "\ud83e\udde9 \u00a1Ronda sorpresa!",
               }),
               MG_H(mgBn[1], {
-                level: 2,
+                // Escala con la banda del niño en vez de quedarse fijo en 2.
+                level: mgSkillBand().id,
                 onFinish: (e) => {
                   (mgSetBnOn(!1),
                     mgSetBn(null),
@@ -21965,7 +22153,7 @@ function tr({
                           className: "pm-band" + (null != sk.manual && sk.manual === b.id ? " sel" : ""),
                           onClick: () => (mgSkillSetManualFor(pf.id, pf.age, b.id), pmRefresh()),
                         },
-                        b.cap))));
+                        b.short))));
               })))
         : null,
       (0, s.jsxs)("div", {

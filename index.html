@@ -358,7 +358,7 @@
 <script>
 (function(){
   var ADV_WORLDS = [["Green Hill", "🌀"], ["Torre de restas", "➖"], ["Cueva de bloques", "⛏️"], ["Galaxia lejana", "🌌"], ["Nebulosa violeta", "💜"], ["Isla del caos", "🌋"], ["Mina profunda", "💎"], ["Estrella oscura", "🌑"], ["Corona galáctica", "👑"], ["Cima del maestro", "🏔️"], ["Nebulosa experta", "🔮"]];
-  var LIT_WORLDS = [["Playa soleada", "🏖️"], ["Bosque mágico", "🌳"], ["Espacio estrellado", "🚀"], ["Pradera de palitos", "🌾"], ["Cueva de puntos", "🔦"], ["Castillo de patrones", "🏰"], ["Volcán de números", "🌋"], ["Isla arcoíris", "🌈"], ["Montaña helada", "🏔️"], ["Jardín de formas", "🌷"]];
+  var LIT_WORLDS = [["Playa soleada", "🏖️"], ["Bosque mágico", "🌳"], ["Espacio estrellado", "🚀"], ["Pradera de palitos", "🌾"], ["Cueva de puntos", "🔦"], ["Castillo de patrones", "🏰"], ["Volcán de números", "🌋"], ["Isla arcoíris", "🌈"], ["Montaña helada", "🏔️"], ["Jardín de formas", "🌷"], ["Feria de juegos", "🎪"], ["Fondo del mar", "🐠"], ["Taller de robots", "🤖"]];
   var ADV_LEVELS = {"0": [1, 2, 3, 4, 5, 6], "1": [7, 8, 9, 10, 11, 12], "2": [13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23], "3": [24, 25, 26, 27, 28, 29, 30, 31, 32, 33], "4": [34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44], "5": [45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55], "6": [56, 57, 58, 59, 60, 61, 62, 63], "7": [64, 65, 66, 67, 68, 69, 70, 71, 72], "8": [73, 74, 75, 76, 77, 78, 79, 80], "9": [81, 82, 83, 84, 85, 86], "10": [87, 88, 89, 90, 91, 92, 93]};
   var LIT_LEVELS = {"0": [1, 2, 3, 4], "1": [5, 6, 7, 8], "2": [9, 10, 11, 12], "3": [13, 14, 15, 16], "4": [17, 18, 19, 20], "5": [21, 22, 23, 24], "6": [25, 26, 27, 28], "7": [29, 30, 31, 32], "8": [33, 34, 35, 36], "9": [37, 38, 39, 40]};
   var SEEN_KEY = 'mg_worlds_celebrated';
@@ -602,6 +602,29 @@ button.pm-band { font-family: inherit; font-weight: 800; font-size: .85rem; curs
   border-radius: 10px; padding: 6px 10px; min-width: 40px; transition: all .12s; }
 button.pm-band:hover { background: rgba(255,255,255,.16); }
 button.pm-band.sel { background: #ffd447; border-color: #b8860b; color: #2a1a4a; }
+
+/* ── Fondos de los mundos del camino pequeño ──
+   Solo existían playa, bosque y espacio: los otros siete mundos se veían
+   todos iguales. Cada uno con su propia paleta, en el mismo estilo de
+   degradado suave de los tres originales. */
+.lws-pradera { background: linear-gradient(#9ad14b4d, #e8c96a47); }
+.lws-cuevita { background: linear-gradient(#3a2f5559, #14101f66); }
+.lws-castillo { background: linear-gradient(#7b5ec44d, #3d2a6b52); }
+.lws-volcan { background: linear-gradient(#ff6b3d4d, #7a1f1f5c); }
+.lws-arcoiris { background: linear-gradient(#ff9ad44d, #7ec8ff4d); }
+.lws-helada { background: linear-gradient(#b8e6ff4d, #5c8fc959); }
+.lws-jardin { background: linear-gradient(#ffb3d94d, #8ed17f47); }
+.lws-feria { background: linear-gradient(#ffd16b4d, #e0559e4d); }
+.lws-mar { background: linear-gradient(#2ea9c94d, #10406b5c); }
+.lws-taller { background: linear-gradient(#9aa5b84d, #4a54685c); }
+
+/* ── Minijuegos montados dentro del camino ── */
+.mini-in-path { display: flex; flex-direction: column; align-items: center; gap: 6px; width: 100%; }
+.mini-title { font-family: var(--pixel); font-size: .7rem; color: #ffd447;
+  text-shadow: 2px 2px 0 rgba(0,0,0,.45); margin-bottom: 2px; }
+.mini-in-path .brain-game { width: 100%; }
+.btn-pixel.mini-skip { font-size: .58rem; padding: 9px 12px; margin-top: 8px;
+  background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.3); color: #e8e2ff; }
 </style>
 <script>
 (function(){
