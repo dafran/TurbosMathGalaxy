@@ -602,6 +602,26 @@ button.pm-band { font-family: inherit; font-weight: 800; font-size: .85rem; curs
   border-radius: 10px; padding: 6px 10px; min-width: 40px; transition: all .12s; }
 button.pm-band:hover { background: rgba(255,255,255,.16); }
 button.pm-band.sel { background: #ffd447; border-color: #b8860b; color: #2a1a4a; }
+
+/* ── Fondos de los mundos del camino pequeño ──
+   Solo existían playa, bosque y espacio: los otros siete mundos se veían
+   todos iguales. Cada uno con su propia paleta, en el mismo estilo de
+   degradado suave de los tres originales. */
+.lws-pradera { background: linear-gradient(#9ad14b4d, #e8c96a47); }
+.lws-cuevita { background: linear-gradient(#3a2f5559, #14101f66); }
+.lws-castillo { background: linear-gradient(#7b5ec44d, #3d2a6b52); }
+.lws-volcan { background: linear-gradient(#ff6b3d4d, #7a1f1f5c); }
+.lws-arcoiris { background: linear-gradient(#ff9ad44d, #7ec8ff4d); }
+.lws-helada { background: linear-gradient(#b8e6ff4d, #5c8fc959); }
+.lws-jardin { background: linear-gradient(#ffb3d94d, #8ed17f47); }
+
+/* ── Minijuegos montados dentro del camino ── */
+.mini-in-path { display: flex; flex-direction: column; align-items: center; gap: 6px; width: 100%; }
+.mini-title { font-family: var(--pixel); font-size: .7rem; color: #ffd447;
+  text-shadow: 2px 2px 0 rgba(0,0,0,.45); margin-bottom: 2px; }
+.mini-in-path .brain-game { width: 100%; }
+.btn-pixel.mini-skip { font-size: .58rem; padding: 9px 12px; margin-top: 8px;
+  background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.3); color: #e8e2ff; }
 </style>
 <script>
 (function(){

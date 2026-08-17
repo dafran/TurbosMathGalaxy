@@ -17035,6 +17035,7 @@ const MG_LITTLE_FRASES = {
   para5: ["¿Cuántos faltan para llenar los 5?", "¿Cuántos más para llegar a 5?", "¿Cuántos faltan para tener 5?"],
   vf: ["Mira bien: ¿sí o no?", "¿Es verdad?", "¿Cierto o no?"],
   tocar: ["¡Toca cada uno para contarlos!", "¡Cuéntalos con tu dedo!", "Toca todos, uno por uno"],
+  mini: ["¡Momento de jugar!", "¡A jugar!", "¡Un jueguito!"],
 };
 let mgLittleLastFrase = "";
 function mgLittleFrase(e) {
@@ -17178,24 +17179,78 @@ const MG_SOOTHE = [
   "Respira y vamos otra vez. ¡Estoy contigo!",
   "Los errores nos enseñan. ¡Sigamos!",
 ];
+/* Minijuegos jugables DENTRO del camino. Los seis de "Juegos de lógica"
+   vivían escondidos en otra pestaña, y otros cuatro del camino grande
+   (contar cubos, recta numérica, ordenar y memoria) son perfectamente
+   apropiados para 4-5 años y no se veían nunca. Todos comparten la misma
+   firma ({ level, onFinish }) y no dependen de nada externo, así que se
+   montan tal cual como una pregunta más. */
+const MG_MINIS = [
+  { id: "luces", comp: O, name: "Memoria de luces" },
+  { id: "parejitas", comp: U, name: "Parejas" },
+  { id: "diferente", comp: Q, name: "El diferente" },
+  { id: "sombras", comp: W, name: "La sombra" },
+  { id: "tren", comp: K, name: "Vías del tren" },
+  { id: "cajas", comp: Y, name: "Guarda en su caja" },
+  { id: "cubos", comp: _, name: "Torre de cubos" },
+  { id: "recta", comp: L, name: "La recta numérica" },
+  { id: "ordena", comp: M, name: "Ordena los números" },
+  { id: "memoria", comp: T, name: "Memoria de flores" },
+];
 // Variedad del camino pequeño (espejo del warmup del camino grande):
 // desde la pregunta 4 de un nivel de modo fijo, ~28% de las preguntas
 // salen del pool del nivel; y un memo evita que salga dos veces seguidas
 // exactamente la misma pregunta.
-let mgLittleLastSig = "";
+let mgLittleLastSig = "",
+  mgLittleLastKind = "";
 function mgLittleSig(e) {
   return e
-    ? [e.kind, e.n, e.a, e.b, e.answer, e.pairs, e.filled, e.target, e.left, e.right, e.claim, e.obj].join("|")
+    ? [e.kind, e.n, e.a, e.b, e.answer, e.pairs, e.filled, e.target, e.left, e.right, e.claim, e.obj, e.game].join("|")
     : "";
 }
 function mgLittleNext(e, t) {
   let n = e.mode,
     mx = mgSkillMax(e); // banda del niño, sin mutar el nivel
+  /* Minijuego intercalado, con su propia probabilidad y NO como un modo más
+     del pool: metido en un pool de ~15 modos la posibilidad real caía a ~2%
+     por pregunta y el niño no llegaba a notar la variedad. Así casi todo
+     nivel de mundo 3+ trae uno, y nunca salen dos seguidos. */
+  if (e.world >= 3 && t >= 1 && "mini" !== mgLittleLastKind && Math.random() < 0.15) {
+    let q = ef("mini", mx, e.pool);
+    return (
+      (mgLittleLastKind = "mini"),
+      (mgLittleLastSig = mgLittleSig(q)),
+      (q.frase = mgLittleFrase("mini")),
+      q
+    );
+  }
+  return mgLittleQ(e, t, n, mx);
+}
+// "Otro juego": entrega OTRO minijuego (distinto al actual), que es lo que
+// promete el botón. Pasar por mgLittleNext daría una pregunta de matemáticas,
+// porque la regla de "nunca dos minijuegos seguidos" lo bloquearía.
+function mgMiniOtro(lvl, actual) {
+  let q = ef("mini", mgSkillMax(lvl), lvl.pool);
+  for (let i = 0; i < 6 && q.game === actual; i++)
+    q = ef("mini", mgSkillMax(lvl), lvl.pool);
+  return (
+    (mgLittleLastKind = "mini"),
+    (mgLittleLastSig = mgLittleSig(q)),
+    (q.frase = mgLittleFrase("mini")),
+    q
+  );
+}
+function mgLittleQ(e, t, n, mx) {
   "mix" !== n && e.pool && e.pool.length > 1 && t >= 3 && Math.random() < 0.28 && (n = "mix");
   let a = ef(n, mx, e.pool);
   for (let r = 0; r < 3 && mgLittleSig(a) === mgLittleLastSig; r++)
     a = ef(n, mx, e.pool);
-  return ((mgLittleLastSig = mgLittleSig(a)), (a.frase = mgLittleFrase(a.kind)), a);
+  return (
+    (mgLittleLastSig = mgLittleSig(a)),
+    (mgLittleLastKind = a.kind),
+    (a.frase = mgLittleFrase(a.kind)),
+    a
+  );
 }
 // Figuras del modo "figura" dibujadas en SVG propio: los emojis
 // geométricos son el bloque que más cambia entre plataformas, y aquí el
@@ -17312,6 +17367,7 @@ function ef(e, t, n) {
       choices: s.sort(() => Math.random() - 0.5),
     };
   }
+  if ("mini" === r) return { kind: "mini", game: ee(MG_MINIS).id };
   if ("vf" === r) {
     let e = Z(1, Math.max(3, Math.min(6, t))),
       n =
@@ -19280,6 +19336,7 @@ function e1({ level: e, onDone: t, onSkill: onSkill }) {
           return e.truth;
         case "orden":
         case "tocar":
+        case "mini":
           return -1;
       }
     },
@@ -19344,7 +19401,8 @@ function e1({ level: e, onDone: t, onSkill: onSkill }) {
       "orden" !== l.kind &&
       "figura" !== l.kind &&
       "vf" !== l.kind &&
-      "tocar" !== l.kind;
+      "tocar" !== l.kind &&
+      "mini" !== l.kind;
   return (0, s.jsxs)("div", {
     className: "screen world-sonic",
     children: [
@@ -19577,6 +19635,36 @@ function e1({ level: e, onDone: t, onSkill: onSkill }) {
                 }),
               ],
             }),
+          "mini" === l.kind &&
+            (() => {
+              let mn = MG_MINIS.find((x) => x.id === l.game) || MG_MINIS[0];
+              return MG_H(
+                "div",
+                { className: "mini-in-path", key: "mini-" + a },
+                MG_H("div", { className: "little-question" }, l.frase || "¡A jugar!"),
+                MG_H("div", { className: "mini-title" }, mn.name),
+                // El minijuego escala con la banda del niño y resuelve la
+                // pregunta él mismo vía onFinish.
+                MG_H(mn.comp, {
+                  level: mgSkillBand().id,
+                  onFinish: (ok) => k(ok ? "orden-ok" : "orden-fail"),
+                }),
+                /* Escape sin castigo. Tren, parejas y cajas solo terminan al
+                   ganar, y el nivel no tiene botón de salir: sin esto, un niño
+                   que no resuelva el puzzle queda atrapado. Cambiar de juego
+                   NO cuenta como error — reemplaza la pregunta por otra. */
+                "ask" === c
+                  ? MG_H(
+                      "button",
+                      {
+                        className: "btn-pixel mini-skip",
+                        onClick: () => (o(mgMiniOtro(e, l.game)), h(null), b([])),
+                      },
+                      "🔄 Otro juego",
+                    )
+                  : null,
+              );
+            })(),
           "tocar" === l.kind &&
             (0, s.jsxs)(s.Fragment, {
               children: [
@@ -19866,7 +19954,8 @@ function e2({
                 children: "\ud83e\udde9 \u00a1Ronda sorpresa!",
               }),
               MG_H(mgBn[1], {
-                level: 2,
+                // Escala con la banda del niño en vez de quedarse fijo en 2.
+                level: mgSkillBand().id,
                 onFinish: (e) => {
                   (mgSetBnOn(!1),
                     mgSetBn(null),
