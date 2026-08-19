@@ -12995,10 +12995,24 @@ let c = [
   ],
   u = null;
 let mgChar = "turbo";
+/* Cada acompañante trae un `perk`: antes elegirlo era puramente estético.
+   El `key` es lo único que consultan los enganches, así que sumar un
+   acompañante no obliga a tocarlos. Ojo: los potenciadores solo existen en
+   el camino del aventurero — el del pequeño no tiene vidas, ni reloj, ni
+   monedas, ni objetos donde aplicarlos. */
 let mgChars = [
-  { id: "turbo", name: "Turbo", emoji: "🐶", unlock: 0, desc: "El pug de siempre", voice: "¡Guau!", voiceLow: "guau", sound: "bark", treat: "huesitos" },
-  { id: "gato", name: "Michi", emoji: "🐱", unlock: 12, desc: "Gatito curioso", voice: "¡Miau!", voiceLow: "miau", sound: "meow", treat: "pescaditos" },
-  { id: "perro2", name: "Bruno", emoji: "🐕", unlock: 30, desc: "Perro negro despeinado", voice: "¡Guau!", voiceLow: "guau", sound: "bark", treat: "huesitos" },
+  { id: "turbo", name: "Turbo", emoji: "🐶", unlock: 0, desc: "El pug de siempre", voice: "¡Guau!", voiceLow: "guau", sound: "bark", treat: "huesitos",
+    perk: { key: "escudo", emoji: "🛡️", txt: "A veces evita perder un corazón" },
+    perkMini: { key: "consuelo", emoji: "🤗", txt: "Te consuela cuando algo sale mal" } },
+  { id: "gato", name: "Michi", emoji: "🐱", unlock: 12, desc: "Gatito curioso", voice: "¡Miau!", voiceLow: "miau", sound: "meow", treat: "pescaditos",
+    perk: { key: "tiempo", emoji: "❄️", txt: "Congela el reloj más seguido" },
+    perkMini: { key: "calma", emoji: "🧩", txt: "Trae juegos sorpresa más seguido" } },
+  { id: "perro2", name: "Bruno", emoji: "🐕", unlock: 30, desc: "Perro negro despeinado", voice: "¡Guau!", voiceLow: "guau", sound: "bark", treat: "huesitos",
+    perk: { key: "monedas", emoji: "🪙", txt: "Una moneda extra por acierto" },
+    perkMini: { key: "fiesta", emoji: "🎉", txt: "Celebra tus rachas desde la segunda" } },
+  { id: "zorro", name: "Rita", emoji: "🦊", unlock: 50, desc: "Zorrita rastreadora", voice: "¡Yip!", voiceLow: "yip", sound: "yip", treat: "moritas",
+    perk: { key: "objetos", emoji: "🎁", txt: "Más cofres y más objetos" },
+    perkMini: { key: "regalos", emoji: "🎁", txt: "Te encuentra calcomanías de regalo" } },
 ];
 function mgCharDef() {
   return mgChars.find((x) => x.id === mgChar) || mgChars[0];
@@ -13076,17 +13090,100 @@ function mgSeedCharUnlocks() {
     mgSyncCharUnlocks(best);
   } catch {}
 }
-// Enemigos menores (secuaces) que aparecen en niveles normales: se
-// derrotan con pocos aciertos, a diferencia del jefe de fin de mundo.
+/* Enemigos menores (secuaces) que aparecen en niveles normales: se
+   derrotan con pocos aciertos, a diferencia del jefe de fin de mundo.
+   `hp` es por enemigo: con un valor único para todos, los secuaces eran
+   seis caras distintas del mismo enemigo. */
 let mgMinions = [
-  { emoji: "👾", name: "Bichito" },
-  { emoji: "🦠", name: "Germín" },
-  { emoji: "🤖", name: "Robotín" },
-  { emoji: "👻", name: "Fantasmín" },
-  { emoji: "🐛", name: "Gusanín" },
-  { emoji: "🦇", name: "Murcielín" },
+  { id: "bichito", emoji: "👾", name: "Bichito", hp: 3 },
+  { id: "germin", emoji: "🦠", name: "Germín", hp: 2 },
+  { id: "robotin", emoji: "🤖", name: "Robotín", hp: 4 },
+  { id: "fantasmin", emoji: "👻", name: "Fantasmín", hp: 3 },
+  { id: "gusanin", emoji: "🐛", name: "Gusanín", hp: 2 },
+  { id: "murcielin", emoji: "🦇", name: "Murcielín", hp: 3 },
+  { id: "aranin", emoji: "🕷️", name: "Arañín", hp: 3 },
+  { id: "cangrejin", emoji: "🦀", name: "Cangrejín", hp: 4 },
+  { id: "pulpin", emoji: "🐙", name: "Pulpín", hp: 4 },
+  { id: "abejin", emoji: "🐝", name: "Abejín", hp: 2 },
+  { id: "dinosaurin", emoji: "🦖", name: "Dinosaurín", hp: 5 },
+  { id: "cactin", emoji: "🌵", name: "Cactín", hp: 3 },
+  { id: "chispin", emoji: "⚡", name: "Chispín", hp: 2 },
+  { id: "cocodrilin", emoji: "🐊", name: "Cocodrilín", hp: 4 },
 ];
-const MG_MINION_HP = 3;
+const MG_MINION_HP = 3; // respaldo si a un secuaz le faltara `hp`
+/* Orden de secuaces de un nivel. Antes el índice salía de los aciertos del
+   nivel, así que TODO nivel empezaba con Bichito y, como un nivel de 10
+   preguntas solo alcanza a mostrar unos cuatro, los últimos del arreglo no
+   se veían nunca. Con una mezcla determinista sembrada por el id del nivel
+   cada nivel trae su propia secuencia, y sigue siendo estable entre
+   repintados porque la función es pura. */
+function mgMinionOrden(seed) {
+  let a = mgMinions.slice(),
+    s = ((seed || 1) * 2654435761) % 4294967291;
+  for (let i = a.length - 1; i > 0; i--) {
+    s = (s * 1103515245 + 12345) & 0x7fffffff;
+    let j = s % (i + 1);
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+/* Quién está enfrente con Q aciertos acumulados. Camina el HP de cada secuaz
+   porque ya no es uniforme y no se puede dividir. Devuelve además `prev`: el
+   secuaz que se acaba de derrotar, cuando Q cae justo en el límite. Hace
+   falta para conservar el comportamiento original — la pantalla muestra al
+   derrotado con 0 corazones solo durante la respuesta correcta, y en la
+   pregunta siguiente ya aparece el enemigo nuevo entero. */
+function mgMinionAt(orden, Q) {
+  let acc = 0,
+    prev = null;
+  for (let i = 0; i < 400; i++) {
+    let m = orden[i % orden.length],
+      h = m.hp || MG_MINION_HP;
+    if (Q < acc + h)
+      return {
+        mn: m,
+        hp: h,
+        resta: acc + h - Q,
+        prev: Q > 0 && Q === acc ? prev : null,
+      };
+    ((acc += h), (prev = m));
+  }
+  return { mn: orden[0], hp: orden[0].hp || MG_MINION_HP, resta: 1, prev: null };
+}
+// Clave del potenciador activo (""/desconocido = sin potenciador).
+function mgPerkKey() {
+  let c = mgCharDef();
+  return (c && c.perk && c.perk.key) || "";
+}
+/* Potenciador del camino pequeño. Es distinto del de arriba a propósito: ahí
+   no hay vidas, reloj ni monedas, así que el acompañante acompaña — consuela,
+   celebra, trae juegos o regala calcomanías. La presencia emocional base la
+   tienen TODOS por igual; esto solo suma, nunca resta. */
+function mgPerkMiniKey() {
+  let c = mgCharDef();
+  return (c && c.perkMini && c.perkMini.key) || "";
+}
+/* Calcomanías de regalo, fuera del álbum de niveles: no las da terminar un
+   nivel sino el acompañante, así que viven en su propia colección. */
+const MG_REGALOS = [
+  { e: "🍀", n: "Trébol de suerte" },
+  { e: "🌻", n: "Girasol gigante" },
+  { e: "🎀", n: "Moño brillante" },
+  { e: "🧸", n: "Osito de peluche" },
+  { e: "🍓", n: "Fresa dulce" },
+  { e: "🧁", n: "Pastelito" },
+  { e: "🪁", n: "Cometa del viento" },
+  { e: "🎵", n: "Nota musical" },
+  { e: "🌙", n: "Luna dormilona" },
+  { e: "⛄", n: "Muñeco de nieve" },
+  { e: "🐣", n: "Pollito recién nacido" },
+  { e: "🍉", n: "Sandía de verano" },
+];
+// Un regalo que el niño aún no tenga; null si ya los tiene todos.
+function mgRegaloNuevo(tengo) {
+  let faltan = MG_REGALOS.filter((r) => !(tengo || []).includes(r.e));
+  return faltan.length ? ee(faltan) : null;
+}
 function mgCharSkin(ch) {
   if ("gato" === ch)
     return {
@@ -13111,6 +13208,31 @@ function mgCharSkin(ch) {
         MG_H("path", { key: "w2", d: "M42 63 L20 66", stroke: "#7a7f87", strokeWidth: "1.2", strokeLinecap: "round" }),
         MG_H("path", { key: "w3", d: "M58 60 L80 56", stroke: "#7a7f87", strokeWidth: "1.2", strokeLinecap: "round" }),
         MG_H("path", { key: "w4", d: "M58 63 L80 66", stroke: "#7a7f87", strokeWidth: "1.2", strokeLinecap: "round" }),
+      ],
+    };
+  if ("zorro" === ch)
+    return {
+      fur: "#e8853c",
+      line: "#c96a24",
+      outline: "#7a3d12",
+      snout: "#fbf3e6",
+      nose: "#3a2a22",
+      // Como el gato, hocico cerrado en vez de la lengua jadeante del pug.
+      mouth: "cat",
+      /* Orejas grandes y puntiagudas, más abiertas que las del gato. Mismo
+         truco: el path va SIN cerrar para que la base no raye la frente. */
+      ears: [
+        MG_H("path", { key: "e1", d: "M24 28 L29 2 L47 18", fill: "#e8853c", stroke: "#7a3d12", strokeWidth: "1.5", strokeLinejoin: "round" }),
+        MG_H("path", { key: "e2", d: "M76 28 L71 2 L53 18", fill: "#e8853c", stroke: "#7a3d12", strokeWidth: "1.5", strokeLinejoin: "round" }),
+        MG_H("path", { key: "e3", d: "M28.5 24 L30 8 L42 17.5 Z", fill: "#2f2019" }),
+        MG_H("path", { key: "e4", d: "M71.5 24 L70 8 L58 17.5 Z", fill: "#2f2019" }),
+      ],
+      extras: [
+        // Mejillas claras que dan la cara acorazonada del zorro
+        MG_H("path", { key: "c1", d: "M22 46 Q14 60 26 70 Q22 56 30 50 Z", fill: "#fbf3e6", opacity: "0.9" }),
+        MG_H("path", { key: "c2", d: "M78 46 Q86 60 74 70 Q78 56 70 50 Z", fill: "#fbf3e6", opacity: "0.9" }),
+        MG_H("path", { key: "w1", d: "M43 61 L23 57", stroke: "#a85a1e", strokeWidth: "1.1", strokeLinecap: "round" }),
+        MG_H("path", { key: "w2", d: "M57 61 L77 57", stroke: "#a85a1e", strokeWidth: "1.1", strokeLinecap: "round" }),
       ],
     };
   if ("perro2" === ch)
@@ -13906,12 +14028,16 @@ function E(e, t) {
   }
   return j(Array.from(n));
 }
-function $({ level: e, onFinish: t }) {
+// `steps` es opcional y solo lo usa el camino pequeño: sin limitarlo, el
+// paso 10 sobre 10 nodos llega a 100. Omitido, el comportamiento del camino
+// grande queda idéntico.
+function $({ level: e, onFinish: t, steps: st }) {
   let [n, a] = (0, i.useState)(() => {
       let t, n, a, r;
       return (
         (t = k(
-          e < 2 ? [2, 5, 10] : e < 4 ? [2, 3, 4, 5, 10] : [2, 3, 4, 6, 7, 8, 9],
+          st ||
+            (e < 2 ? [2, 5, 10] : e < 4 ? [2, 3, 4, 5, 10] : [2, 3, 4, 6, 7, 8, 9]),
         )),
         (n = Array.from({ length: 10 }, (e, n) => t * (n + 1))),
         (a = Math.min(5, 2 + Math.floor(e / 2))),
@@ -14194,8 +14320,14 @@ function _({ level: e, onFinish: t }) {
     ],
   });
 }
-function P({ level: e, onFinish: t }) {
-  let [n] = (0, i.useState)(() =>
+/* `deck` y `label` son opcionales y solo los usa el camino pequeño: el juego
+   original empareja a×b con su producto, que no corresponde a 4-5 años. Con
+   una baraja de sumas el mismo armazón refuerza composición de números.
+   Omitidos, el camino grande queda idéntico. */
+function P({ level: e, onFinish: t, deck: dk, label: lb }) {
+  let [n] = (0, i.useState)(
+      () =>
+        dk ||
       (function (e) {
         let t = Math.min(6, 3 + Math.floor(e / 2)),
           n = e < 2 ? [2, 5, 10] : e < 4 ? [2, 3, 4, 5] : [3, 4, 6, 7, 8],
@@ -14228,7 +14360,8 @@ function P({ level: e, onFinish: t }) {
       (0, s.jsxs)("p", {
         className: "brain-instr",
         children: [
-          "Une cada multiplicación con su resultado. Fallos: ",
+          lb || "Une cada multiplicación con su resultado",
+          ". Fallos: ",
           c,
           "/6",
         ],
@@ -14278,9 +14411,11 @@ function P({ level: e, onFinish: t }) {
     ],
   });
 }
-function A({ level: e, onFinish: t }) {
+// `cap` es opcional y solo lo usa el camino pequeño, para que los operandos
+// quepan en el techo de la banda del niño. Omitido, el camino grande no cambia.
+function A({ level: e, onFinish: t, cap: cp }) {
   let [{ a: n, b: a, c: r, answer: l }] = (0, i.useState)(() => {
-      let t = e < 2 ? 6 : e < 4 ? 9 : 12,
+      let t = cp || (e < 2 ? 6 : e < 4 ? 9 : 12),
         n = x(1, t),
         a = x(1, t),
         r = n + a,
@@ -17215,6 +17350,39 @@ const MG_SOOTHE = [
    apropiados para 4-5 años y no se veían nunca. Todos comparten la misma
    firma ({ level, onFinish }) y no dependen de nada externo, así que se
    montan tal cual como una pregunta más. */
+/* Baraja para "Parejas que suman": empareja "2+3" con "5". Refuerza la
+   composición de números (number bonds), que el camino no cubría: sabía
+   contar y sumar, pero no descomponer un número en partes. */
+function mgDeckSuma(techo) {
+  let tope = Math.max(5, Math.min(techo, 12)),
+    pares = tope <= 8 ? 3 : 4,
+    ri = (a, b) => a + Math.floor(Math.random() * (b - a + 1)),
+    vistos = new Set(),
+    cartas = [],
+    id = 0;
+  for (let g = 0; g < 80 && cartas.length < 2 * pares; g++) {
+    let s = ri(3, tope),
+      a = ri(1, s - 1),
+      k = String(s);
+    if (vistos.has(k)) continue;
+    (vistos.add(k),
+      cartas.push({ id: id++, text: `${a}+${s - a}`, pairKey: k }),
+      cartas.push({ id: id++, text: k, pairKey: k }));
+  }
+  // Mezcla propia para no depender de helpers de otra sección del archivo.
+  for (let i = cartas.length - 1; i > 0; i--) {
+    let j2 = Math.floor(Math.random() * (i + 1));
+    [cartas[i], cartas[j2]] = [cartas[j2], cartas[i]];
+  }
+  return cartas;
+}
+/* `min` = banda mínima en la que se ofrece el juego, y `props` = ajustes que
+   dependen del techo del niño. Hacen falta porque cada minijuego escala con
+   su propio `level`, que significa cosas distintas en cada uno (largo de una
+   secuencia, tamaño de una cuadrícula, rango numérico) y no conoce el techo
+   de la banda: la recta, por ejemplo, arranca en rango 20 aunque la banda 0
+   tope en 8. Por eso el límite se pone por juego y no con un recorte global,
+   que falsearía juegos donde `level` no es una cantidad. */
 const MG_MINIS = [
   { id: "luces", comp: O, name: "Memoria de luces" },
   { id: "parejitas", comp: U, name: "Parejas" },
@@ -17223,10 +17391,47 @@ const MG_MINIS = [
   { id: "tren", comp: K, name: "Vías del tren" },
   { id: "cajas", comp: Y, name: "Guarda en su caja" },
   { id: "cubos", comp: _, name: "Torre de cubos" },
-  { id: "recta", comp: L, name: "La recta numérica" },
-  { id: "ordena", comp: M, name: "Ordena los números" },
+  { id: "recta", comp: L, name: "La recta numérica", min: 1 },
+  { id: "ordena", comp: M, name: "Ordena los números", min: 1 },
   { id: "memoria", comp: T, name: "Memoria de flores" },
+  // Equivalencia y el signo "=": los niños suelen leerlo como "aquí viene el
+  // resultado" en vez de "los dos lados valen lo mismo". La balanza lo vuelve
+  // físico, porque el fiel se inclina.
+  {
+    id: "balanza",
+    comp: A,
+    name: "La balanza",
+    min: 1,
+    props: (t) => ({ cap: Math.max(4, Math.min(12, Math.round(t / 2))) }),
+  },
+  /* Contar de N en N, que el camino ya enseña ("Cuenta de 2 en 2"). El paso
+     se limita porque con paso 10 sobre 10 nodos llegaría a 100. Ojo: aquí el
+     techo de la banda NO aplica tal cual — gobierna cantidades que se cuentan,
+     no la secuencia de conteo, y contar de 5 en 5 hasta 50 es propio de esta
+     edad aunque 50 pase del techo. */
+  {
+    id: "reloj",
+    comp: $,
+    name: "El búho que cuenta",
+    min: 1,
+    props: (t) => ({ steps: t <= 15 ? [2, 5] : [2, 3, 5, 10] }),
+  },
+  // Razonamiento deductivo puro (filas y columnas) con dígitos 1-4, dentro
+  // del rango de subitización. Pide banda 2 porque arranca con 5 huecos.
+  { id: "sudoku", comp: C, name: "Sudoku de 4", min: 2 },
+  {
+    id: "sumapar",
+    comp: P,
+    name: "Parejas que suman",
+    min: 1,
+    props: (t) => ({ deck: mgDeckSuma(t), label: "Une cada suma con su resultado" }),
+  },
 ];
+// Juegos disponibles para la banda actual del niño.
+function mgMinisAptos() {
+  let b = mgSkillBand().id;
+  return MG_MINIS.filter((g) => (g.min || 0) <= b);
+}
 // Variedad del camino pequeño (espejo del warmup del camino grande):
 // desde la pregunta 4 de un nivel de modo fijo, ~28% de las preguntas
 // salen del pool del nivel; y un memo evita que salga dos veces seguidas
@@ -17260,8 +17465,9 @@ function mgLittleNext(e, t) {
 // promete el botón. Pasar por mgLittleNext daría una pregunta de matemáticas,
 // porque la regla de "nunca dos minijuegos seguidos" lo bloquearía.
 function mgMiniOtro(lvl, actual) {
-  let q = ef("mini", mgSkillMax(lvl), lvl.pool);
-  for (let i = 0; i < 6 && q.game === actual; i++)
+  let q = ef("mini", mgSkillMax(lvl), lvl.pool),
+    tope = mgMinisAptos().length > 1 ? 8 : 0; // si solo hay uno, no insistir
+  for (let i = 0; i < tope && q.game === actual; i++)
     q = ef("mini", mgSkillMax(lvl), lvl.pool);
   return (
     (mgLittleLastKind = "mini"),
@@ -17296,6 +17502,224 @@ const MG_FIGURAS = {
   "corazon-morado": ["path", { d: "M24 41 C10 30 6 22 10 14 C13 8 21 8 24 15 C27 8 35 8 38 14 C42 22 38 30 24 41 Z", fill: "#8e24aa" }],
   "rombo-naranja": ["path", { d: "M24 6 L40 24 L24 42 L8 24 Z", fill: "#fb8c00" }],
 };
+/* Adornos del fondo del camino, en SVG. Antes eran emoji, que sobre un fondo
+   pintado se ven pegados y además cambian de dibujo en cada plataforma. Se
+   dimensionan en `em` a propósito: así las reglas de font-size, posición y
+   animación que ya existían siguen mandando, sin tocar el CSS. */
+function mgAmbArt(kind) {
+  let H = MG_H,
+    lienzo = (vb, ...hijos) =>
+      H(
+        "svg",
+        {
+          viewBox: vb,
+          width: "1em",
+          height: "1em",
+          fill: "none",
+          xmlns: "http://www.w3.org/2000/svg",
+          style: { display: "block", overflow: "visible" },
+        },
+        ...hijos,
+      ),
+    grad = (id, paradas, vert = !0) =>
+      H(
+        "linearGradient",
+        { id: id, x1: "0", y1: "0", x2: vert ? "0" : "1", y2: vert ? "1" : "0" },
+        ...paradas.map((s, i) =>
+          H("stop", { key: i, offset: s[0], stopColor: s[1], stopOpacity: s[2] }),
+        ),
+      );
+
+  if ("cloud1" === kind || "cloud2" === kind) {
+    let dos = "cloud2" === kind,
+      g = "mgAmbNube" + (dos ? "B" : "A");
+    return lienzo(
+      "0 0 108 72",
+      H("defs", { key: "d" }, grad(g, [["0%", "#ffffff"], ["62%", "#f2f7ff"], ["100%", "#c9daf2"]])),
+      H(
+        "g",
+        { key: "g", fill: `url(#${g})` },
+        H("ellipse", { cx: dos ? 30 : 33, cy: 44, rx: 19, ry: 17 }),
+        H("ellipse", { cx: 54, cy: 34, rx: 23, ry: 21 }),
+        H("ellipse", { cx: dos ? 80 : 77, cy: 45, rx: 17, ry: 15 }),
+        H("rect", { x: 13, y: 42, width: 82, height: 20, rx: 10 }),
+      ),
+      // Panza sombreada: da volumen sin necesidad de contorno
+      H("path", {
+        key: "s",
+        d: "M22 58 Q40 52 56 56 Q72 60 88 55",
+        stroke: "#aec4e2",
+        strokeWidth: "2.4",
+        strokeLinecap: "round",
+        opacity: "0.55",
+      }),
+    );
+  }
+
+  if ("balloon" === kind)
+    return lienzo(
+      "0 0 64 104",
+      H(
+        "defs",
+        { key: "d" },
+        grad("mgAmbGlobo", [["0%", "#ff8fa8"], ["55%", "#f0517a"], ["100%", "#b32b52"]]),
+      ),
+      // Cuerpo en gota: círculo que se cierra en punta hacia el nudo
+      H("path", {
+        key: "b",
+        d: "M32 4 C48 4 60 17 60 33 C60 50 45 62 34 70 L32 73 L30 70 C19 62 4 50 4 33 C4 17 16 4 32 4 Z",
+        fill: "url(#mgAmbGlobo)",
+      }),
+      H("ellipse", { key: "h", cx: 22, cy: 24, rx: 6, ry: 9, fill: "#fff", opacity: "0.45", transform: "rotate(-20 22 24)" }),
+      H("path", { key: "k", d: "M28 72 L36 72 L32 78 Z", fill: "#b32b52" }),
+      H("path", { key: "c", d: "M32 78 Q38 85 30 90 Q24 95 32 100", stroke: "#8a6a4f", strokeWidth: "2", strokeLinecap: "round" }),
+      // Canastita: es lo que lo separa de un globo de fiesta
+      H("path", { key: "n", d: "M23 99 h18 l-2 8 a3 3 0 0 1 -3 2 h-8 a3 3 0 0 1 -3 -2 Z", fill: "#c98b4f" }),
+    );
+
+  if ("butterfly" === kind)
+    return lienzo(
+      "0 0 96 84",
+      H(
+        "defs",
+        { key: "d" },
+        grad("mgAmbMari", [["0%", "#ffcf5c"], ["100%", "#ef7d3a"]]),
+        grad("mgAmbMariB", [["0%", "#f0975a"], ["100%", "#c4562b"]]),
+      ),
+      /* Alas de elipses rotadas y no de beziers: dibujadas a mano salían en
+         punta y el conjunto se leía como un moño, no como una mariposa. */
+      H("ellipse", { key: "a1", cx: 30, cy: 30, rx: 21, ry: 16, fill: "url(#mgAmbMari)", transform: "rotate(-28 30 30)" }),
+      H("ellipse", { key: "a2", cx: 66, cy: 30, rx: 21, ry: 16, fill: "url(#mgAmbMari)", transform: "rotate(28 66 30)" }),
+      H("ellipse", { key: "a3", cx: 34, cy: 58, rx: 16, ry: 13, fill: "url(#mgAmbMariB)", transform: "rotate(26 34 58)" }),
+      H("ellipse", { key: "a4", cx: 62, cy: 58, rx: 16, ry: 13, fill: "url(#mgAmbMariB)", transform: "rotate(-26 62 58)" }),
+      // Lunares en las alas
+      H("circle", { key: "p1", cx: 26, cy: 26, r: 4.5, fill: "#fff6d8", opacity: "0.85" }),
+      H("circle", { key: "p2", cx: 70, cy: 26, r: 4.5, fill: "#fff6d8", opacity: "0.85" }),
+      H("circle", { key: "p3", cx: 32, cy: 60, r: 3, fill: "#fff6d8", opacity: "0.6" }),
+      H("circle", { key: "p4", cx: 64, cy: 60, r: 3, fill: "#fff6d8", opacity: "0.6" }),
+      H("rect", { key: "b", x: 44, y: 22, width: 8, height: 48, rx: 4, fill: "#4a3222" }),
+      H("circle", { key: "hd", cx: 48, cy: 20, r: 6, fill: "#4a3222" }),
+      H("path", { key: "an", d: "M45 16 Q39 6 32 3 M51 16 Q57 6 64 3", stroke: "#4a3222", strokeWidth: "2.2", strokeLinecap: "round" }),
+      H("circle", { key: "a5", cx: 32, cy: 3, r: 2.4, fill: "#4a3222" }),
+      H("circle", { key: "a6", cx: 64, cy: 3, r: 2.4, fill: "#4a3222" }),
+    );
+
+  if ("bird" === kind)
+    return lienzo(
+      "0 0 96 64",
+      H("defs", { key: "d" }, grad("mgAmbAve", [["0%", "#7fd4f5"], ["100%", "#3a86c8"]])),
+      /* Pajarito de perfil: cuerpo, cabeza, pico y ala. La versión anterior
+         era una silueta de golondrina que se leía como un avión. */
+      H("path", { key: "t", d: "M26 32 L4 22 L9 34 L4 46 Z", fill: "#2f6ea8" }),
+      H("ellipse", { key: "b", cx: 44, cy: 34, rx: 23, ry: 16, fill: "url(#mgAmbAve)" }),
+      H("circle", { key: "h", cx: 68, cy: 23, r: 12, fill: "url(#mgAmbAve)" }),
+      H("ellipse", { key: "w", cx: 42, cy: 33, rx: 14, ry: 8.5, fill: "#cfeefc", opacity: "0.95", transform: "rotate(-18 42 33)" }),
+      H("circle", { key: "e", cx: 72, cy: 20, r: 2.4, fill: "#22364a" }),
+      H("path", { key: "k", d: "M79 22 L93 26 L79 30 Z", fill: "#f5a623" }),
+    );
+
+  if ("rainbow" === kind) {
+    let colores = ["#ff6b6b", "#ffa94d", "#ffd43b", "#69db7c", "#4dabf7", "#9775fa"];
+    return lienzo(
+      "0 0 100 60",
+      ...colores.map((c, i) =>
+        H("path", {
+          key: i,
+          d: `M8 56 A ${42 - i * 6} ${42 - i * 6} 0 0 1 ${92 - i * 0} 56`.replace(
+            "M8 56",
+            `M${8 + i * 6} 56`,
+          ),
+          stroke: c,
+          strokeWidth: "5.5",
+          strokeLinecap: "round",
+          opacity: "0.92",
+        }),
+      ),
+    );
+  }
+
+  if ("planet1" === kind)
+    return lienzo(
+      "0 0 104 80",
+      H(
+        "defs",
+        { key: "d" },
+        grad("mgAmbPl1", [["0%", "#ffd98a"], ["55%", "#e8a13f"], ["100%", "#a35f1e"]]),
+      ),
+      // Anillo: mitad de atrás, planeta, y mitad de delante encima
+      H("ellipse", { key: "r1", cx: 52, cy: 40, rx: 48, ry: 15, stroke: "#f2d6a8", strokeWidth: "4", opacity: "0.55" }),
+      H("circle", { key: "p", cx: 52, cy: 38, r: 26, fill: "url(#mgAmbPl1)" }),
+      H("path", { key: "r2", d: "M4 40 A 48 15 0 0 0 100 40", stroke: "#fbe9c8", strokeWidth: "4", strokeLinecap: "round", opacity: "0.9" }),
+      H("ellipse", { key: "b1", cx: 46, cy: 30, rx: 14, ry: 4, fill: "#fff2d0", opacity: "0.35" }),
+    );
+
+  if ("planet2" === kind)
+    return lienzo(
+      "0 0 80 80",
+      H(
+        "defs",
+        { key: "d" },
+        grad("mgAmbPl2", [["0%", "#8fd3ff"], ["60%", "#3f86c9"], ["100%", "#1d4f7d"]]),
+      ),
+      H("circle", { key: "p", cx: 40, cy: 40, r: 34, fill: "url(#mgAmbPl2)" }),
+      // Continentes: manchas, no un mapa real
+      H("path", { key: "c1", d: "M18 34 Q28 24 40 30 Q34 40 22 42 Z", fill: "#63c07a" }),
+      H("path", { key: "c2", d: "M44 48 Q58 42 66 50 Q56 62 44 56 Z", fill: "#63c07a" }),
+      H("circle", { key: "h", cx: 28, cy: 24, r: 9, fill: "#fff", opacity: "0.25" }),
+    );
+
+  if ("moon" === kind)
+    return lienzo(
+      "0 0 72 72",
+      H("defs", { key: "d" }, grad("mgAmbLuna", [["0%", "#fff7d6"], ["100%", "#e8cf83"]])),
+      /* Creciente como dos círculos con regla evenodd: el segundo recorta al
+         primero. Hacerlo con dos arcos encadenados daba una forma casi vacía. */
+      H("path", {
+        key: "m",
+        d: "M36 36 m-30 0 a30 30 0 1 0 60 0 a30 30 0 1 0 -60 0 M52 30 m-25 0 a25 25 0 1 0 50 0 a25 25 0 1 0 -50 0",
+        fillRule: "evenodd",
+        fill: "url(#mgAmbLuna)",
+      }),
+      H("circle", { key: "k1", cx: 20, cy: 30, r: 4, fill: "#d9bd6a", opacity: "0.55" }),
+      H("circle", { key: "k2", cx: 17, cy: 46, r: 2.8, fill: "#d9bd6a", opacity: "0.45" }),
+    );
+
+  if ("spark" === kind)
+    return lienzo(
+      "0 0 64 64",
+      H("path", { key: "s1", d: "M32 2 L38 26 L62 32 L38 38 L32 62 L26 38 L2 32 L26 26 Z", fill: "#fff3b0" }),
+      H("path", { key: "s2", d: "M32 14 L35 29 L50 32 L35 35 L32 50 L29 35 L14 32 L29 29 Z", fill: "#fff" }),
+      H("circle", { key: "d1", cx: 54, cy: 12, r: 3, fill: "#fff3b0", opacity: "0.85" }),
+      H("circle", { key: "d2", cx: 12, cy: 50, r: 2.2, fill: "#fff3b0", opacity: "0.7" }),
+    );
+
+  if ("comet" === kind)
+    return lienzo(
+      "0 0 112 56",
+      H("defs", { key: "d" }, grad("mgAmbCola", [["0%", "#7fd4f5", "0.15"], ["100%", "#dff4fd", "1"]], !1)),
+      H("path", { key: "t", d: "M0 28 L72 13 L72 43 Z", fill: "url(#mgAmbCola)" }),
+      // Mechones que dan sensación de velocidad
+      H("path", { key: "t2", d: "M12 22 L60 16 M14 36 L60 40", stroke: "#bfe9fb", strokeWidth: "2", strokeLinecap: "round", opacity: "0.5" }),
+      H("circle", { key: "h", cx: 84, cy: 28, r: 18, fill: "#fff6d8" }),
+      H("circle", { key: "h2", cx: 89, cy: 23, r: 8, fill: "#fff" }),
+    );
+
+  if ("ship" === kind)
+    return lienzo(
+      "0 0 104 60",
+      H("defs", { key: "d" }, grad("mgAmbNave", [["0%", "#d8e4f2"], ["100%", "#8496ae"]])),
+      // Platillo: cúpula, casco y luces
+      H("ellipse", { key: "c", cx: 52, cy: 34, rx: 46, ry: 13, fill: "url(#mgAmbNave)" }),
+      H("path", { key: "d2", d: "M28 30 A 24 22 0 0 1 76 30 Z", fill: "#9fe3ff", opacity: "0.9" }),
+      H("path", { key: "d3", d: "M36 30 A 16 15 0 0 1 60 18", stroke: "#fff", strokeWidth: "2.5", strokeLinecap: "round", opacity: "0.7" }),
+      ...[24, 40, 56, 72].map((x, i) =>
+        H("circle", { key: "l" + i, cx: x, cy: 40, r: 3.2, fill: "#ffd447" }),
+      ),
+    );
+
+  return null;
+}
+
 function mgShapeSVG(id, size = 44) {
   let f = MG_FIGURAS[id];
   return f
@@ -17397,7 +17821,7 @@ function ef(e, t, n) {
       choices: s.sort(() => Math.random() - 0.5),
     };
   }
-  if ("mini" === r) return { kind: "mini", game: ee(MG_MINIS).id };
+  if ("mini" === r) return { kind: "mini", game: ee(mgMinisAptos()).id };
   if ("vf" === r) {
     let e = Z(1, Math.max(3, Math.min(6, t))),
       n =
@@ -18444,6 +18868,7 @@ async function eH(e, t) {
   return t;
 }
 let eW = [
+  "mg_gifts",
   "mg_facts",
   "mg_daily",
   "mg_little",
@@ -18596,7 +19021,7 @@ function mgIcon(name, size, color) {
   if (!kids) return null;
   return MG_H("svg", { width: size || 22, height: size || 22, viewBox: "0 0 24 24", className: "mg-ic mg-ic-" + name, "aria-hidden": "true" }, ...kids(color));
 }
-const MG_PROFILE_KEYS = ["mg_facts", "mg_daily", "mg_little", "mg_little_path", "mg_path", "mg_coins", "mg_inv", "mg_reto", "mg_practice", "mg_brain", "mg_lbrain", "mg_outfit", "mg_pathver", "mg_goals", "mg_worlds_celebrated", "mg_lessons", "mg_char", "mg_skill"];
+const MG_PROFILE_KEYS = ["mg_facts", "mg_daily", "mg_little", "mg_little_path", "mg_path", "mg_coins", "mg_inv", "mg_reto", "mg_practice", "mg_brain", "mg_lbrain", "mg_outfit", "mg_pathver", "mg_goals", "mg_worlds_celebrated", "mg_lessons", "mg_char", "mg_skill", "mg_gifts"];
 const MG_AVATARS = ["🦄", "🐯", "🦖", "🐸", "🦊", "🐼", "🐧", "🦁", "🐙", "🐨", "🦉", "🐢", "🐝", "🦋", "🐬", "🦕", "🚀", "🌟"];
 const mgRaw = () => window.__mgRaw || { get: () => null, set: () => {}, remove: () => {} };
 function mgNewId() { return "p" + Math.random().toString(36).slice(2, 8); }
@@ -18752,6 +19177,13 @@ function MgCharScreen({ charDone: dq, onBack: bk }) {
               : MG_H("div", { className: "char-lock" }, "🔒"),
             MG_H("div", { className: "char-name" }, unlocked ? cc.name : "Completa " + cc.unlock + " niveles"),
             unlocked ? MG_H("div", { className: "char-desc" }, cc.desc) : null,
+            /* Aquí se muestra el potenciador del camino pequeño, NO el del
+               aventurero: este camino no tiene vidas, reloj, monedas ni
+               objetos, así que anunciar un escudo o monedas extra sería
+               prometer algo que nunca va a ocurrir. */
+            cc.perkMini
+              ? MG_H("div", { className: "char-perk" }, cc.perkMini.emoji + " " + cc.perkMini.txt)
+              : null,
             sel && MG_H("div", { className: "char-badge" }, "✓ elegido"));
         }))));
 }
@@ -18821,7 +19253,11 @@ function mgConceptOf(level) {
   if (["reparto", "resto", "division"].includes(level.kind)) return "division";
   return null;
 }
-function mgStreakCheer(n) {
+function mgStreakCheer(n, fiesta) {
+  // Bruno celebra antes: la 2ª y la 4ª, que en el camino pequeño es donde una
+  // racha todavía se siente frágil.
+  if (fiesta && (2 === n || 4 === n))
+    return 2 === n ? "🎉 ¡Dos seguidas! ¡Vas muy bien!" : "🎉 ¡Cuatro seguidas! ¡Qué bien vas!";
   if (3 === n) return "🔥 ¡3 seguidas! ¡Qué racha!";
   if (5 === n) return "⚡ ¡5 seguidas! ¡Imparable!";
   if (7 === n) return "🌟 ¡7 seguidas! ¡Qué constancia!";
@@ -19140,12 +19576,12 @@ function eZ({ progress: e, onLevel: t, onStickers: n, onBrain: a, onBack: r }) {
           MG_H(
             "div",
             { className: "path-ambient sky", "aria-hidden": "true" },
-            MG_H("span", { className: "amb amb-cloud1" }, "☁️"),
-            MG_H("span", { className: "amb amb-cloud2" }, "☁️"),
-            MG_H("span", { className: "amb amb-balloon" }, "🎈"),
-            MG_H("span", { className: "amb amb-butterfly" }, "🦋"),
-            MG_H("span", { className: "amb amb-bird" }, "🐦"),
-            MG_H("span", { className: "amb amb-rainbow" }, "🌈"),
+            MG_H("span", { className: "amb amb-cloud1" }, mgAmbArt("cloud1")),
+            MG_H("span", { className: "amb amb-cloud2" }, mgAmbArt("cloud2")),
+            MG_H("span", { className: "amb amb-balloon" }, mgAmbArt("balloon")),
+            MG_H("span", { className: "amb amb-butterfly" }, mgAmbArt("butterfly")),
+            MG_H("span", { className: "amb amb-bird" }, mgAmbArt("bird")),
+            MG_H("span", { className: "amb amb-rainbow" }, mgAmbArt("rainbow")),
           ),
           (0, s.jsxs)("div", {
             className: "path-header",
@@ -19269,8 +19705,9 @@ function eZ({ progress: e, onLevel: t, onStickers: n, onBrain: a, onBack: r }) {
     ],
   });
 }
-function e0({ progress: e, onBack: t }) {
-  let n = eo.filter((t) => e[t.id]?.done).length;
+function e0({ progress: e, gifts: gf, onBack: t }) {
+  let n = eo.filter((t) => e[t.id]?.done).length,
+    regalos = gf || [];
   return (0, s.jsxs)("div", {
     className: "screen world-sonic scroll-screen",
     children: [
@@ -19315,6 +19752,35 @@ function e0({ progress: e, onBack: t }) {
           }),
         }),
       }),
+      /* Regalos del acompañante. Van en su propia sección y no mezclados con
+         las calcomanías de nivel, porque no se ganan superando un nivel sino
+         acompañando: mezclarlas haría parecer que faltan niveles. */
+      regalos.length > 0 &&
+        (0, s.jsxs)("div", {
+          className: "panel album-panel",
+          children: [
+            (0, s.jsxs)("div", {
+              className: "album-gift-title",
+              children: ["🎁 Regalos de ", mgCharName(), " · ", regalos.length, "/", MG_REGALOS.length],
+            }),
+            (0, s.jsx)("div", {
+              className: "sticker-grid",
+              children: MG_REGALOS.filter((r) => regalos.includes(r.e)).map((r) =>
+                (0, s.jsxs)(
+                  "div",
+                  {
+                    className: "sticker-slot got",
+                    children: [
+                      (0, s.jsx)("span", { className: "ss-emoji", children: r.e }),
+                      (0, s.jsx)("span", { className: "ss-name", children: r.n }),
+                    ],
+                  },
+                  r.e,
+                ),
+              ),
+            }),
+          ],
+        }),
     ],
   });
 }
@@ -19376,7 +19842,7 @@ function e1({ level: e, onDone: t, onSkill: onSkill }) {
       if (s) {
         let e = mgLS + 1;
         mgSetLS(e);
-        let t = mgStreakCheer(e);
+        let t = mgStreakCheer(e, "fiesta" === mgPerkMiniKey());
         t &&
           (mgSetLCheer(t),
           mgLCheerT.current && clearTimeout(mgLCheerT.current),
@@ -19390,6 +19856,18 @@ function e1({ level: e, onDone: t, onSkill: onSkill }) {
           ctx = s ? null : mgMissCtx(lat, mgLS),
           antes = mgSoothe;
         (mgSessSeen(lat), mgSkillRecord(s, onSkill, ctx));
+        /* Consuelo del acompañante: además del ánimo que dispara el
+           controlador de frustración, Turbo aparece por su cuenta tras un
+           fallo. No sustituye al del controlador — si ese ya saltó, no se
+           pisan. */
+        !antes &&
+          !mgSoothe &&
+          !s &&
+          "consuelo" === mgPerkMiniKey() &&
+          Math.random() < 0.35 &&
+          (mgSetLCheer(ee(MG_SOOTHE)),
+          mgLCheerT.current && clearTimeout(mgLCheerT.current),
+          (mgLCheerT.current = setTimeout(() => mgSetLCheer(null), 2200)));
         !antes &&
           mgSoothe &&
           (mgSetLCheer(ee(MG_SOOTHE)),
@@ -19667,7 +20145,8 @@ function e1({ level: e, onDone: t, onSkill: onSkill }) {
             }),
           "mini" === l.kind &&
             (() => {
-              let mn = MG_MINIS.find((x) => x.id === l.game) || MG_MINIS[0];
+              let mn = MG_MINIS.find((x) => x.id === l.game) || MG_MINIS[0],
+                extra = mn.props ? mn.props(mgSkillBand().cap) : null;
               return MG_H(
                 "div",
                 { className: "mini-in-path", key: "mini-" + a },
@@ -19677,6 +20156,7 @@ function e1({ level: e, onDone: t, onSkill: onSkill }) {
                 // pregunta él mismo vía onFinish.
                 MG_H(mn.comp, {
                   level: mgSkillBand().id,
+                  ...extra,
                   onFinish: (ok) => k(ok ? "orden-ok" : "orden-fail"),
                 }),
                 /* Escape sin castigo. Tren, parejas y cajas solo terminan al
@@ -19898,6 +20378,7 @@ function e2({
   correct: t,
   stars: n,
   isNewSticker: a,
+  regalo: mgReg,
   onNext: r,
   onPath: l,
   hasNext: o,
@@ -19910,7 +20391,10 @@ function e2({
       // Si el nivel mostró señales de cansancio/frustración, la ronda
       // sorpresa deja de ser azar y se ofrece siempre: cambiar de actividad
       // es mejor respuesta que bajarle los números.
-      mgSootheTake() || Math.random() < 0.34 ? ee(MG_BONUS_GAMES) : null,
+      mgSootheTake() ||
+      Math.random() < ("calma" === mgPerkMiniKey() ? 0.55 : 0.34)
+        ? ee(MG_BONUS_GAMES)
+        : null,
     ),
     [mgBnOn, mgSetBnOn] = (0, i.useState)(!1),
     [mgBnFlash, mgSetBnFlash] = (0, i.useState)(null);
@@ -19960,6 +20444,24 @@ function e2({
                   }),
                 ],
               }),
+              // Regalo del acompañante, aparte de la calcomanía del nivel
+              mgReg &&
+                (0, s.jsxs)("div", {
+                  className: "gift-extra",
+                  children: [
+                    (0, s.jsxs)("div", {
+                      className: "gift-who",
+                      children: ["🎁 ", mgCharName(), " te encontró esto:"],
+                    }),
+                    (0, s.jsxs)("div", {
+                      className: "gift-item",
+                      children: [
+                        mgReg.e,
+                        (0, s.jsx)("span", { className: "cr-name", children: mgReg.n }),
+                      ],
+                    }),
+                  ],
+                }),
               (0, s.jsx)("button", {
                 className: "btn-pixel btn-go",
                 onClick: (e) => {
@@ -20094,12 +20596,12 @@ function e3({
           MG_H(
             "div",
             { className: "path-ambient", "aria-hidden": "true" },
-            MG_H("span", { className: "amb amb-planet1" }, "🪐"),
-            MG_H("span", { className: "amb amb-planet2" }, "🌍"),
-            MG_H("span", { className: "amb amb-ship" }, "🛸"),
-            MG_H("span", { className: "amb amb-comet" }, "☄️"),
-            MG_H("span", { className: "amb amb-moon" }, "🌙"),
-            MG_H("span", { className: "amb amb-spark" }, "✨"),
+            MG_H("span", { className: "amb amb-planet1" }, mgAmbArt("planet1")),
+            MG_H("span", { className: "amb amb-planet2" }, mgAmbArt("planet2")),
+            MG_H("span", { className: "amb amb-ship" }, mgAmbArt("ship")),
+            MG_H("span", { className: "amb amb-comet" }, mgAmbArt("comet")),
+            MG_H("span", { className: "amb amb-moon" }, mgAmbArt("moon")),
+            MG_H("span", { className: "amb amb-spark" }, mgAmbArt("spark")),
           ),
           (0, s.jsxs)("div", {
             className: "path-header",
@@ -20696,7 +21198,12 @@ function e8({
           e.kind !== "boss" &&
           Math.random() < 0.2 &&
           (s = mgWarmup());
-        let mgBase = mgTimeFor(s) + (mgFastRef.current ? 5 : 0);
+        // El gato regala segundos. Ojo: agotar el tiempo ya no resta corazones,
+        // así que esto no salva vidas — reduce la pregunta sin crédito y la prisa.
+        let mgBase =
+          mgTimeFor(s) +
+          (mgFastRef.current ? 5 : 0) +
+          ("tiempo" === mgPerkKey() ? 4 : 0);
         ((mgFastRef.current = !1),
           mgSetMax(mgBase),
           mgSetStar((v) => Math.max(0, v - 1)));
@@ -20713,7 +21220,19 @@ function e8({
       },
       [y, e, ed],
     );
+  let mgPugRef = (0, i.useRef)(!1); // el pug ya salvó en este nivel
+  /* Potenciador del pug. Va ANTES del escudo a propósito: si salva, el
+     escudo comprado sigue guardado para después. Una sola vez por nivel,
+     para que siga importando acertar. La probabilidad sube mucho con un
+     corazón porque es justo donde un niño abandona. */
   function mgApplyMiss() {
+    if ("escudo" === mgPerkKey() && !mgPugRef.current) {
+      let prob = c <= 1 ? 0.7 : 0.18;
+      if (Math.random() < prob) {
+        ((mgPugRef.current = !0), B("pugsave"));
+        return;
+      }
+    }
     f ? (m(!1), B("shielded")) : (u((e) => e - 1), B("wrong"));
   }
   function em(e, mgIsTimeout = !1) {
@@ -20744,7 +21263,14 @@ function e8({
       if (mgSinceFreeze.current >= mgFreezeGoal.current) {
         ((mgFreezePend.current = !0),
           (mgSinceFreeze.current = 0),
-          (mgFreezeGoal.current = Math.random() < 0.5 ? 2 : 3));
+          (mgFreezeGoal.current =
+            "tiempo" === mgPerkKey()
+              ? Math.random() < 0.5
+                ? 1
+                : 2
+              : Math.random() < 0.5
+                ? 2
+                : 3));
       }
       let mgGotStar = !1;
       0 === mgStar &&
@@ -20753,7 +21279,7 @@ function e8({
           : Math.random() < 0.05 && (mgSetStar(5), (mgGotStar = !0)));
       let e = J > mgMax * 0.6;
       mgFastRef.current = e;
-      let t = 2 + +!!e,
+      let t = 2 + +!!e + ("monedas" === mgPerkKey() ? 1 : 0),
         a = W + t;
       if (
         (V(a),
@@ -20856,6 +21382,7 @@ function e8({
       "boss" === e.kind &&
         (() => {
           let hurt = "wrong" === U || "shielded" === U,
+            _pug = "pugsave" === U,
             hp = Math.max(0, e.passAt - Q),
             frac = hp / e.passAt,
             defeated = 0 === hp,
@@ -20947,13 +21474,12 @@ function e8({
         })(),
       "boss" !== e.kind &&
         (() => {
-          let mHp = MG_MINION_HP,
-            beaten = Math.floor(Q / mHp),
-            justBeat = "right" === U && Q > 0 && Q % mHp === 0,
-            idx = (justBeat ? beaten - 1 : beaten) % mgMinions.length,
-            mn = mgMinions[((idx % mgMinions.length) + mgMinions.length) % mgMinions.length],
+          let paso = mgMinionAt(mgMinionOrden(e.id), Q),
+            justBeat = "right" === U && !!paso.prev,
+            mn = justBeat ? paso.prev : paso.mn,
+            mHp = mn.hp || MG_MINION_HP,
             hit = "right" === U,
-            shownHp = justBeat ? 0 : mHp - (Q % mHp);
+            shownHp = justBeat ? 0 : paso.resta;
           return MG_H(
             "div",
             { className: "minion-strip" + (justBeat ? " beat" : "") },
@@ -21187,6 +21713,24 @@ function e8({
                   "🔄 ¡Ups! ¿Quieres usar un doble intento y volver a probar esta pregunta?",
               }),
             }),
+          "pugsave" === U &&
+            (0, s.jsxs)("div", {
+              className: "q-feedback pugmsg",
+              children: [
+                (0, s.jsxs)("div", {
+                  className: "wrong-answer",
+                  children: [
+                    `${mgCharDef().emoji} ¡${mgCharName()} te salvó! `,
+                    ey(),
+                  ],
+                }),
+                ec &&
+                  (0, s.jsxs)("div", {
+                    className: "hint-box",
+                    children: ["💡 ", ec],
+                  }),
+              ],
+            }),
           "shielded" === U &&
             (0, s.jsxs)("div", {
               className: "q-feedback shieldmsg",
@@ -21279,6 +21823,7 @@ function e8({
         : "wrong" === U ||
             "shielded" === U ||
             "starred" === U ||
+            "pugsave" === U ||
             "timeout" === U
           ? (0, s.jsx)("button", {
               className: "btn-pixel btn-go next-btn",
@@ -22775,6 +23320,11 @@ function to({
                     ? MG_H(d, { mood: sel ? "excited" : "happy", size: 60, char: cc.id })
                     : MG_H("div", { className: "char-lock" }, "🔒"),
                   MG_H("div", { className: "char-name" }, unlocked ? cc.name : "Completa " + cc.unlock + " niveles"),
+                  // El potenciador se muestra también bloqueado: saber qué se
+                  // gana es lo que hace que valga la pena desbloquearlo.
+                  cc.perk
+                    ? MG_H("div", { className: "char-perk" }, cc.perk.emoji + " " + cc.perk.txt)
+                    : null,
                   sel && MG_H("div", { className: "char-badge" }, "✓ elegido"),
                 );
               }),
@@ -22995,6 +23545,7 @@ function tc({ facts: e, onBack: t, onReset: n }) {
         [n, a] = (0, i.useState)({}),
         [r, l] = (0, i.useState)({ date: "", streak: 0, bestScore: 0 }),
         [o, d] = (0, i.useState)({}),
+        [mgGifts, mgSetGifts] = (0, i.useState)([]),
         [f, m] = (0, i.useState)(eo[0]),
         [p, h] = (0, i.useState)({ correct: 0, stars: 0, newSticker: !1 }),
         [b, x] = (0, i.useState)({}),
@@ -23041,7 +23592,8 @@ function tc({ facts: e, onBack: t, onReset: n }) {
             l(await eH("mg_daily", { date: "", streak: 0, bestScore: 0 })),
             // mg_little_path se carga tal cual: los ids de `eo` son fijos, así
             // que no necesita migración por versión (ver nota en la def de eo).
-            d(await eH("mg_little_path", {})));
+            d(await eH("mg_little_path", {})),
+            mgSetGifts(await eH("mg_gifts", [])));
           {
             // Si falta la marca de versión, el avance ya está en el formato
             // actual (perfiles recientes / importado): asumimos la versión de
@@ -23257,7 +23809,7 @@ function tc({ facts: e, onBack: t, onReset: n }) {
               onBack: () => t("little-hub"),
             }),
           "stickers" === e &&
-            (0, s.jsx)(e0, { progress: o, onBack: () => t("little-hub") }),
+            (0, s.jsx)(e0, { progress: o, gifts: mgGifts, onBack: () => t("little-hub") }),
           "charpick" === e &&
             (0, s.jsx)(MgCharScreen, {
               charDone:
@@ -23272,7 +23824,18 @@ function tc({ facts: e, onBack: t, onReset: n }) {
               onSkill: mgSaveSkill,
               onDone: (e) => {
                 let n = eG(e / f.questions);
-                h({ correct: e, stars: n, newSticker: !o[f.id]?.done });
+                /* Regalo de Rita: solo al superar el nivel por primera vez, y
+                   nunca repetido. Va aquí y no en la pantalla de resultado
+                   porque es donde se persiste el avance. */
+                let mgReg = null;
+                if ("regalos" === mgPerkMiniKey() && !o[f.id]?.done && Math.random() < 0.4) {
+                  mgReg = mgRegaloNuevo(mgGifts);
+                  if (mgReg) {
+                    let g = [...mgGifts, mgReg.e];
+                    (mgSetGifts(g), eQ("mg_gifts", g));
+                  }
+                }
+                h({ correct: e, stars: n, newSticker: !o[f.id]?.done, regalo: mgReg });
                 let a = o[f.id] || { stars: 0, done: !1 },
                   r = {
                     ...o,
@@ -23287,6 +23850,7 @@ function tc({ facts: e, onBack: t, onReset: n }) {
               correct: p.correct,
               stars: p.stars,
               isNewSticker: p.newSticker,
+              regalo: p.regalo,
               hasNext: !!ep && !!o[f.id]?.done,
               onNext: () => {
                 ep && (m(ep), t("little-play"));
@@ -23353,6 +23917,10 @@ function tc({ facts: e, onBack: t, onReset: n }) {
                   e.passed)
                 ) {
                   var s, i;
+                  // Potenciador de la zorra: más cofres y, dentro, más objetos
+                  // que monedas. Vive aquí y no en el nivel porque el cofre se
+                  // decide al cerrar la partida.
+                  let mgZorro = "objetos" === mgPerkKey();
                   let t,
                     n,
                     a,
@@ -23368,9 +23936,10 @@ function tc({ facts: e, onBack: t, onReset: n }) {
                         : (a = Math.max(2, Math.floor(a / 4))),
                       (o = null),
                       t &&
-                        (n || 0.55 > Math.random()) &&
+                        (n || (mgZorro ? 0.75 : 0.55) > Math.random()) &&
                         (o =
-                          Math.random() < (n ? 0.7 : 0.75)
+                          Math.random() <
+                          (mgZorro ? (n ? 0.4 : 0.45) : n ? 0.7 : 0.75)
                             ? {
                                 kind: "coins",
                                 coins: n ? Z(30, 60) : Z(15, 35),

@@ -166,7 +166,7 @@
     .char-name { font-family: 'Press Start 2P', monospace; font-size: .5rem; color: #cfc8ee; text-align: center; }
     .char-badge { font-family: 'Press Start 2P', monospace; font-size: .42rem; color: var(--accent); }
     .char-picker-full { margin: 8px auto 24px; max-width: 400px; padding: 0 10px; }
-    .char-picker-full .char-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .char-picker-full .char-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
     .char-picker-full .char-card { width: auto; min-height: 150px; background: #201546; border-color: #5a49b0; }
     .char-desc { font-family: 'Nunito', sans-serif; font-size: .62rem; color: #b3aad8; text-align: center; line-height: 1.15; overflow-wrap: anywhere; }
     .chest-box.shake-1 { animation-duration: .5s; font-size: 5rem; }
@@ -196,10 +196,10 @@
     @keyframes hpDanger { 0%,100% { box-shadow: 0 0 8px #ff5050 inset; } 50% { box-shadow: 0 0 16px #ff2020 inset, 0 0 10px #ff3030; } }
     .path-ambient { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
     .path-header, .world-section { position: relative; z-index: 1; }
-    .amb { position: absolute; line-height: 1; opacity: .5; filter: drop-shadow(0 2px 6px #0006); }
+    .amb { position: absolute; line-height: 1; opacity: .5; filter: drop-shadow(0 2px 7px #00000073); }
     .amb-planet1 { right: 7%; top: 9%; font-size: 2.5rem; opacity: .55; animation: ambFloat 9s ease-in-out infinite; }
     .amb-planet2 { right: 4%; top: 34%; font-size: 2.1rem; opacity: .5; animation: ambFloat 11s ease-in-out infinite reverse; }
-    .amb-moon { right: 8%; top: 72%; font-size: 1.9rem; opacity: .55; animation: ambFloat 8s ease-in-out infinite; }
+    .amb-moon { right: 8%; top: 72%; font-size: 2.2rem; opacity: .7; animation: ambFloat 8s ease-in-out infinite; }
     .amb-spark { left: 13%; top: 57%; font-size: 1.2rem; opacity: .7; animation: ambTwinkle 3s ease-in-out infinite; }
     .amb-comet { left: -12%; top: 24%; font-size: 1.6rem; opacity: 0; animation: ambComet 15s linear infinite; }
     .amb-ship { left: -16%; top: 64%; font-size: 1.9rem; opacity: 0; animation: ambShip 19s linear infinite; }
@@ -214,9 +214,9 @@
     .amb-cloud1 { left: -18%; top: 12%; font-size: 2.4rem; opacity: .8; animation: ambDrift 26s linear infinite; }
     .amb-cloud2 { left: -22%; top: 40%; font-size: 3rem; opacity: .7; animation: ambDrift 34s linear infinite; animation-delay: -12s; }
     .amb-balloon { right: 8%; top: 66%; font-size: 2.2rem; opacity: .85; animation: ambFloat 7s ease-in-out infinite; }
-    .amb-butterfly { left: 8%; top: 78%; font-size: 1.6rem; opacity: .9; animation: ambFloat 4.5s ease-in-out infinite; }
-    .amb-bird { left: -14%; top: 26%; font-size: 1.5rem; opacity: 0; animation: ambBird 16s linear infinite; }
-    .amb-rainbow { right: 4%; top: 14%; font-size: 2.4rem; opacity: .55; animation: ambFloat 10s ease-in-out infinite; }
+    .amb-butterfly { left: 8%; top: 78%; font-size: 2.1rem; opacity: .9; animation: ambFloat 4.5s ease-in-out infinite; }
+    .amb-bird { left: -14%; top: 26%; font-size: 2rem; opacity: 0; animation: ambBird 16s linear infinite; }
+    .amb-rainbow { right: 4%; top: 14%; font-size: 2.8rem; opacity: .72; animation: ambFloat 10s ease-in-out infinite; }
     @keyframes ambDrift { 0% { transform: translateX(0); } 100% { transform: translateX(150vw); } }
     @keyframes ambBird { 0% { transform: translateX(0) translateY(0); opacity: 0; } 10% { opacity: .85; } 50% { transform: translateX(70vw) translateY(-18px); } 90% { opacity: .85; } 100% { transform: translateX(140vw) translateY(6px); opacity: 0; } }
     @keyframes streakReady { from { filter: brightness(1); } to { filter: brightness(1.4); } }
@@ -617,6 +617,26 @@ button.pm-band.sel { background: #ffd447; border-color: #b8860b; color: #2a1a4a;
 .lws-feria { background: linear-gradient(#ffd16b4d, #e0559e4d); }
 .lws-mar { background: linear-gradient(#2ea9c94d, #10406b5c); }
 .lws-taller { background: linear-gradient(#9aa5b84d, #4a54685c); }
+/* ── Potenciador del acompañante: el pug te salva de perder un corazón ── */
+.pugmsg { display: flex; flex-direction: column; gap: 8px; }
+.pugmsg .wrong-answer { color: #ffd447; }
+/* Con cuatro acompañantes, 2x2 se lee mejor que 3+1. El selector del ropero
+   usa .char-picker a secas (tarjetas flex de ancho fijo), distinto del
+   .char-picker-full del hub del pequeño. */
+.char-picker .char-grid { display: grid; grid-template-columns: repeat(2, 1fr); }
+.char-picker .char-card { width: auto; }
+/* ── Regalos del acompañante (camino pequeño) ── */
+.gift-extra { margin-top: 12px; padding-top: 10px; border-top: 2px dashed rgba(255,212,71,.4);
+  display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.gift-who { font-family: var(--pixel); font-size: .55rem; color: #ffd447; text-align: center; }
+.gift-item { font-size: 2.4rem; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.album-gift-title { font-family: var(--pixel); font-size: .62rem; color: #ffd447; text-align: center;
+  margin-bottom: 10px; text-shadow: 2px 2px 0 rgba(0,0,0,.45); }
+/* Ficha del potenciador en el selector de acompañante */
+.char-perk { font-family: var(--pixel); font-size: .5rem; line-height: 1.5;
+  color: #ffd447; margin-top: 5px; display: block; }
+.char-card.locked .char-perk { opacity: .45; }
+
 
 /* ── Minijuegos montados dentro del camino ── */
 .mini-in-path { display: flex; flex-direction: column; align-items: center; gap: 6px; width: 100%; }
