@@ -17502,6 +17502,224 @@ const MG_FIGURAS = {
   "corazon-morado": ["path", { d: "M24 41 C10 30 6 22 10 14 C13 8 21 8 24 15 C27 8 35 8 38 14 C42 22 38 30 24 41 Z", fill: "#8e24aa" }],
   "rombo-naranja": ["path", { d: "M24 6 L40 24 L24 42 L8 24 Z", fill: "#fb8c00" }],
 };
+/* Adornos del fondo del camino, en SVG. Antes eran emoji, que sobre un fondo
+   pintado se ven pegados y además cambian de dibujo en cada plataforma. Se
+   dimensionan en `em` a propósito: así las reglas de font-size, posición y
+   animación que ya existían siguen mandando, sin tocar el CSS. */
+function mgAmbArt(kind) {
+  let H = MG_H,
+    lienzo = (vb, ...hijos) =>
+      H(
+        "svg",
+        {
+          viewBox: vb,
+          width: "1em",
+          height: "1em",
+          fill: "none",
+          xmlns: "http://www.w3.org/2000/svg",
+          style: { display: "block", overflow: "visible" },
+        },
+        ...hijos,
+      ),
+    grad = (id, paradas, vert = !0) =>
+      H(
+        "linearGradient",
+        { id: id, x1: "0", y1: "0", x2: vert ? "0" : "1", y2: vert ? "1" : "0" },
+        ...paradas.map((s, i) =>
+          H("stop", { key: i, offset: s[0], stopColor: s[1], stopOpacity: s[2] }),
+        ),
+      );
+
+  if ("cloud1" === kind || "cloud2" === kind) {
+    let dos = "cloud2" === kind,
+      g = "mgAmbNube" + (dos ? "B" : "A");
+    return lienzo(
+      "0 0 108 72",
+      H("defs", { key: "d" }, grad(g, [["0%", "#ffffff"], ["62%", "#f2f7ff"], ["100%", "#c9daf2"]])),
+      H(
+        "g",
+        { key: "g", fill: `url(#${g})` },
+        H("ellipse", { cx: dos ? 30 : 33, cy: 44, rx: 19, ry: 17 }),
+        H("ellipse", { cx: 54, cy: 34, rx: 23, ry: 21 }),
+        H("ellipse", { cx: dos ? 80 : 77, cy: 45, rx: 17, ry: 15 }),
+        H("rect", { x: 13, y: 42, width: 82, height: 20, rx: 10 }),
+      ),
+      // Panza sombreada: da volumen sin necesidad de contorno
+      H("path", {
+        key: "s",
+        d: "M22 58 Q40 52 56 56 Q72 60 88 55",
+        stroke: "#aec4e2",
+        strokeWidth: "2.4",
+        strokeLinecap: "round",
+        opacity: "0.55",
+      }),
+    );
+  }
+
+  if ("balloon" === kind)
+    return lienzo(
+      "0 0 64 104",
+      H(
+        "defs",
+        { key: "d" },
+        grad("mgAmbGlobo", [["0%", "#ff8fa8"], ["55%", "#f0517a"], ["100%", "#b32b52"]]),
+      ),
+      // Cuerpo en gota: círculo que se cierra en punta hacia el nudo
+      H("path", {
+        key: "b",
+        d: "M32 4 C48 4 60 17 60 33 C60 50 45 62 34 70 L32 73 L30 70 C19 62 4 50 4 33 C4 17 16 4 32 4 Z",
+        fill: "url(#mgAmbGlobo)",
+      }),
+      H("ellipse", { key: "h", cx: 22, cy: 24, rx: 6, ry: 9, fill: "#fff", opacity: "0.45", transform: "rotate(-20 22 24)" }),
+      H("path", { key: "k", d: "M28 72 L36 72 L32 78 Z", fill: "#b32b52" }),
+      H("path", { key: "c", d: "M32 78 Q38 85 30 90 Q24 95 32 100", stroke: "#8a6a4f", strokeWidth: "2", strokeLinecap: "round" }),
+      // Canastita: es lo que lo separa de un globo de fiesta
+      H("path", { key: "n", d: "M23 99 h18 l-2 8 a3 3 0 0 1 -3 2 h-8 a3 3 0 0 1 -3 -2 Z", fill: "#c98b4f" }),
+    );
+
+  if ("butterfly" === kind)
+    return lienzo(
+      "0 0 96 84",
+      H(
+        "defs",
+        { key: "d" },
+        grad("mgAmbMari", [["0%", "#ffcf5c"], ["100%", "#ef7d3a"]]),
+        grad("mgAmbMariB", [["0%", "#f0975a"], ["100%", "#c4562b"]]),
+      ),
+      /* Alas de elipses rotadas y no de beziers: dibujadas a mano salían en
+         punta y el conjunto se leía como un moño, no como una mariposa. */
+      H("ellipse", { key: "a1", cx: 30, cy: 30, rx: 21, ry: 16, fill: "url(#mgAmbMari)", transform: "rotate(-28 30 30)" }),
+      H("ellipse", { key: "a2", cx: 66, cy: 30, rx: 21, ry: 16, fill: "url(#mgAmbMari)", transform: "rotate(28 66 30)" }),
+      H("ellipse", { key: "a3", cx: 34, cy: 58, rx: 16, ry: 13, fill: "url(#mgAmbMariB)", transform: "rotate(26 34 58)" }),
+      H("ellipse", { key: "a4", cx: 62, cy: 58, rx: 16, ry: 13, fill: "url(#mgAmbMariB)", transform: "rotate(-26 62 58)" }),
+      // Lunares en las alas
+      H("circle", { key: "p1", cx: 26, cy: 26, r: 4.5, fill: "#fff6d8", opacity: "0.85" }),
+      H("circle", { key: "p2", cx: 70, cy: 26, r: 4.5, fill: "#fff6d8", opacity: "0.85" }),
+      H("circle", { key: "p3", cx: 32, cy: 60, r: 3, fill: "#fff6d8", opacity: "0.6" }),
+      H("circle", { key: "p4", cx: 64, cy: 60, r: 3, fill: "#fff6d8", opacity: "0.6" }),
+      H("rect", { key: "b", x: 44, y: 22, width: 8, height: 48, rx: 4, fill: "#4a3222" }),
+      H("circle", { key: "hd", cx: 48, cy: 20, r: 6, fill: "#4a3222" }),
+      H("path", { key: "an", d: "M45 16 Q39 6 32 3 M51 16 Q57 6 64 3", stroke: "#4a3222", strokeWidth: "2.2", strokeLinecap: "round" }),
+      H("circle", { key: "a5", cx: 32, cy: 3, r: 2.4, fill: "#4a3222" }),
+      H("circle", { key: "a6", cx: 64, cy: 3, r: 2.4, fill: "#4a3222" }),
+    );
+
+  if ("bird" === kind)
+    return lienzo(
+      "0 0 96 64",
+      H("defs", { key: "d" }, grad("mgAmbAve", [["0%", "#7fd4f5"], ["100%", "#3a86c8"]])),
+      /* Pajarito de perfil: cuerpo, cabeza, pico y ala. La versión anterior
+         era una silueta de golondrina que se leía como un avión. */
+      H("path", { key: "t", d: "M26 32 L4 22 L9 34 L4 46 Z", fill: "#2f6ea8" }),
+      H("ellipse", { key: "b", cx: 44, cy: 34, rx: 23, ry: 16, fill: "url(#mgAmbAve)" }),
+      H("circle", { key: "h", cx: 68, cy: 23, r: 12, fill: "url(#mgAmbAve)" }),
+      H("ellipse", { key: "w", cx: 42, cy: 33, rx: 14, ry: 8.5, fill: "#cfeefc", opacity: "0.95", transform: "rotate(-18 42 33)" }),
+      H("circle", { key: "e", cx: 72, cy: 20, r: 2.4, fill: "#22364a" }),
+      H("path", { key: "k", d: "M79 22 L93 26 L79 30 Z", fill: "#f5a623" }),
+    );
+
+  if ("rainbow" === kind) {
+    let colores = ["#ff6b6b", "#ffa94d", "#ffd43b", "#69db7c", "#4dabf7", "#9775fa"];
+    return lienzo(
+      "0 0 100 60",
+      ...colores.map((c, i) =>
+        H("path", {
+          key: i,
+          d: `M8 56 A ${42 - i * 6} ${42 - i * 6} 0 0 1 ${92 - i * 0} 56`.replace(
+            "M8 56",
+            `M${8 + i * 6} 56`,
+          ),
+          stroke: c,
+          strokeWidth: "5.5",
+          strokeLinecap: "round",
+          opacity: "0.92",
+        }),
+      ),
+    );
+  }
+
+  if ("planet1" === kind)
+    return lienzo(
+      "0 0 104 80",
+      H(
+        "defs",
+        { key: "d" },
+        grad("mgAmbPl1", [["0%", "#ffd98a"], ["55%", "#e8a13f"], ["100%", "#a35f1e"]]),
+      ),
+      // Anillo: mitad de atrás, planeta, y mitad de delante encima
+      H("ellipse", { key: "r1", cx: 52, cy: 40, rx: 48, ry: 15, stroke: "#f2d6a8", strokeWidth: "4", opacity: "0.55" }),
+      H("circle", { key: "p", cx: 52, cy: 38, r: 26, fill: "url(#mgAmbPl1)" }),
+      H("path", { key: "r2", d: "M4 40 A 48 15 0 0 0 100 40", stroke: "#fbe9c8", strokeWidth: "4", strokeLinecap: "round", opacity: "0.9" }),
+      H("ellipse", { key: "b1", cx: 46, cy: 30, rx: 14, ry: 4, fill: "#fff2d0", opacity: "0.35" }),
+    );
+
+  if ("planet2" === kind)
+    return lienzo(
+      "0 0 80 80",
+      H(
+        "defs",
+        { key: "d" },
+        grad("mgAmbPl2", [["0%", "#8fd3ff"], ["60%", "#3f86c9"], ["100%", "#1d4f7d"]]),
+      ),
+      H("circle", { key: "p", cx: 40, cy: 40, r: 34, fill: "url(#mgAmbPl2)" }),
+      // Continentes: manchas, no un mapa real
+      H("path", { key: "c1", d: "M18 34 Q28 24 40 30 Q34 40 22 42 Z", fill: "#63c07a" }),
+      H("path", { key: "c2", d: "M44 48 Q58 42 66 50 Q56 62 44 56 Z", fill: "#63c07a" }),
+      H("circle", { key: "h", cx: 28, cy: 24, r: 9, fill: "#fff", opacity: "0.25" }),
+    );
+
+  if ("moon" === kind)
+    return lienzo(
+      "0 0 72 72",
+      H("defs", { key: "d" }, grad("mgAmbLuna", [["0%", "#fff7d6"], ["100%", "#e8cf83"]])),
+      /* Creciente como dos círculos con regla evenodd: el segundo recorta al
+         primero. Hacerlo con dos arcos encadenados daba una forma casi vacía. */
+      H("path", {
+        key: "m",
+        d: "M36 36 m-30 0 a30 30 0 1 0 60 0 a30 30 0 1 0 -60 0 M52 30 m-25 0 a25 25 0 1 0 50 0 a25 25 0 1 0 -50 0",
+        fillRule: "evenodd",
+        fill: "url(#mgAmbLuna)",
+      }),
+      H("circle", { key: "k1", cx: 20, cy: 30, r: 4, fill: "#d9bd6a", opacity: "0.55" }),
+      H("circle", { key: "k2", cx: 17, cy: 46, r: 2.8, fill: "#d9bd6a", opacity: "0.45" }),
+    );
+
+  if ("spark" === kind)
+    return lienzo(
+      "0 0 64 64",
+      H("path", { key: "s1", d: "M32 2 L38 26 L62 32 L38 38 L32 62 L26 38 L2 32 L26 26 Z", fill: "#fff3b0" }),
+      H("path", { key: "s2", d: "M32 14 L35 29 L50 32 L35 35 L32 50 L29 35 L14 32 L29 29 Z", fill: "#fff" }),
+      H("circle", { key: "d1", cx: 54, cy: 12, r: 3, fill: "#fff3b0", opacity: "0.85" }),
+      H("circle", { key: "d2", cx: 12, cy: 50, r: 2.2, fill: "#fff3b0", opacity: "0.7" }),
+    );
+
+  if ("comet" === kind)
+    return lienzo(
+      "0 0 112 56",
+      H("defs", { key: "d" }, grad("mgAmbCola", [["0%", "#7fd4f5", "0.15"], ["100%", "#dff4fd", "1"]], !1)),
+      H("path", { key: "t", d: "M0 28 L72 13 L72 43 Z", fill: "url(#mgAmbCola)" }),
+      // Mechones que dan sensación de velocidad
+      H("path", { key: "t2", d: "M12 22 L60 16 M14 36 L60 40", stroke: "#bfe9fb", strokeWidth: "2", strokeLinecap: "round", opacity: "0.5" }),
+      H("circle", { key: "h", cx: 84, cy: 28, r: 18, fill: "#fff6d8" }),
+      H("circle", { key: "h2", cx: 89, cy: 23, r: 8, fill: "#fff" }),
+    );
+
+  if ("ship" === kind)
+    return lienzo(
+      "0 0 104 60",
+      H("defs", { key: "d" }, grad("mgAmbNave", [["0%", "#d8e4f2"], ["100%", "#8496ae"]])),
+      // Platillo: cúpula, casco y luces
+      H("ellipse", { key: "c", cx: 52, cy: 34, rx: 46, ry: 13, fill: "url(#mgAmbNave)" }),
+      H("path", { key: "d2", d: "M28 30 A 24 22 0 0 1 76 30 Z", fill: "#9fe3ff", opacity: "0.9" }),
+      H("path", { key: "d3", d: "M36 30 A 16 15 0 0 1 60 18", stroke: "#fff", strokeWidth: "2.5", strokeLinecap: "round", opacity: "0.7" }),
+      ...[24, 40, 56, 72].map((x, i) =>
+        H("circle", { key: "l" + i, cx: x, cy: 40, r: 3.2, fill: "#ffd447" }),
+      ),
+    );
+
+  return null;
+}
+
 function mgShapeSVG(id, size = 44) {
   let f = MG_FIGURAS[id];
   return f
@@ -19358,12 +19576,12 @@ function eZ({ progress: e, onLevel: t, onStickers: n, onBrain: a, onBack: r }) {
           MG_H(
             "div",
             { className: "path-ambient sky", "aria-hidden": "true" },
-            MG_H("span", { className: "amb amb-cloud1" }, "☁️"),
-            MG_H("span", { className: "amb amb-cloud2" }, "☁️"),
-            MG_H("span", { className: "amb amb-balloon" }, "🎈"),
-            MG_H("span", { className: "amb amb-butterfly" }, "🦋"),
-            MG_H("span", { className: "amb amb-bird" }, "🐦"),
-            MG_H("span", { className: "amb amb-rainbow" }, "🌈"),
+            MG_H("span", { className: "amb amb-cloud1" }, mgAmbArt("cloud1")),
+            MG_H("span", { className: "amb amb-cloud2" }, mgAmbArt("cloud2")),
+            MG_H("span", { className: "amb amb-balloon" }, mgAmbArt("balloon")),
+            MG_H("span", { className: "amb amb-butterfly" }, mgAmbArt("butterfly")),
+            MG_H("span", { className: "amb amb-bird" }, mgAmbArt("bird")),
+            MG_H("span", { className: "amb amb-rainbow" }, mgAmbArt("rainbow")),
           ),
           (0, s.jsxs)("div", {
             className: "path-header",
@@ -20378,12 +20596,12 @@ function e3({
           MG_H(
             "div",
             { className: "path-ambient", "aria-hidden": "true" },
-            MG_H("span", { className: "amb amb-planet1" }, "🪐"),
-            MG_H("span", { className: "amb amb-planet2" }, "🌍"),
-            MG_H("span", { className: "amb amb-ship" }, "🛸"),
-            MG_H("span", { className: "amb amb-comet" }, "☄️"),
-            MG_H("span", { className: "amb amb-moon" }, "🌙"),
-            MG_H("span", { className: "amb amb-spark" }, "✨"),
+            MG_H("span", { className: "amb amb-planet1" }, mgAmbArt("planet1")),
+            MG_H("span", { className: "amb amb-planet2" }, mgAmbArt("planet2")),
+            MG_H("span", { className: "amb amb-ship" }, mgAmbArt("ship")),
+            MG_H("span", { className: "amb amb-comet" }, mgAmbArt("comet")),
+            MG_H("span", { className: "amb amb-moon" }, mgAmbArt("moon")),
+            MG_H("span", { className: "amb amb-spark" }, mgAmbArt("spark")),
           ),
           (0, s.jsxs)("div", {
             className: "path-header",

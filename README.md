@@ -87,6 +87,7 @@ Un juego educativo de matemáticas en español para niños, con **Turbo el pug**
 - **🎯 Mapa de dominio de hechos:** rastrea qué hechos (sumas, tablas…) ya domina el niño, marcándolos con estrellas — recordatorio visual del progreso real.
 - **⚡ Reto relámpago:** modo de 60 segundos que guarda el **récord** personal y refuerza la fluidez.
 - **📅 Metas diarias:** objetivos por día para sostener el hábito de práctica.
+- **🎨 Fondos ilustrados a mano:** los adornos que flotan en el fondo del camino (nubes, globo aerostático, mariposa, pájaro, arcoíris; y planetas, luna, cometa y platillo en el camino del aventurero) son **SVG dibujados a medida**, no emoji. Un emoji sobre un fondo pintado se ve pegado, y además cada sistema operativo lo dibuja distinto.
 - **📱 PWA instalable:** funciona offline y se instala en el teléfono como una app.
 
 ## 🧱 Tecnología

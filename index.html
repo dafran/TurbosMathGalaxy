@@ -196,10 +196,10 @@
     @keyframes hpDanger { 0%,100% { box-shadow: 0 0 8px #ff5050 inset; } 50% { box-shadow: 0 0 16px #ff2020 inset, 0 0 10px #ff3030; } }
     .path-ambient { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
     .path-header, .world-section { position: relative; z-index: 1; }
-    .amb { position: absolute; line-height: 1; opacity: .5; filter: drop-shadow(0 2px 6px #0006); }
+    .amb { position: absolute; line-height: 1; opacity: .5; filter: drop-shadow(0 2px 7px #00000073); }
     .amb-planet1 { right: 7%; top: 9%; font-size: 2.5rem; opacity: .55; animation: ambFloat 9s ease-in-out infinite; }
     .amb-planet2 { right: 4%; top: 34%; font-size: 2.1rem; opacity: .5; animation: ambFloat 11s ease-in-out infinite reverse; }
-    .amb-moon { right: 8%; top: 72%; font-size: 1.9rem; opacity: .55; animation: ambFloat 8s ease-in-out infinite; }
+    .amb-moon { right: 8%; top: 72%; font-size: 2.2rem; opacity: .7; animation: ambFloat 8s ease-in-out infinite; }
     .amb-spark { left: 13%; top: 57%; font-size: 1.2rem; opacity: .7; animation: ambTwinkle 3s ease-in-out infinite; }
     .amb-comet { left: -12%; top: 24%; font-size: 1.6rem; opacity: 0; animation: ambComet 15s linear infinite; }
     .amb-ship { left: -16%; top: 64%; font-size: 1.9rem; opacity: 0; animation: ambShip 19s linear infinite; }
@@ -214,9 +214,9 @@
     .amb-cloud1 { left: -18%; top: 12%; font-size: 2.4rem; opacity: .8; animation: ambDrift 26s linear infinite; }
     .amb-cloud2 { left: -22%; top: 40%; font-size: 3rem; opacity: .7; animation: ambDrift 34s linear infinite; animation-delay: -12s; }
     .amb-balloon { right: 8%; top: 66%; font-size: 2.2rem; opacity: .85; animation: ambFloat 7s ease-in-out infinite; }
-    .amb-butterfly { left: 8%; top: 78%; font-size: 1.6rem; opacity: .9; animation: ambFloat 4.5s ease-in-out infinite; }
-    .amb-bird { left: -14%; top: 26%; font-size: 1.5rem; opacity: 0; animation: ambBird 16s linear infinite; }
-    .amb-rainbow { right: 4%; top: 14%; font-size: 2.4rem; opacity: .55; animation: ambFloat 10s ease-in-out infinite; }
+    .amb-butterfly { left: 8%; top: 78%; font-size: 2.1rem; opacity: .9; animation: ambFloat 4.5s ease-in-out infinite; }
+    .amb-bird { left: -14%; top: 26%; font-size: 2rem; opacity: 0; animation: ambBird 16s linear infinite; }
+    .amb-rainbow { right: 4%; top: 14%; font-size: 2.8rem; opacity: .72; animation: ambFloat 10s ease-in-out infinite; }
     @keyframes ambDrift { 0% { transform: translateX(0); } 100% { transform: translateX(150vw); } }
     @keyframes ambBird { 0% { transform: translateX(0) translateY(0); opacity: 0; } 10% { opacity: .85; } 50% { transform: translateX(70vw) translateY(-18px); } 90% { opacity: .85; } 100% { transform: translateX(140vw) translateY(6px); opacity: 0; } }
     @keyframes streakReady { from { filter: brightness(1); } to { filter: brightness(1.4); } }
