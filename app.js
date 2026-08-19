@@ -13002,13 +13002,17 @@ let mgChar = "turbo";
    monedas, ni objetos donde aplicarlos. */
 let mgChars = [
   { id: "turbo", name: "Turbo", emoji: "🐶", unlock: 0, desc: "El pug de siempre", voice: "¡Guau!", voiceLow: "guau", sound: "bark", treat: "huesitos",
-    perk: { key: "escudo", emoji: "🛡️", txt: "A veces evita perder un corazón" } },
+    perk: { key: "escudo", emoji: "🛡️", txt: "A veces evita perder un corazón" },
+    perkMini: { key: "consuelo", emoji: "🤗", txt: "Te consuela cuando algo sale mal" } },
   { id: "gato", name: "Michi", emoji: "🐱", unlock: 12, desc: "Gatito curioso", voice: "¡Miau!", voiceLow: "miau", sound: "meow", treat: "pescaditos",
-    perk: { key: "tiempo", emoji: "❄️", txt: "Congela el reloj más seguido" } },
+    perk: { key: "tiempo", emoji: "❄️", txt: "Congela el reloj más seguido" },
+    perkMini: { key: "calma", emoji: "🧩", txt: "Trae juegos sorpresa más seguido" } },
   { id: "perro2", name: "Bruno", emoji: "🐕", unlock: 30, desc: "Perro negro despeinado", voice: "¡Guau!", voiceLow: "guau", sound: "bark", treat: "huesitos",
-    perk: { key: "monedas", emoji: "🪙", txt: "Una moneda extra por acierto" } },
+    perk: { key: "monedas", emoji: "🪙", txt: "Una moneda extra por acierto" },
+    perkMini: { key: "fiesta", emoji: "🎉", txt: "Celebra tus rachas desde la segunda" } },
   { id: "zorro", name: "Rita", emoji: "🦊", unlock: 50, desc: "Zorrita rastreadora", voice: "¡Yip!", voiceLow: "yip", sound: "yip", treat: "moritas",
-    perk: { key: "objetos", emoji: "🎁", txt: "Más cofres y más objetos" } },
+    perk: { key: "objetos", emoji: "🎁", txt: "Más cofres y más objetos" },
+    perkMini: { key: "regalos", emoji: "🎁", txt: "Te encuentra calcomanías de regalo" } },
 ];
 function mgCharDef() {
   return mgChars.find((x) => x.id === mgChar) || mgChars[0];
@@ -13150,6 +13154,35 @@ function mgMinionAt(orden, Q) {
 function mgPerkKey() {
   let c = mgCharDef();
   return (c && c.perk && c.perk.key) || "";
+}
+/* Potenciador del camino pequeño. Es distinto del de arriba a propósito: ahí
+   no hay vidas, reloj ni monedas, así que el acompañante acompaña — consuela,
+   celebra, trae juegos o regala calcomanías. La presencia emocional base la
+   tienen TODOS por igual; esto solo suma, nunca resta. */
+function mgPerkMiniKey() {
+  let c = mgCharDef();
+  return (c && c.perkMini && c.perkMini.key) || "";
+}
+/* Calcomanías de regalo, fuera del álbum de niveles: no las da terminar un
+   nivel sino el acompañante, así que viven en su propia colección. */
+const MG_REGALOS = [
+  { e: "🍀", n: "Trébol de suerte" },
+  { e: "🌻", n: "Girasol gigante" },
+  { e: "🎀", n: "Moño brillante" },
+  { e: "🧸", n: "Osito de peluche" },
+  { e: "🍓", n: "Fresa dulce" },
+  { e: "🧁", n: "Pastelito" },
+  { e: "🪁", n: "Cometa del viento" },
+  { e: "🎵", n: "Nota musical" },
+  { e: "🌙", n: "Luna dormilona" },
+  { e: "⛄", n: "Muñeco de nieve" },
+  { e: "🐣", n: "Pollito recién nacido" },
+  { e: "🍉", n: "Sandía de verano" },
+];
+// Un regalo que el niño aún no tenga; null si ya los tiene todos.
+function mgRegaloNuevo(tengo) {
+  let faltan = MG_REGALOS.filter((r) => !(tengo || []).includes(r.e));
+  return faltan.length ? ee(faltan) : null;
 }
 function mgCharSkin(ch) {
   if ("gato" === ch)
@@ -18617,6 +18650,7 @@ async function eH(e, t) {
   return t;
 }
 let eW = [
+  "mg_gifts",
   "mg_facts",
   "mg_daily",
   "mg_little",
@@ -18769,7 +18803,7 @@ function mgIcon(name, size, color) {
   if (!kids) return null;
   return MG_H("svg", { width: size || 22, height: size || 22, viewBox: "0 0 24 24", className: "mg-ic mg-ic-" + name, "aria-hidden": "true" }, ...kids(color));
 }
-const MG_PROFILE_KEYS = ["mg_facts", "mg_daily", "mg_little", "mg_little_path", "mg_path", "mg_coins", "mg_inv", "mg_reto", "mg_practice", "mg_brain", "mg_lbrain", "mg_outfit", "mg_pathver", "mg_goals", "mg_worlds_celebrated", "mg_lessons", "mg_char", "mg_skill"];
+const MG_PROFILE_KEYS = ["mg_facts", "mg_daily", "mg_little", "mg_little_path", "mg_path", "mg_coins", "mg_inv", "mg_reto", "mg_practice", "mg_brain", "mg_lbrain", "mg_outfit", "mg_pathver", "mg_goals", "mg_worlds_celebrated", "mg_lessons", "mg_char", "mg_skill", "mg_gifts"];
 const MG_AVATARS = ["🦄", "🐯", "🦖", "🐸", "🦊", "🐼", "🐧", "🦁", "🐙", "🐨", "🦉", "🐢", "🐝", "🦋", "🐬", "🦕", "🚀", "🌟"];
 const mgRaw = () => window.__mgRaw || { get: () => null, set: () => {}, remove: () => {} };
 function mgNewId() { return "p" + Math.random().toString(36).slice(2, 8); }
@@ -18925,11 +18959,13 @@ function MgCharScreen({ charDone: dq, onBack: bk }) {
               : MG_H("div", { className: "char-lock" }, "🔒"),
             MG_H("div", { className: "char-name" }, unlocked ? cc.name : "Completa " + cc.unlock + " niveles"),
             unlocked ? MG_H("div", { className: "char-desc" }, cc.desc) : null,
-            /* Aquí NO se muestra el potenciador: esta pantalla vive en el hub
-               del pequeño, cuyo camino no tiene vidas, reloj, monedas ni
-               objetos donde aplicarlo. Prometer un poder que no va a ocurrir
-               es peor que no mencionarlo. Se muestra en el ropero, que es
-               donde elige el aventurero. */
+            /* Aquí se muestra el potenciador del camino pequeño, NO el del
+               aventurero: este camino no tiene vidas, reloj, monedas ni
+               objetos, así que anunciar un escudo o monedas extra sería
+               prometer algo que nunca va a ocurrir. */
+            cc.perkMini
+              ? MG_H("div", { className: "char-perk" }, cc.perkMini.emoji + " " + cc.perkMini.txt)
+              : null,
             sel && MG_H("div", { className: "char-badge" }, "✓ elegido"));
         }))));
 }
@@ -18999,7 +19035,11 @@ function mgConceptOf(level) {
   if (["reparto", "resto", "division"].includes(level.kind)) return "division";
   return null;
 }
-function mgStreakCheer(n) {
+function mgStreakCheer(n, fiesta) {
+  // Bruno celebra antes: la 2ª y la 4ª, que en el camino pequeño es donde una
+  // racha todavía se siente frágil.
+  if (fiesta && (2 === n || 4 === n))
+    return 2 === n ? "🎉 ¡Dos seguidas! ¡Vas muy bien!" : "🎉 ¡Cuatro seguidas! ¡Qué bien vas!";
   if (3 === n) return "🔥 ¡3 seguidas! ¡Qué racha!";
   if (5 === n) return "⚡ ¡5 seguidas! ¡Imparable!";
   if (7 === n) return "🌟 ¡7 seguidas! ¡Qué constancia!";
@@ -19447,8 +19487,9 @@ function eZ({ progress: e, onLevel: t, onStickers: n, onBrain: a, onBack: r }) {
     ],
   });
 }
-function e0({ progress: e, onBack: t }) {
-  let n = eo.filter((t) => e[t.id]?.done).length;
+function e0({ progress: e, gifts: gf, onBack: t }) {
+  let n = eo.filter((t) => e[t.id]?.done).length,
+    regalos = gf || [];
   return (0, s.jsxs)("div", {
     className: "screen world-sonic scroll-screen",
     children: [
@@ -19493,6 +19534,35 @@ function e0({ progress: e, onBack: t }) {
           }),
         }),
       }),
+      /* Regalos del acompañante. Van en su propia sección y no mezclados con
+         las calcomanías de nivel, porque no se ganan superando un nivel sino
+         acompañando: mezclarlas haría parecer que faltan niveles. */
+      regalos.length > 0 &&
+        (0, s.jsxs)("div", {
+          className: "panel album-panel",
+          children: [
+            (0, s.jsxs)("div", {
+              className: "album-gift-title",
+              children: ["🎁 Regalos de ", mgCharName(), " · ", regalos.length, "/", MG_REGALOS.length],
+            }),
+            (0, s.jsx)("div", {
+              className: "sticker-grid",
+              children: MG_REGALOS.filter((r) => regalos.includes(r.e)).map((r) =>
+                (0, s.jsxs)(
+                  "div",
+                  {
+                    className: "sticker-slot got",
+                    children: [
+                      (0, s.jsx)("span", { className: "ss-emoji", children: r.e }),
+                      (0, s.jsx)("span", { className: "ss-name", children: r.n }),
+                    ],
+                  },
+                  r.e,
+                ),
+              ),
+            }),
+          ],
+        }),
     ],
   });
 }
@@ -19554,7 +19624,7 @@ function e1({ level: e, onDone: t, onSkill: onSkill }) {
       if (s) {
         let e = mgLS + 1;
         mgSetLS(e);
-        let t = mgStreakCheer(e);
+        let t = mgStreakCheer(e, "fiesta" === mgPerkMiniKey());
         t &&
           (mgSetLCheer(t),
           mgLCheerT.current && clearTimeout(mgLCheerT.current),
@@ -19568,6 +19638,18 @@ function e1({ level: e, onDone: t, onSkill: onSkill }) {
           ctx = s ? null : mgMissCtx(lat, mgLS),
           antes = mgSoothe;
         (mgSessSeen(lat), mgSkillRecord(s, onSkill, ctx));
+        /* Consuelo del acompañante: además del ánimo que dispara el
+           controlador de frustración, Turbo aparece por su cuenta tras un
+           fallo. No sustituye al del controlador — si ese ya saltó, no se
+           pisan. */
+        !antes &&
+          !mgSoothe &&
+          !s &&
+          "consuelo" === mgPerkMiniKey() &&
+          Math.random() < 0.35 &&
+          (mgSetLCheer(ee(MG_SOOTHE)),
+          mgLCheerT.current && clearTimeout(mgLCheerT.current),
+          (mgLCheerT.current = setTimeout(() => mgSetLCheer(null), 2200)));
         !antes &&
           mgSoothe &&
           (mgSetLCheer(ee(MG_SOOTHE)),
@@ -20078,6 +20160,7 @@ function e2({
   correct: t,
   stars: n,
   isNewSticker: a,
+  regalo: mgReg,
   onNext: r,
   onPath: l,
   hasNext: o,
@@ -20090,7 +20173,10 @@ function e2({
       // Si el nivel mostró señales de cansancio/frustración, la ronda
       // sorpresa deja de ser azar y se ofrece siempre: cambiar de actividad
       // es mejor respuesta que bajarle los números.
-      mgSootheTake() || Math.random() < 0.34 ? ee(MG_BONUS_GAMES) : null,
+      mgSootheTake() ||
+      Math.random() < ("calma" === mgPerkMiniKey() ? 0.55 : 0.34)
+        ? ee(MG_BONUS_GAMES)
+        : null,
     ),
     [mgBnOn, mgSetBnOn] = (0, i.useState)(!1),
     [mgBnFlash, mgSetBnFlash] = (0, i.useState)(null);
@@ -20140,6 +20226,24 @@ function e2({
                   }),
                 ],
               }),
+              // Regalo del acompañante, aparte de la calcomanía del nivel
+              mgReg &&
+                (0, s.jsxs)("div", {
+                  className: "gift-extra",
+                  children: [
+                    (0, s.jsxs)("div", {
+                      className: "gift-who",
+                      children: ["🎁 ", mgCharName(), " te encontró esto:"],
+                    }),
+                    (0, s.jsxs)("div", {
+                      className: "gift-item",
+                      children: [
+                        mgReg.e,
+                        (0, s.jsx)("span", { className: "cr-name", children: mgReg.n }),
+                      ],
+                    }),
+                  ],
+                }),
               (0, s.jsx)("button", {
                 className: "btn-pixel btn-go",
                 onClick: (e) => {
@@ -23223,6 +23327,7 @@ function tc({ facts: e, onBack: t, onReset: n }) {
         [n, a] = (0, i.useState)({}),
         [r, l] = (0, i.useState)({ date: "", streak: 0, bestScore: 0 }),
         [o, d] = (0, i.useState)({}),
+        [mgGifts, mgSetGifts] = (0, i.useState)([]),
         [f, m] = (0, i.useState)(eo[0]),
         [p, h] = (0, i.useState)({ correct: 0, stars: 0, newSticker: !1 }),
         [b, x] = (0, i.useState)({}),
@@ -23269,7 +23374,8 @@ function tc({ facts: e, onBack: t, onReset: n }) {
             l(await eH("mg_daily", { date: "", streak: 0, bestScore: 0 })),
             // mg_little_path se carga tal cual: los ids de `eo` son fijos, así
             // que no necesita migración por versión (ver nota en la def de eo).
-            d(await eH("mg_little_path", {})));
+            d(await eH("mg_little_path", {})),
+            mgSetGifts(await eH("mg_gifts", [])));
           {
             // Si falta la marca de versión, el avance ya está en el formato
             // actual (perfiles recientes / importado): asumimos la versión de
@@ -23485,7 +23591,7 @@ function tc({ facts: e, onBack: t, onReset: n }) {
               onBack: () => t("little-hub"),
             }),
           "stickers" === e &&
-            (0, s.jsx)(e0, { progress: o, onBack: () => t("little-hub") }),
+            (0, s.jsx)(e0, { progress: o, gifts: mgGifts, onBack: () => t("little-hub") }),
           "charpick" === e &&
             (0, s.jsx)(MgCharScreen, {
               charDone:
@@ -23500,7 +23606,18 @@ function tc({ facts: e, onBack: t, onReset: n }) {
               onSkill: mgSaveSkill,
               onDone: (e) => {
                 let n = eG(e / f.questions);
-                h({ correct: e, stars: n, newSticker: !o[f.id]?.done });
+                /* Regalo de Rita: solo al superar el nivel por primera vez, y
+                   nunca repetido. Va aquí y no en la pantalla de resultado
+                   porque es donde se persiste el avance. */
+                let mgReg = null;
+                if ("regalos" === mgPerkMiniKey() && !o[f.id]?.done && Math.random() < 0.4) {
+                  mgReg = mgRegaloNuevo(mgGifts);
+                  if (mgReg) {
+                    let g = [...mgGifts, mgReg.e];
+                    (mgSetGifts(g), eQ("mg_gifts", g));
+                  }
+                }
+                h({ correct: e, stars: n, newSticker: !o[f.id]?.done, regalo: mgReg });
                 let a = o[f.id] || { stars: 0, done: !1 },
                   r = {
                     ...o,
@@ -23515,6 +23632,7 @@ function tc({ facts: e, onBack: t, onReset: n }) {
               correct: p.correct,
               stars: p.stars,
               isNewSticker: p.newSticker,
+              regalo: p.regalo,
               hasNext: !!ep && !!o[f.id]?.done,
               onNext: () => {
                 ep && (m(ep), t("little-play"));
