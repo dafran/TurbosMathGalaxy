@@ -13076,17 +13076,66 @@ function mgSeedCharUnlocks() {
     mgSyncCharUnlocks(best);
   } catch {}
 }
-// Enemigos menores (secuaces) que aparecen en niveles normales: se
-// derrotan con pocos aciertos, a diferencia del jefe de fin de mundo.
+/* Enemigos menores (secuaces) que aparecen en niveles normales: se
+   derrotan con pocos aciertos, a diferencia del jefe de fin de mundo.
+   `hp` es por enemigo: con un valor único para todos, los secuaces eran
+   seis caras distintas del mismo enemigo. */
 let mgMinions = [
-  { emoji: "👾", name: "Bichito" },
-  { emoji: "🦠", name: "Germín" },
-  { emoji: "🤖", name: "Robotín" },
-  { emoji: "👻", name: "Fantasmín" },
-  { emoji: "🐛", name: "Gusanín" },
-  { emoji: "🦇", name: "Murcielín" },
+  { id: "bichito", emoji: "👾", name: "Bichito", hp: 3 },
+  { id: "germin", emoji: "🦠", name: "Germín", hp: 2 },
+  { id: "robotin", emoji: "🤖", name: "Robotín", hp: 4 },
+  { id: "fantasmin", emoji: "👻", name: "Fantasmín", hp: 3 },
+  { id: "gusanin", emoji: "🐛", name: "Gusanín", hp: 2 },
+  { id: "murcielin", emoji: "🦇", name: "Murcielín", hp: 3 },
+  { id: "aranin", emoji: "🕷️", name: "Arañín", hp: 3 },
+  { id: "cangrejin", emoji: "🦀", name: "Cangrejín", hp: 4 },
+  { id: "pulpin", emoji: "🐙", name: "Pulpín", hp: 4 },
+  { id: "abejin", emoji: "🐝", name: "Abejín", hp: 2 },
+  { id: "dinosaurin", emoji: "🦖", name: "Dinosaurín", hp: 5 },
+  { id: "cactin", emoji: "🌵", name: "Cactín", hp: 3 },
+  { id: "chispin", emoji: "⚡", name: "Chispín", hp: 2 },
+  { id: "cocodrilin", emoji: "🐊", name: "Cocodrilín", hp: 4 },
 ];
-const MG_MINION_HP = 3;
+const MG_MINION_HP = 3; // respaldo si a un secuaz le faltara `hp`
+/* Orden de secuaces de un nivel. Antes el índice salía de los aciertos del
+   nivel, así que TODO nivel empezaba con Bichito y, como un nivel de 10
+   preguntas solo alcanza a mostrar unos cuatro, los últimos del arreglo no
+   se veían nunca. Con una mezcla determinista sembrada por el id del nivel
+   cada nivel trae su propia secuencia, y sigue siendo estable entre
+   repintados porque la función es pura. */
+function mgMinionOrden(seed) {
+  let a = mgMinions.slice(),
+    s = ((seed || 1) * 2654435761) % 4294967291;
+  for (let i = a.length - 1; i > 0; i--) {
+    s = (s * 1103515245 + 12345) & 0x7fffffff;
+    let j = s % (i + 1);
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+/* Quién está enfrente con Q aciertos acumulados. Camina el HP de cada secuaz
+   porque ya no es uniforme y no se puede dividir. Devuelve además `prev`: el
+   secuaz que se acaba de derrotar, cuando Q cae justo en el límite. Hace
+   falta para conservar el comportamiento original — la pantalla muestra al
+   derrotado con 0 corazones solo durante la respuesta correcta, y en la
+   pregunta siguiente ya aparece el enemigo nuevo entero. */
+function mgMinionAt(orden, Q) {
+  let acc = 0,
+    prev = null;
+  for (let i = 0; i < 400; i++) {
+    let m = orden[i % orden.length],
+      h = m.hp || MG_MINION_HP;
+    if (Q < acc + h)
+      return {
+        mn: m,
+        hp: h,
+        resta: acc + h - Q,
+        prev: Q > 0 && Q === acc ? prev : null,
+      };
+    ((acc += h), (prev = m));
+  }
+  return { mn: orden[0], hp: orden[0].hp || MG_MINION_HP, resta: 1, prev: null };
+}
 function mgCharSkin(ch) {
   if ("gato" === ch)
     return {
@@ -21033,13 +21082,12 @@ function e8({
         })(),
       "boss" !== e.kind &&
         (() => {
-          let mHp = MG_MINION_HP,
-            beaten = Math.floor(Q / mHp),
-            justBeat = "right" === U && Q > 0 && Q % mHp === 0,
-            idx = (justBeat ? beaten - 1 : beaten) % mgMinions.length,
-            mn = mgMinions[((idx % mgMinions.length) + mgMinions.length) % mgMinions.length],
+          let paso = mgMinionAt(mgMinionOrden(e.id), Q),
+            justBeat = "right" === U && !!paso.prev,
+            mn = justBeat ? paso.prev : paso.mn,
+            mHp = mn.hp || MG_MINION_HP,
             hit = "right" === U,
-            shownHp = justBeat ? 0 : mHp - (Q % mHp);
+            shownHp = justBeat ? 0 : paso.resta;
           return MG_H(
             "div",
             { className: "minion-strip" + (justBeat ? " beat" : "") },
