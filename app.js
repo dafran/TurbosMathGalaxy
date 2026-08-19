@@ -13906,12 +13906,16 @@ function E(e, t) {
   }
   return j(Array.from(n));
 }
-function $({ level: e, onFinish: t }) {
+// `steps` es opcional y solo lo usa el camino pequeño: sin limitarlo, el
+// paso 10 sobre 10 nodos llega a 100. Omitido, el comportamiento del camino
+// grande queda idéntico.
+function $({ level: e, onFinish: t, steps: st }) {
   let [n, a] = (0, i.useState)(() => {
       let t, n, a, r;
       return (
         (t = k(
-          e < 2 ? [2, 5, 10] : e < 4 ? [2, 3, 4, 5, 10] : [2, 3, 4, 6, 7, 8, 9],
+          st ||
+            (e < 2 ? [2, 5, 10] : e < 4 ? [2, 3, 4, 5, 10] : [2, 3, 4, 6, 7, 8, 9]),
         )),
         (n = Array.from({ length: 10 }, (e, n) => t * (n + 1))),
         (a = Math.min(5, 2 + Math.floor(e / 2))),
@@ -14194,8 +14198,14 @@ function _({ level: e, onFinish: t }) {
     ],
   });
 }
-function P({ level: e, onFinish: t }) {
-  let [n] = (0, i.useState)(() =>
+/* `deck` y `label` son opcionales y solo los usa el camino pequeño: el juego
+   original empareja a×b con su producto, que no corresponde a 4-5 años. Con
+   una baraja de sumas el mismo armazón refuerza composición de números.
+   Omitidos, el camino grande queda idéntico. */
+function P({ level: e, onFinish: t, deck: dk, label: lb }) {
+  let [n] = (0, i.useState)(
+      () =>
+        dk ||
       (function (e) {
         let t = Math.min(6, 3 + Math.floor(e / 2)),
           n = e < 2 ? [2, 5, 10] : e < 4 ? [2, 3, 4, 5] : [3, 4, 6, 7, 8],
@@ -14228,7 +14238,8 @@ function P({ level: e, onFinish: t }) {
       (0, s.jsxs)("p", {
         className: "brain-instr",
         children: [
-          "Une cada multiplicación con su resultado. Fallos: ",
+          lb || "Une cada multiplicación con su resultado",
+          ". Fallos: ",
           c,
           "/6",
         ],
@@ -14278,9 +14289,11 @@ function P({ level: e, onFinish: t }) {
     ],
   });
 }
-function A({ level: e, onFinish: t }) {
+// `cap` es opcional y solo lo usa el camino pequeño, para que los operandos
+// quepan en el techo de la banda del niño. Omitido, el camino grande no cambia.
+function A({ level: e, onFinish: t, cap: cp }) {
   let [{ a: n, b: a, c: r, answer: l }] = (0, i.useState)(() => {
-      let t = e < 2 ? 6 : e < 4 ? 9 : 12,
+      let t = cp || (e < 2 ? 6 : e < 4 ? 9 : 12),
         n = x(1, t),
         a = x(1, t),
         r = n + a,
@@ -17215,6 +17228,39 @@ const MG_SOOTHE = [
    apropiados para 4-5 años y no se veían nunca. Todos comparten la misma
    firma ({ level, onFinish }) y no dependen de nada externo, así que se
    montan tal cual como una pregunta más. */
+/* Baraja para "Parejas que suman": empareja "2+3" con "5". Refuerza la
+   composición de números (number bonds), que el camino no cubría: sabía
+   contar y sumar, pero no descomponer un número en partes. */
+function mgDeckSuma(techo) {
+  let tope = Math.max(5, Math.min(techo, 12)),
+    pares = tope <= 8 ? 3 : 4,
+    ri = (a, b) => a + Math.floor(Math.random() * (b - a + 1)),
+    vistos = new Set(),
+    cartas = [],
+    id = 0;
+  for (let g = 0; g < 80 && cartas.length < 2 * pares; g++) {
+    let s = ri(3, tope),
+      a = ri(1, s - 1),
+      k = String(s);
+    if (vistos.has(k)) continue;
+    (vistos.add(k),
+      cartas.push({ id: id++, text: `${a}+${s - a}`, pairKey: k }),
+      cartas.push({ id: id++, text: k, pairKey: k }));
+  }
+  // Mezcla propia para no depender de helpers de otra sección del archivo.
+  for (let i = cartas.length - 1; i > 0; i--) {
+    let j2 = Math.floor(Math.random() * (i + 1));
+    [cartas[i], cartas[j2]] = [cartas[j2], cartas[i]];
+  }
+  return cartas;
+}
+/* `min` = banda mínima en la que se ofrece el juego, y `props` = ajustes que
+   dependen del techo del niño. Hacen falta porque cada minijuego escala con
+   su propio `level`, que significa cosas distintas en cada uno (largo de una
+   secuencia, tamaño de una cuadrícula, rango numérico) y no conoce el techo
+   de la banda: la recta, por ejemplo, arranca en rango 20 aunque la banda 0
+   tope en 8. Por eso el límite se pone por juego y no con un recorte global,
+   que falsearía juegos donde `level` no es una cantidad. */
 const MG_MINIS = [
   { id: "luces", comp: O, name: "Memoria de luces" },
   { id: "parejitas", comp: U, name: "Parejas" },
@@ -17223,10 +17269,47 @@ const MG_MINIS = [
   { id: "tren", comp: K, name: "Vías del tren" },
   { id: "cajas", comp: Y, name: "Guarda en su caja" },
   { id: "cubos", comp: _, name: "Torre de cubos" },
-  { id: "recta", comp: L, name: "La recta numérica" },
-  { id: "ordena", comp: M, name: "Ordena los números" },
+  { id: "recta", comp: L, name: "La recta numérica", min: 1 },
+  { id: "ordena", comp: M, name: "Ordena los números", min: 1 },
   { id: "memoria", comp: T, name: "Memoria de flores" },
+  // Equivalencia y el signo "=": los niños suelen leerlo como "aquí viene el
+  // resultado" en vez de "los dos lados valen lo mismo". La balanza lo vuelve
+  // físico, porque el fiel se inclina.
+  {
+    id: "balanza",
+    comp: A,
+    name: "La balanza",
+    min: 1,
+    props: (t) => ({ cap: Math.max(4, Math.min(12, Math.round(t / 2))) }),
+  },
+  /* Contar de N en N, que el camino ya enseña ("Cuenta de 2 en 2"). El paso
+     se limita porque con paso 10 sobre 10 nodos llegaría a 100. Ojo: aquí el
+     techo de la banda NO aplica tal cual — gobierna cantidades que se cuentan,
+     no la secuencia de conteo, y contar de 5 en 5 hasta 50 es propio de esta
+     edad aunque 50 pase del techo. */
+  {
+    id: "reloj",
+    comp: $,
+    name: "El búho que cuenta",
+    min: 1,
+    props: (t) => ({ steps: t <= 15 ? [2, 5] : [2, 3, 5, 10] }),
+  },
+  // Razonamiento deductivo puro (filas y columnas) con dígitos 1-4, dentro
+  // del rango de subitización. Pide banda 2 porque arranca con 5 huecos.
+  { id: "sudoku", comp: C, name: "Sudoku de 4", min: 2 },
+  {
+    id: "sumapar",
+    comp: P,
+    name: "Parejas que suman",
+    min: 1,
+    props: (t) => ({ deck: mgDeckSuma(t), label: "Une cada suma con su resultado" }),
+  },
 ];
+// Juegos disponibles para la banda actual del niño.
+function mgMinisAptos() {
+  let b = mgSkillBand().id;
+  return MG_MINIS.filter((g) => (g.min || 0) <= b);
+}
 // Variedad del camino pequeño (espejo del warmup del camino grande):
 // desde la pregunta 4 de un nivel de modo fijo, ~28% de las preguntas
 // salen del pool del nivel; y un memo evita que salga dos veces seguidas
@@ -17260,8 +17343,9 @@ function mgLittleNext(e, t) {
 // promete el botón. Pasar por mgLittleNext daría una pregunta de matemáticas,
 // porque la regla de "nunca dos minijuegos seguidos" lo bloquearía.
 function mgMiniOtro(lvl, actual) {
-  let q = ef("mini", mgSkillMax(lvl), lvl.pool);
-  for (let i = 0; i < 6 && q.game === actual; i++)
+  let q = ef("mini", mgSkillMax(lvl), lvl.pool),
+    tope = mgMinisAptos().length > 1 ? 8 : 0; // si solo hay uno, no insistir
+  for (let i = 0; i < tope && q.game === actual; i++)
     q = ef("mini", mgSkillMax(lvl), lvl.pool);
   return (
     (mgLittleLastKind = "mini"),
@@ -17397,7 +17481,7 @@ function ef(e, t, n) {
       choices: s.sort(() => Math.random() - 0.5),
     };
   }
-  if ("mini" === r) return { kind: "mini", game: ee(MG_MINIS).id };
+  if ("mini" === r) return { kind: "mini", game: ee(mgMinisAptos()).id };
   if ("vf" === r) {
     let e = Z(1, Math.max(3, Math.min(6, t))),
       n =
@@ -19667,7 +19751,8 @@ function e1({ level: e, onDone: t, onSkill: onSkill }) {
             }),
           "mini" === l.kind &&
             (() => {
-              let mn = MG_MINIS.find((x) => x.id === l.game) || MG_MINIS[0];
+              let mn = MG_MINIS.find((x) => x.id === l.game) || MG_MINIS[0],
+                extra = mn.props ? mn.props(mgSkillBand().cap) : null;
               return MG_H(
                 "div",
                 { className: "mini-in-path", key: "mini-" + a },
@@ -19677,6 +19762,7 @@ function e1({ level: e, onDone: t, onSkill: onSkill }) {
                 // pregunta él mismo vía onFinish.
                 MG_H(mn.comp, {
                   level: mgSkillBand().id,
+                  ...extra,
                   onFinish: (ok) => k(ok ? "orden-ok" : "orden-fail"),
                 }),
                 /* Escape sin castigo. Tren, parejas y cajas solo terminan al
