@@ -12995,10 +12995,20 @@ let c = [
   ],
   u = null;
 let mgChar = "turbo";
+/* Cada acompañante trae un `perk`: antes elegirlo era puramente estético.
+   El `key` es lo único que consultan los enganches, así que sumar un
+   acompañante no obliga a tocarlos. Ojo: los potenciadores solo existen en
+   el camino del aventurero — el del pequeño no tiene vidas, ni reloj, ni
+   monedas, ni objetos donde aplicarlos. */
 let mgChars = [
-  { id: "turbo", name: "Turbo", emoji: "🐶", unlock: 0, desc: "El pug de siempre", voice: "¡Guau!", voiceLow: "guau", sound: "bark", treat: "huesitos" },
-  { id: "gato", name: "Michi", emoji: "🐱", unlock: 12, desc: "Gatito curioso", voice: "¡Miau!", voiceLow: "miau", sound: "meow", treat: "pescaditos" },
-  { id: "perro2", name: "Bruno", emoji: "🐕", unlock: 30, desc: "Perro negro despeinado", voice: "¡Guau!", voiceLow: "guau", sound: "bark", treat: "huesitos" },
+  { id: "turbo", name: "Turbo", emoji: "🐶", unlock: 0, desc: "El pug de siempre", voice: "¡Guau!", voiceLow: "guau", sound: "bark", treat: "huesitos",
+    perk: { key: "escudo", emoji: "🛡️", txt: "A veces evita perder un corazón" } },
+  { id: "gato", name: "Michi", emoji: "🐱", unlock: 12, desc: "Gatito curioso", voice: "¡Miau!", voiceLow: "miau", sound: "meow", treat: "pescaditos",
+    perk: { key: "tiempo", emoji: "❄️", txt: "Congela el reloj más seguido" } },
+  { id: "perro2", name: "Bruno", emoji: "🐕", unlock: 30, desc: "Perro negro despeinado", voice: "¡Guau!", voiceLow: "guau", sound: "bark", treat: "huesitos",
+    perk: { key: "monedas", emoji: "🪙", txt: "Una moneda extra por acierto" } },
+  { id: "zorro", name: "Rita", emoji: "🦊", unlock: 50, desc: "Zorrita rastreadora", voice: "¡Yip!", voiceLow: "yip", sound: "yip", treat: "moritas",
+    perk: { key: "objetos", emoji: "🎁", txt: "Más cofres y más objetos" } },
 ];
 function mgCharDef() {
   return mgChars.find((x) => x.id === mgChar) || mgChars[0];
@@ -13136,6 +13146,11 @@ function mgMinionAt(orden, Q) {
   }
   return { mn: orden[0], hp: orden[0].hp || MG_MINION_HP, resta: 1, prev: null };
 }
+// Clave del potenciador activo (""/desconocido = sin potenciador).
+function mgPerkKey() {
+  let c = mgCharDef();
+  return (c && c.perk && c.perk.key) || "";
+}
 function mgCharSkin(ch) {
   if ("gato" === ch)
     return {
@@ -13160,6 +13175,31 @@ function mgCharSkin(ch) {
         MG_H("path", { key: "w2", d: "M42 63 L20 66", stroke: "#7a7f87", strokeWidth: "1.2", strokeLinecap: "round" }),
         MG_H("path", { key: "w3", d: "M58 60 L80 56", stroke: "#7a7f87", strokeWidth: "1.2", strokeLinecap: "round" }),
         MG_H("path", { key: "w4", d: "M58 63 L80 66", stroke: "#7a7f87", strokeWidth: "1.2", strokeLinecap: "round" }),
+      ],
+    };
+  if ("zorro" === ch)
+    return {
+      fur: "#e8853c",
+      line: "#c96a24",
+      outline: "#7a3d12",
+      snout: "#fbf3e6",
+      nose: "#3a2a22",
+      // Como el gato, hocico cerrado en vez de la lengua jadeante del pug.
+      mouth: "cat",
+      /* Orejas grandes y puntiagudas, más abiertas que las del gato. Mismo
+         truco: el path va SIN cerrar para que la base no raye la frente. */
+      ears: [
+        MG_H("path", { key: "e1", d: "M24 28 L29 2 L47 18", fill: "#e8853c", stroke: "#7a3d12", strokeWidth: "1.5", strokeLinejoin: "round" }),
+        MG_H("path", { key: "e2", d: "M76 28 L71 2 L53 18", fill: "#e8853c", stroke: "#7a3d12", strokeWidth: "1.5", strokeLinejoin: "round" }),
+        MG_H("path", { key: "e3", d: "M28.5 24 L30 8 L42 17.5 Z", fill: "#2f2019" }),
+        MG_H("path", { key: "e4", d: "M71.5 24 L70 8 L58 17.5 Z", fill: "#2f2019" }),
+      ],
+      extras: [
+        // Mejillas claras que dan la cara acorazonada del zorro
+        MG_H("path", { key: "c1", d: "M22 46 Q14 60 26 70 Q22 56 30 50 Z", fill: "#fbf3e6", opacity: "0.9" }),
+        MG_H("path", { key: "c2", d: "M78 46 Q86 60 74 70 Q78 56 70 50 Z", fill: "#fbf3e6", opacity: "0.9" }),
+        MG_H("path", { key: "w1", d: "M43 61 L23 57", stroke: "#a85a1e", strokeWidth: "1.1", strokeLinecap: "round" }),
+        MG_H("path", { key: "w2", d: "M57 61 L77 57", stroke: "#a85a1e", strokeWidth: "1.1", strokeLinecap: "round" }),
       ],
     };
   if ("perro2" === ch)
@@ -18885,6 +18925,11 @@ function MgCharScreen({ charDone: dq, onBack: bk }) {
               : MG_H("div", { className: "char-lock" }, "🔒"),
             MG_H("div", { className: "char-name" }, unlocked ? cc.name : "Completa " + cc.unlock + " niveles"),
             unlocked ? MG_H("div", { className: "char-desc" }, cc.desc) : null,
+            /* Aquí NO se muestra el potenciador: esta pantalla vive en el hub
+               del pequeño, cuyo camino no tiene vidas, reloj, monedas ni
+               objetos donde aplicarlo. Prometer un poder que no va a ocurrir
+               es peor que no mencionarlo. Se muestra en el ropero, que es
+               donde elige el aventurero. */
             sel && MG_H("div", { className: "char-badge" }, "✓ elegido"));
         }))));
 }
@@ -20831,7 +20876,12 @@ function e8({
           e.kind !== "boss" &&
           Math.random() < 0.2 &&
           (s = mgWarmup());
-        let mgBase = mgTimeFor(s) + (mgFastRef.current ? 5 : 0);
+        // El gato regala segundos. Ojo: agotar el tiempo ya no resta corazones,
+        // así que esto no salva vidas — reduce la pregunta sin crédito y la prisa.
+        let mgBase =
+          mgTimeFor(s) +
+          (mgFastRef.current ? 5 : 0) +
+          ("tiempo" === mgPerkKey() ? 4 : 0);
         ((mgFastRef.current = !1),
           mgSetMax(mgBase),
           mgSetStar((v) => Math.max(0, v - 1)));
@@ -20848,7 +20898,19 @@ function e8({
       },
       [y, e, ed],
     );
+  let mgPugRef = (0, i.useRef)(!1); // el pug ya salvó en este nivel
+  /* Potenciador del pug. Va ANTES del escudo a propósito: si salva, el
+     escudo comprado sigue guardado para después. Una sola vez por nivel,
+     para que siga importando acertar. La probabilidad sube mucho con un
+     corazón porque es justo donde un niño abandona. */
   function mgApplyMiss() {
+    if ("escudo" === mgPerkKey() && !mgPugRef.current) {
+      let prob = c <= 1 ? 0.7 : 0.18;
+      if (Math.random() < prob) {
+        ((mgPugRef.current = !0), B("pugsave"));
+        return;
+      }
+    }
     f ? (m(!1), B("shielded")) : (u((e) => e - 1), B("wrong"));
   }
   function em(e, mgIsTimeout = !1) {
@@ -20879,7 +20941,14 @@ function e8({
       if (mgSinceFreeze.current >= mgFreezeGoal.current) {
         ((mgFreezePend.current = !0),
           (mgSinceFreeze.current = 0),
-          (mgFreezeGoal.current = Math.random() < 0.5 ? 2 : 3));
+          (mgFreezeGoal.current =
+            "tiempo" === mgPerkKey()
+              ? Math.random() < 0.5
+                ? 1
+                : 2
+              : Math.random() < 0.5
+                ? 2
+                : 3));
       }
       let mgGotStar = !1;
       0 === mgStar &&
@@ -20888,7 +20957,7 @@ function e8({
           : Math.random() < 0.05 && (mgSetStar(5), (mgGotStar = !0)));
       let e = J > mgMax * 0.6;
       mgFastRef.current = e;
-      let t = 2 + +!!e,
+      let t = 2 + +!!e + ("monedas" === mgPerkKey() ? 1 : 0),
         a = W + t;
       if (
         (V(a),
@@ -20991,6 +21060,7 @@ function e8({
       "boss" === e.kind &&
         (() => {
           let hurt = "wrong" === U || "shielded" === U,
+            _pug = "pugsave" === U,
             hp = Math.max(0, e.passAt - Q),
             frac = hp / e.passAt,
             defeated = 0 === hp,
@@ -21321,6 +21391,24 @@ function e8({
                   "🔄 ¡Ups! ¿Quieres usar un doble intento y volver a probar esta pregunta?",
               }),
             }),
+          "pugsave" === U &&
+            (0, s.jsxs)("div", {
+              className: "q-feedback pugmsg",
+              children: [
+                (0, s.jsxs)("div", {
+                  className: "wrong-answer",
+                  children: [
+                    `${mgCharDef().emoji} ¡${mgCharName()} te salvó! `,
+                    ey(),
+                  ],
+                }),
+                ec &&
+                  (0, s.jsxs)("div", {
+                    className: "hint-box",
+                    children: ["💡 ", ec],
+                  }),
+              ],
+            }),
           "shielded" === U &&
             (0, s.jsxs)("div", {
               className: "q-feedback shieldmsg",
@@ -21413,6 +21501,7 @@ function e8({
         : "wrong" === U ||
             "shielded" === U ||
             "starred" === U ||
+            "pugsave" === U ||
             "timeout" === U
           ? (0, s.jsx)("button", {
               className: "btn-pixel btn-go next-btn",
@@ -22909,6 +22998,11 @@ function to({
                     ? MG_H(d, { mood: sel ? "excited" : "happy", size: 60, char: cc.id })
                     : MG_H("div", { className: "char-lock" }, "🔒"),
                   MG_H("div", { className: "char-name" }, unlocked ? cc.name : "Completa " + cc.unlock + " niveles"),
+                  // El potenciador se muestra también bloqueado: saber qué se
+                  // gana es lo que hace que valga la pena desbloquearlo.
+                  cc.perk
+                    ? MG_H("div", { className: "char-perk" }, cc.perk.emoji + " " + cc.perk.txt)
+                    : null,
                   sel && MG_H("div", { className: "char-badge" }, "✓ elegido"),
                 );
               }),
@@ -23487,6 +23581,10 @@ function tc({ facts: e, onBack: t, onReset: n }) {
                   e.passed)
                 ) {
                   var s, i;
+                  // Potenciador de la zorra: más cofres y, dentro, más objetos
+                  // que monedas. Vive aquí y no en el nivel porque el cofre se
+                  // decide al cerrar la partida.
+                  let mgZorro = "objetos" === mgPerkKey();
                   let t,
                     n,
                     a,
@@ -23502,9 +23600,10 @@ function tc({ facts: e, onBack: t, onReset: n }) {
                         : (a = Math.max(2, Math.floor(a / 4))),
                       (o = null),
                       t &&
-                        (n || 0.55 > Math.random()) &&
+                        (n || (mgZorro ? 0.75 : 0.55) > Math.random()) &&
                         (o =
-                          Math.random() < (n ? 0.7 : 0.75)
+                          Math.random() <
+                          (mgZorro ? (n ? 0.4 : 0.45) : n ? 0.7 : 0.75)
                             ? {
                                 kind: "coins",
                                 coins: n ? Z(30, 60) : Z(15, 35),

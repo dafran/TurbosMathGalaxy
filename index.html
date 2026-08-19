@@ -166,7 +166,7 @@
     .char-name { font-family: 'Press Start 2P', monospace; font-size: .5rem; color: #cfc8ee; text-align: center; }
     .char-badge { font-family: 'Press Start 2P', monospace; font-size: .42rem; color: var(--accent); }
     .char-picker-full { margin: 8px auto 24px; max-width: 400px; padding: 0 10px; }
-    .char-picker-full .char-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .char-picker-full .char-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
     .char-picker-full .char-card { width: auto; min-height: 150px; background: #201546; border-color: #5a49b0; }
     .char-desc { font-family: 'Nunito', sans-serif; font-size: .62rem; color: #b3aad8; text-align: center; line-height: 1.15; overflow-wrap: anywhere; }
     .chest-box.shake-1 { animation-duration: .5s; font-size: 5rem; }
@@ -617,6 +617,19 @@ button.pm-band.sel { background: #ffd447; border-color: #b8860b; color: #2a1a4a;
 .lws-feria { background: linear-gradient(#ffd16b4d, #e0559e4d); }
 .lws-mar { background: linear-gradient(#2ea9c94d, #10406b5c); }
 .lws-taller { background: linear-gradient(#9aa5b84d, #4a54685c); }
+/* ── Potenciador del acompañante: el pug te salva de perder un corazón ── */
+.pugmsg { display: flex; flex-direction: column; gap: 8px; }
+.pugmsg .wrong-answer { color: #ffd447; }
+/* Con cuatro acompañantes, 2x2 se lee mejor que 3+1. El selector del ropero
+   usa .char-picker a secas (tarjetas flex de ancho fijo), distinto del
+   .char-picker-full del hub del pequeño. */
+.char-picker .char-grid { display: grid; grid-template-columns: repeat(2, 1fr); }
+.char-picker .char-card { width: auto; }
+/* Ficha del potenciador en el selector de acompañante */
+.char-perk { font-family: var(--pixel); font-size: .5rem; line-height: 1.5;
+  color: #ffd447; margin-top: 5px; display: block; }
+.char-card.locked .char-perk { opacity: .45; }
+
 
 /* ── Minijuegos montados dentro del camino ── */
 .mini-in-path { display: flex; flex-direction: column; align-items: center; gap: 6px; width: 100%; }
