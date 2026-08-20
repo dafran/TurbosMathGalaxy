@@ -58,7 +58,7 @@ Un juego educativo de matemáticas en español para niños, con **Turbo el pug**
 
 ## 🎮 Qué es
 
-- **Pequeño explorador** (~4-5 años): 52 niveles, 13 mundos — lógica y matemáticas tempranas, con **10 minijuegos intercalados** en el propio camino y dificultad que se ajusta al niño.
+- **Pequeño explorador** (~4-5 años): 52 niveles, 13 mundos — lógica y matemáticas tempranas, con **14 minijuegos** jugables tanto en la pestaña "Juegos de lógica" como intercalados en el propio camino y dificultad que se ajusta al niño.
 - **Aventurero** (~8 años): 100+ niveles, 11 mundos — sumas, restas, multiplicación, división, fracciones, patrones y jefes.
 - Mascota interactiva (Turbo el pug, **o el compañero que el niño elija**), camino de niveles y jefes de fin de mundo.
 

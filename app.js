@@ -14707,7 +14707,11 @@ function q({ levels: e, onReward: t, onBack: n }) {
     ],
   });
 }
-let R = { luces: 0, parejitas: 0, diferente: 0, sombras: 0, tren: 0, cajas: 0 },
+/* Contador de rondas ganadas por juego. Tiene que cubrir los CATORCE: el hub
+   pasa este número como `level`, y una clave ausente llegaría como undefined y
+   rompería el generador del juego. */
+let R = { luces: 0, parejitas: 0, diferente: 0, sombras: 0, tren: 0, cajas: 0,
+    cubos: 0, recta: 0, ordena: 0, memoria: 0, balanza: 0, reloj: 0, sudoku: 0, sumapar: 0 },
   D = [
     { id: "luces", name: "Memoria de luces", emoji: "✨" },
     { id: "parejitas", name: "Parejas", emoji: "🃏" },
@@ -15274,7 +15278,7 @@ function X({ levels: e, onWin: t, onBack: n }) {
     v = () => {
       (m(!1), u(null), r("hub"));
     },
-    y = D.find((e) => e.id === a);
+    y = MG_MINIS.find((e) => e.id === a) || D.find((e) => e.id === a);
   return (0, s.jsxs)("div", {
     className: "screen world-sonic brain-bg",
     onPointerDown: (ev) => {
@@ -15304,7 +15308,7 @@ function X({ levels: e, onWin: t, onBack: n }) {
               }),
               (0, s.jsx)("div", {
                 className: "brain-list",
-                children: D.map((t) =>
+                children: MG_MINIS.map((t) =>
                   (0, s.jsxs)(
                     "button",
                     {
@@ -15370,26 +15374,19 @@ function X({ levels: e, onWin: t, onBack: n }) {
                   ),
                 ),
               }),
-              "luces" === a &&
-                (0, s.jsx)(O, { level: e.luces, onFinish: b("luces") }, p),
-              "parejitas" === a &&
-                (0, s.jsx)(
-                  U,
-                  { level: e.parejitas, onFinish: b("parejitas") },
-                  p,
-                ),
-              "diferente" === a &&
-                (0, s.jsx)(
-                  Q,
-                  { level: e.diferente, onFinish: b("diferente") },
-                  p,
-                ),
-              "sombras" === a &&
-                (0, s.jsx)(W, { level: e.sombras, onFinish: b("sombras") }, p),
-              "tren" === a &&
-                (0, s.jsx)(K, { level: e.tren, onFinish: b("tren") }, p),
-              "cajas" === a &&
-                (0, s.jsx)(Y, { level: e.cajas, onFinish: b("cajas") }, p),
+              /* Despacho por búsqueda en MG_MINIS y no una cadena de seis
+                 casos: los ocho juegos añadidos al camino no aparecían aquí,
+                 así que esta pestaña seguía mostrando solo los originales.
+                 Con una sola fuente de verdad no se pueden desincronizar. */
+              (() => {
+                let mn = MG_MINIS.find((g) => g.id === a);
+                if (!mn) return null;
+                let extra = mn.props ? mn.props(mgSkillBand().cap) : null;
+                return MG_H(
+                  mn.comp,
+                  { level: e[a] || 0, ...extra, onFinish: b(a), key: p },
+                );
+              })(),
             ],
           }),
       c &&
@@ -17438,16 +17435,16 @@ function mgDeckSuma(techo) {
    tope en 8. Por eso el límite se pone por juego y no con un recorte global,
    que falsearía juegos donde `level` no es una cantidad. */
 const MG_MINIS = [
-  { id: "luces", comp: O, name: "Memoria de luces" },
-  { id: "parejitas", comp: U, name: "Parejas" },
-  { id: "diferente", comp: Q, name: "El diferente" },
-  { id: "sombras", comp: W, name: "La sombra" },
-  { id: "tren", comp: K, name: "Vías del tren" },
-  { id: "cajas", comp: Y, name: "Guarda en su caja" },
-  { id: "cubos", comp: _, name: "Torre de cubos" },
-  { id: "recta", comp: L, name: "La recta numérica", min: 1 },
-  { id: "ordena", comp: M, name: "Ordena los números", min: 1 },
-  { id: "memoria", comp: T, name: "Memoria de flores" },
+  { id: "luces", comp: O, name: "Memoria de luces", emoji: "✨" },
+  { id: "parejitas", comp: U, name: "Parejas", emoji: "🃏" },
+  { id: "diferente", comp: Q, name: "El diferente", emoji: "👀" },
+  { id: "sombras", comp: W, name: "La sombra", emoji: "🌑" },
+  { id: "tren", comp: K, name: "Vías del tren", emoji: "🚂" },
+  { id: "cajas", comp: Y, name: "Guarda en su caja", emoji: "📦" },
+  { id: "cubos", comp: _, name: "Torre de cubos", emoji: "🧊" },
+  { id: "recta", comp: L, name: "La recta numérica", emoji: "📏", min: 1 },
+  { id: "ordena", comp: M, name: "Ordena los números", emoji: "🔢", min: 1 },
+  { id: "memoria", comp: T, name: "Memoria de flores", emoji: "🌸" },
   // Equivalencia y el signo "=": los niños suelen leerlo como "aquí viene el
   // resultado" en vez de "los dos lados valen lo mismo". La balanza lo vuelve
   // físico, porque el fiel se inclina.
@@ -17455,6 +17452,7 @@ const MG_MINIS = [
     id: "balanza",
     comp: A,
     name: "La balanza",
+    emoji: "⚖️",
     min: 1,
     props: (t) => ({ cap: Math.max(4, Math.min(12, Math.round(t / 2))) }),
   },
@@ -17467,16 +17465,18 @@ const MG_MINIS = [
     id: "reloj",
     comp: $,
     name: "El búho que cuenta",
+    emoji: "🦉",
     min: 1,
     props: (t) => ({ steps: t <= 15 ? [2, 5] : [2, 3, 5, 10] }),
   },
   // Razonamiento deductivo puro (filas y columnas) con dígitos 1-4, dentro
   // del rango de subitización. Pide banda 2 porque arranca con 5 huecos.
-  { id: "sudoku", comp: C, name: "Sudoku de 4", min: 2 },
+  { id: "sudoku", comp: C, name: "Sudoku de 4", emoji: "🧠", min: 2 },
   {
     id: "sumapar",
     comp: P,
     name: "Parejas que suman",
+    emoji: "➕",
     min: 1,
     props: (t) => ({ deck: mgDeckSuma(t), label: "Une cada suma con su resultado" }),
   },
