@@ -13109,6 +13109,18 @@ let mgMinions = [
   { id: "cactin", emoji: "🌵", name: "Cactín", hp: 3 },
   { id: "chispin", emoji: "⚡", name: "Chispín", hp: 2 },
   { id: "cocodrilin", emoji: "🐊", name: "Cocodrilín", hp: 4 },
+  // Segunda tanda: al niño le gustó explorar el catálogo, así que hay más
+  // enemigos distintos, no más seguidos.
+  { id: "pinguin", emoji: "🐧", name: "Pingüín", hp: 2 },
+  { id: "ranin", emoji: "🐸", name: "Ranín", hp: 2 },
+  { id: "erizin", emoji: "🦔", name: "Ericín", hp: 3 },
+  { id: "calamarin", emoji: "🦑", name: "Calamarín", hp: 3 },
+  { id: "buhin", emoji: "🦉", name: "Buhín", hp: 3 },
+  { id: "mapachin", emoji: "🦝", name: "Mapachín", hp: 3 },
+  { id: "escorpin", emoji: "🦂", name: "Escorpín", hp: 4 },
+  { id: "tiburin", emoji: "🦈", name: "Tiburín", hp: 4 },
+  { id: "dragoncin", emoji: "🐲", name: "Dragoncín", hp: 5 },
+  { id: "yetin", emoji: "🦣", name: "Mamutín", hp: 5 },
 ];
 const MG_MINION_HP = 3; // respaldo si a un secuaz le faltara `hp`
 /* Orden de secuaces de un nivel. Antes el índice salía de los aciertos del
@@ -13152,6 +13164,7 @@ function mgMinionAt(orden, Q) {
 }
 // Clave del potenciador activo (""/desconocido = sin potenciador).
 function mgPerkKey() {
+  if (!mgOn("perks")) return "";
   let c = mgCharDef();
   return (c && c.perk && c.perk.key) || "";
 }
@@ -13160,6 +13173,7 @@ function mgPerkKey() {
    celebra, trae juegos o regala calcomanías. La presencia emocional base la
    tienen TODOS por igual; esto solo suma, nunca resta. */
 function mgPerkMiniKey() {
+  if (!mgOn("perks")) return "";
   let c = mgCharDef();
   return (c && c.perkMini && c.perkMini.key) || "";
 }
@@ -14693,7 +14707,11 @@ function q({ levels: e, onReward: t, onBack: n }) {
     ],
   });
 }
-let R = { luces: 0, parejitas: 0, diferente: 0, sombras: 0, tren: 0, cajas: 0 },
+/* Contador de rondas ganadas por juego. Tiene que cubrir los CATORCE: el hub
+   pasa este número como `level`, y una clave ausente llegaría como undefined y
+   rompería el generador del juego. */
+let R = { luces: 0, parejitas: 0, diferente: 0, sombras: 0, tren: 0, cajas: 0,
+    cubos: 0, recta: 0, ordena: 0, memoria: 0, balanza: 0, reloj: 0, sudoku: 0, sumapar: 0 },
   D = [
     { id: "luces", name: "Memoria de luces", emoji: "✨" },
     { id: "parejitas", name: "Parejas", emoji: "🃏" },
@@ -15260,7 +15278,7 @@ function X({ levels: e, onWin: t, onBack: n }) {
     v = () => {
       (m(!1), u(null), r("hub"));
     },
-    y = D.find((e) => e.id === a);
+    y = MG_MINIS.find((e) => e.id === a) || D.find((e) => e.id === a);
   return (0, s.jsxs)("div", {
     className: "screen world-sonic brain-bg",
     onPointerDown: (ev) => {
@@ -15290,7 +15308,7 @@ function X({ levels: e, onWin: t, onBack: n }) {
               }),
               (0, s.jsx)("div", {
                 className: "brain-list",
-                children: D.map((t) =>
+                children: MG_MINIS.map((t) =>
                   (0, s.jsxs)(
                     "button",
                     {
@@ -15356,26 +15374,19 @@ function X({ levels: e, onWin: t, onBack: n }) {
                   ),
                 ),
               }),
-              "luces" === a &&
-                (0, s.jsx)(O, { level: e.luces, onFinish: b("luces") }, p),
-              "parejitas" === a &&
-                (0, s.jsx)(
-                  U,
-                  { level: e.parejitas, onFinish: b("parejitas") },
-                  p,
-                ),
-              "diferente" === a &&
-                (0, s.jsx)(
-                  Q,
-                  { level: e.diferente, onFinish: b("diferente") },
-                  p,
-                ),
-              "sombras" === a &&
-                (0, s.jsx)(W, { level: e.sombras, onFinish: b("sombras") }, p),
-              "tren" === a &&
-                (0, s.jsx)(K, { level: e.tren, onFinish: b("tren") }, p),
-              "cajas" === a &&
-                (0, s.jsx)(Y, { level: e.cajas, onFinish: b("cajas") }, p),
+              /* Despacho por búsqueda en MG_MINIS y no una cadena de seis
+                 casos: los ocho juegos añadidos al camino no aparecían aquí,
+                 así que esta pestaña seguía mostrando solo los originales.
+                 Con una sola fuente de verdad no se pueden desincronizar. */
+              (() => {
+                let mn = MG_MINIS.find((g) => g.id === a);
+                if (!mn) return null;
+                let extra = mn.props ? mn.props(mgSkillBand().cap) : null;
+                return MG_H(
+                  mn.comp,
+                  { level: e[a] || 0, ...extra, onFinish: b(a), key: p },
+                );
+              })(),
             ],
           }),
       c &&
@@ -17224,6 +17235,46 @@ const MG_BANDS = [
   { id: 3, factor: 2, cap: 32, label: "Reto máximo", short: "Máx" },
 ];
 const MG_SKILL_WINDOW = 12; // respuestas que mira el ajuste automático
+/* Ajustes de experiencia que el papá puede apagar. Vienen TODOS encendidos:
+   son el juego tal como está pensado, y esto solo da la posibilidad de
+   ajustarlo si a un niño concreto algo le estorba (por ejemplo, si el reloj
+   le pone ansioso, o si los minijuegos le distraen de la matemática). */
+const MG_SETTINGS = [
+  { key: "perks", label: "Poderes del acompañante", hint: "Escudo, reloj, monedas o regalos según quién lo acompañe" },
+  { key: "freeze", label: "Congelar el reloj como premio", hint: "Al encadenar aciertos, una pregunta sin reloj. Solo en el camino del aventurero" },
+  { key: "minis", label: "Minijuegos dentro del camino", hint: "Memoria, tren, recta numérica... intercalados. Solo en el camino del pequeño" },
+  { key: "bonus", label: "Ronda sorpresa al terminar", hint: "Un juego extra opcional al acabar un nivel" },
+];
+let mgSet = null; // copia viva del perfil que juega
+function mgSetDefaults() {
+  let o = {};
+  MG_SETTINGS.forEach((s) => (o[s.key] = !0));
+  return o;
+}
+// ¿Está encendido este ajuste? Ante la duda, sí: el juego completo es el
+// comportamiento por defecto.
+function mgOn(key) {
+  let v = (mgSet || {})[key];
+  return void 0 === v ? !0 : !!v;
+}
+// Lectura/escritura de CUALQUIER perfil, para el panel de papás, que los
+// lista todos. Va por __mgRaw porque el shim solo mapea al perfil activo.
+function mgSettingsReadFor(id) {
+  try {
+    let v = window.__mgRaw && window.__mgRaw.get("mg_" + id + "__mg_settings");
+    if (v) return { ...mgSetDefaults(), ...JSON.parse(v) };
+  } catch {}
+  return mgSetDefaults();
+}
+function mgSettingsToggleFor(id, key) {
+  let s = mgSettingsReadFor(id);
+  s[key] = !s[key];
+  try {
+    window.__mgRaw && window.__mgRaw.set("mg_" + id + "__mg_settings", JSON.stringify(s));
+    window.__mgRaw && window.__mgRaw.get("mg_active") === id && (mgSet = s);
+  } catch {}
+  return s;
+}
 let mgSkill = null; // { v, band, hist:[], manual }
 function mgSkillSeed(age) {
   // La edad SOLO siembra la conjetura inicial; el desempeño manda después.
@@ -17384,16 +17435,16 @@ function mgDeckSuma(techo) {
    tope en 8. Por eso el límite se pone por juego y no con un recorte global,
    que falsearía juegos donde `level` no es una cantidad. */
 const MG_MINIS = [
-  { id: "luces", comp: O, name: "Memoria de luces" },
-  { id: "parejitas", comp: U, name: "Parejas" },
-  { id: "diferente", comp: Q, name: "El diferente" },
-  { id: "sombras", comp: W, name: "La sombra" },
-  { id: "tren", comp: K, name: "Vías del tren" },
-  { id: "cajas", comp: Y, name: "Guarda en su caja" },
-  { id: "cubos", comp: _, name: "Torre de cubos" },
-  { id: "recta", comp: L, name: "La recta numérica", min: 1 },
-  { id: "ordena", comp: M, name: "Ordena los números", min: 1 },
-  { id: "memoria", comp: T, name: "Memoria de flores" },
+  { id: "luces", comp: O, name: "Memoria de luces", emoji: "✨" },
+  { id: "parejitas", comp: U, name: "Parejas", emoji: "🃏" },
+  { id: "diferente", comp: Q, name: "El diferente", emoji: "👀" },
+  { id: "sombras", comp: W, name: "La sombra", emoji: "🌑" },
+  { id: "tren", comp: K, name: "Vías del tren", emoji: "🚂" },
+  { id: "cajas", comp: Y, name: "Guarda en su caja", emoji: "📦" },
+  { id: "cubos", comp: _, name: "Torre de cubos", emoji: "🧊" },
+  { id: "recta", comp: L, name: "La recta numérica", emoji: "📏", min: 1 },
+  { id: "ordena", comp: M, name: "Ordena los números", emoji: "🔢", min: 1 },
+  { id: "memoria", comp: T, name: "Memoria de flores", emoji: "🌸" },
   // Equivalencia y el signo "=": los niños suelen leerlo como "aquí viene el
   // resultado" en vez de "los dos lados valen lo mismo". La balanza lo vuelve
   // físico, porque el fiel se inclina.
@@ -17401,6 +17452,7 @@ const MG_MINIS = [
     id: "balanza",
     comp: A,
     name: "La balanza",
+    emoji: "⚖️",
     min: 1,
     props: (t) => ({ cap: Math.max(4, Math.min(12, Math.round(t / 2))) }),
   },
@@ -17413,16 +17465,18 @@ const MG_MINIS = [
     id: "reloj",
     comp: $,
     name: "El búho que cuenta",
+    emoji: "🦉",
     min: 1,
     props: (t) => ({ steps: t <= 15 ? [2, 5] : [2, 3, 5, 10] }),
   },
   // Razonamiento deductivo puro (filas y columnas) con dígitos 1-4, dentro
   // del rango de subitización. Pide banda 2 porque arranca con 5 huecos.
-  { id: "sudoku", comp: C, name: "Sudoku de 4", min: 2 },
+  { id: "sudoku", comp: C, name: "Sudoku de 4", emoji: "🧠", min: 2 },
   {
     id: "sumapar",
     comp: P,
     name: "Parejas que suman",
+    emoji: "➕",
     min: 1,
     props: (t) => ({ deck: mgDeckSuma(t), label: "Une cada suma con su resultado" }),
   },
@@ -17450,7 +17504,7 @@ function mgLittleNext(e, t) {
      del pool: metido en un pool de ~15 modos la posibilidad real caía a ~2%
      por pregunta y el niño no llegaba a notar la variedad. Así casi todo
      nivel de mundo 3+ trae uno, y nunca salen dos seguidos. */
-  if (e.world >= 3 && t >= 1 && "mini" !== mgLittleLastKind && Math.random() < 0.15) {
+  if (mgOn("minis") && e.world >= 3 && t >= 1 && "mini" !== mgLittleLastKind && Math.random() < 0.15) {
     let q = ef("mini", mx, e.pool);
     return (
       (mgLittleLastKind = "mini"),
@@ -18868,6 +18922,7 @@ async function eH(e, t) {
   return t;
 }
 let eW = [
+  "mg_settings",
   "mg_gifts",
   "mg_facts",
   "mg_daily",
@@ -19021,7 +19076,7 @@ function mgIcon(name, size, color) {
   if (!kids) return null;
   return MG_H("svg", { width: size || 22, height: size || 22, viewBox: "0 0 24 24", className: "mg-ic mg-ic-" + name, "aria-hidden": "true" }, ...kids(color));
 }
-const MG_PROFILE_KEYS = ["mg_facts", "mg_daily", "mg_little", "mg_little_path", "mg_path", "mg_coins", "mg_inv", "mg_reto", "mg_practice", "mg_brain", "mg_lbrain", "mg_outfit", "mg_pathver", "mg_goals", "mg_worlds_celebrated", "mg_lessons", "mg_char", "mg_skill", "mg_gifts"];
+const MG_PROFILE_KEYS = ["mg_facts", "mg_daily", "mg_little", "mg_little_path", "mg_path", "mg_coins", "mg_inv", "mg_reto", "mg_practice", "mg_brain", "mg_lbrain", "mg_outfit", "mg_pathver", "mg_goals", "mg_worlds_celebrated", "mg_lessons", "mg_char", "mg_skill", "mg_gifts", "mg_settings"];
 const MG_AVATARS = ["🦄", "🐯", "🦖", "🐸", "🦊", "🐼", "🐧", "🦁", "🐙", "🐨", "🦉", "🐢", "🐝", "🦋", "🐬", "🦕", "🚀", "🌟"];
 const mgRaw = () => window.__mgRaw || { get: () => null, set: () => {}, remove: () => {} };
 function mgNewId() { return "p" + Math.random().toString(36).slice(2, 8); }
@@ -20391,8 +20446,9 @@ function e2({
       // Si el nivel mostró señales de cansancio/frustración, la ronda
       // sorpresa deja de ser azar y se ofrece siempre: cambiar de actividad
       // es mejor respuesta que bajarle los números.
-      mgSootheTake() ||
-      Math.random() < ("calma" === mgPerkMiniKey() ? 0.55 : 0.34)
+      mgOn("bonus") &&
+      (mgSootheTake() ||
+        Math.random() < ("calma" === mgPerkMiniKey() ? 0.55 : 0.34))
         ? ee(MG_BONUS_GAMES)
         : null,
     ),
@@ -21259,18 +21315,23 @@ function e8({
           mgCheerT.current && clearTimeout(mgCheerT.current),
           (mgCheerT.current = setTimeout(() => mgSetCheer(null), 1600)));
       }
-      mgSinceFreeze.current += 1;
-      if (mgSinceFreeze.current >= mgFreezeGoal.current) {
+      /* El acierto de una pregunta YA congelada no cuenta para el siguiente
+         congelado. Antes sí contaba, así que en cuanto el niño encadenaba
+         aciertos se congelaba una de cada dos o tres preguntas y el reloj
+         dejaba de significar nada — un premio siempre encendido deja de ser
+         premio. Y con la meta en 1 quedaba congelado de forma permanente. */
+      mgFrozen || (mgSinceFreeze.current += 1);
+      if (mgOn("freeze") && !mgFrozen && mgSinceFreeze.current >= mgFreezeGoal.current) {
         ((mgFreezePend.current = !0),
           (mgSinceFreeze.current = 0),
           (mgFreezeGoal.current =
             "tiempo" === mgPerkKey()
               ? Math.random() < 0.5
-                ? 1
-                : 2
-              : Math.random() < 0.5
                 ? 2
-                : 3));
+                : 3
+              : Math.random() < 0.5
+                ? 3
+                : 4));
       }
       let mgGotStar = !1;
       0 === mgStar &&
@@ -22701,6 +22762,34 @@ function tr({
                         b.short))));
               })))
         : null,
+      /* Ajustes de experiencia, por niño. Vienen todos encendidos: esto no es
+         una lista de cosas que activar, sino la posibilidad de apagar algo que
+         a un niño concreto le estorbe. */
+      MG_H("div", { className: "panel", style: { marginBottom: 12 } },
+        MG_H("h3", { className: "rs-title" }, "🎛️ Experiencia"),
+        MG_H("p", { className: "pm-hint" },
+          "Todo viene encendido: así está pensado el juego. Apaga algo solo si a tu hijo le estorba — por ejemplo el reloj, si le pone ansioso."),
+        MG_H("div", { className: "pm-list" },
+          ...pmProfiles.map((pf) => {
+            let st = mgSettingsReadFor(pf.id);
+            return MG_H("div", { key: pf.id, className: "pm-row pm-set-row" },
+              MG_H("div", { className: "pm-set-head" },
+                MG_H("span", { className: "pm-emoji" }, pf.emoji),
+                MG_H("span", { className: "pm-name" }, pf.name)),
+              MG_H("div", { className: "pm-toggles" },
+                ...MG_SETTINGS.map((cfg) =>
+                  MG_H("button",
+                    {
+                      key: cfg.key,
+                      className: "pm-toggle" + (st[cfg.key] ? " on" : ""),
+                      onClick: () => (mgSettingsToggleFor(pf.id, cfg.key), pmRefresh()),
+                      title: cfg.hint,
+                    },
+                    MG_H("span", { className: "pm-tg-dot" }, st[cfg.key] ? "✓" : "✕"),
+                    MG_H("span", { className: "pm-tg-txt" },
+                      MG_H("span", { className: "pm-tg-label" }, cfg.label),
+                      MG_H("span", { className: "pm-tg-hint" }, cfg.hint))))));
+          }))),
       (0, s.jsxs)("div", {
         className: "panel album-panel report-panel",
         children: [
@@ -23668,6 +23757,9 @@ function tc({ facts: e, onBack: t, onReset: n }) {
                 : { v: 1, band: mgSkillSeed(pf ? pf.age : 6), hist: [], manual: null };
             mgSetSkillV((v) => v + 1);
           }
+           // Ajustes de experiencia. Si la llave no existe, todo encendido:
+           // el juego completo es el comportamiento por defecto.
+           mgSet = { ...mgSetDefaults(), ...((await eH("mg_settings", null)) || {}) };
           let e = await eH("mg_outfit", { owned: [], equipped: null });
           (Y(e), (u = e.equipped));
           let t = await eH("mg_sound", { on: !0 });
