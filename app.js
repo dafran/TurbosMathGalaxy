@@ -15564,7 +15564,8 @@ let Z = (e, t) => Math.floor(Math.random() * (t - e + 1)) + e,
     {
       id: 6,
       world: 0,
-      name: "Jefe: Robotnik",
+      name: "Jefe: Doctor Tornillo",
+      foe: "tornillo",
       kind: "boss",
       tables: [],
       questions: 12,
@@ -15665,6 +15666,7 @@ let Z = (e, t) => Math.floor(Math.random() * (t - e + 1)) + e,
       id: 12,
       world: 1,
       name: "Jefe: Caballero resta",
+      foe: "caballero",
       kind: "boss",
       tables: [],
       questions: 12,
@@ -15797,7 +15799,8 @@ let Z = (e, t) => Math.floor(Math.random() * (t - e + 1)) + e,
     {
       id: 23,
       world: 2,
-      name: "Jefe: Dragón Ender",
+      name: "Jefe: Dragón de Obsidiana",
+      foe: "obsidiana",
       kind: "boss",
       tables: [1, 2, 5, 10],
       questions: 12,
@@ -15899,7 +15902,8 @@ let Z = (e, t) => Math.floor(Math.random() * (t - e + 1)) + e,
     {
       id: 33,
       world: 3,
-      name: "Jefe: Darth Vader",
+      name: "Jefe: Lord Eclipse",
+      foe: "eclipse",
       kind: "boss",
       tables: [2, 3, 4, 5, 10],
       questions: 12,
@@ -16011,7 +16015,8 @@ let Z = (e, t) => Math.floor(Math.random() * (t - e + 1)) + e,
     {
       id: 44,
       world: 4,
-      name: "Jefe: Metal Sonic",
+      name: "Jefe: Acero Veloz",
+      foe: "acero",
       kind: "boss",
       tables: [6, 7],
       questions: 12,
@@ -16124,7 +16129,8 @@ let Z = (e, t) => Math.floor(Math.random() * (t - e + 1)) + e,
     {
       id: 55,
       world: 5,
-      name: "Jefe: Dr. Eggman",
+      name: "Jefe: Profesor Cascarón",
+      foe: "cascaron",
       kind: "boss",
       tables: [2, 3, 4, 5, 6, 7, 8, 9, 10],
       questions: 14,
@@ -16225,7 +16231,8 @@ let Z = (e, t) => Math.floor(Math.random() * (t - e + 1)) + e,
     {
       id: 63,
       world: 6,
-      name: "Jefe: Wither",
+      name: "Jefe: El Tricalavera",
+      foe: "tricalavera",
       kind: "boss",
       tables: [2, 5, 10],
       questions: 12,
@@ -16315,7 +16322,8 @@ let Z = (e, t) => Math.floor(Math.random() * (t - e + 1)) + e,
     {
       id: 72,
       world: 7,
-      name: "Jefe: Kylo Ren",
+      name: "Jefe: Chispa Oscura",
+      foe: "chispa",
       kind: "boss",
       tables: [3, 4, 6, 7],
       questions: 12,
@@ -16396,7 +16404,8 @@ let Z = (e, t) => Math.floor(Math.random() * (t - e + 1)) + e,
     {
       id: 80,
       world: 8,
-      name: "Jefe: Emperador",
+      name: "Jefe: Emperador de Hierro",
+      foe: "emperador",
       kind: "boss",
       tables: [2, 3, 4, 5, 6, 7, 8, 9, 10],
       questions: 14,
@@ -16458,6 +16467,7 @@ let Z = (e, t) => Math.floor(Math.random() * (t - e + 1)) + e,
       id: 86,
       world: 9,
       name: "Jefe supremo: Maestro del tiempo",
+      foe: "tiempo",
       kind: "boss",
       tables: [2, 3, 4, 5, 6, 7, 8, 9, 10],
       questions: 14,
@@ -16528,6 +16538,7 @@ let Z = (e, t) => Math.floor(Math.random() * (t - e + 1)) + e,
       id: 93,
       world: 10,
       name: "Jefe: Sabio galáctico",
+      foe: "sabio",
       kind: "boss",
       tables: [2, 3, 4, 5, 6, 7, 8, 9, 10],
       questions: 14,
@@ -17560,6 +17571,198 @@ const MG_FIGURAS = {
    pintado se ven pegados y además cambian de dibujo en cada plataforma. Se
    dimensionan en `em` a propósito: así las reglas de font-size, posición y
    animación que ya existían siguen mandando, sin tocar el CSS. */
+/* Retratos de los jefes, en SVG. Antes eran emoji, y el nombre prometía un
+   personaje que el dibujo no daba: el señor oscuro salía como 🌑, que es una
+   luna. Siete jefes se renombraron a la vez porque eran personajes de marca
+   registrada y dibujarlos con fidelidad habría empeorado el problema.
+   Regla de dibujo: silueta fuerte y pocos detalles — el nodo del camino los
+   pinta a 1.5rem, así que el detalle fino se pierde. Van en `em` para que el
+   tamaño lo siga mandando el CSS de cada sitio. */
+function mgFoeArt(id) {
+  let H = MG_H,
+    lienzo = (...hijos) =>
+      H(
+        "svg",
+        {
+          viewBox: "0 0 100 100",
+          width: "1em",
+          height: "1em",
+          fill: "none",
+          xmlns: "http://www.w3.org/2000/svg",
+          style: { display: "block", overflow: "visible" },
+        },
+        ...hijos,
+      ),
+    grad = (gid, paradas) =>
+      H(
+        "linearGradient",
+        { id: gid, x1: "0", y1: "0", x2: "0", y2: "1" },
+        ...paradas.map((s, i) => H("stop", { key: i, offset: s[0], stopColor: s[1] })),
+      );
+
+  if ("tornillo" === id)
+    return lienzo(
+      H("defs", { key: "d" }, grad("mgFoeTor", [["0%", "#d9e2ee"], ["100%", "#8e9bad"]])),
+      /* Sin llave inglesa: a 1.5rem era un garabato. El personaje se sostiene
+         con tres formas gordas — greñas, gafas y bigotazo. */
+      H("path", { key: "hair", d: "M20 30 Q26 6 40 16 Q50 0 60 16 Q74 6 80 30 Z", fill: "#c4531f" }),
+      H("circle", { key: "h", cx: 50, cy: 48, r: 30, fill: "url(#mgFoeTor)" }),
+      H("rect", { key: "g", x: 18, y: 36, width: 64, height: 15, rx: 7, fill: "#2b3444" }),
+      H("circle", { key: "l1", cx: 36, cy: 43.5, r: 8, fill: "#7ce0ff" }),
+      H("circle", { key: "l2", cx: 64, cy: 43.5, r: 8, fill: "#7ce0ff" }),
+      H("circle", { key: "p1", cx: 36, cy: 43.5, r: 3, fill: "#12303f" }),
+      H("circle", { key: "p2", cx: 64, cy: 43.5, r: 3, fill: "#12303f" }),
+      // Bigotazo grueso: es lo que lo hace legible de lejos
+      H("path", { key: "m", d: "M16 62 Q33 54 50 66 Q67 54 84 62 Q67 84 50 72 Q33 84 16 62 Z", fill: "#c4531f" }),
+    );
+
+  if ("caballero" === id)
+    return lienzo(
+      H("defs", { key: "d" }, grad("mgFoeCab", [["0%", "#e8eef7"], ["100%", "#95a3b8"]])),
+      /* Penacho barrido hacia atrás y DOS rejillas en vez de un visor con
+         nasal: con una barra horizontal y otra vertical el casco se leía
+         literalmente como una letra T. */
+      H("path", { key: "p", d: "M52 12 Q74 0 92 10 Q74 12 62 28 Z", fill: "#e04a5f" }),
+      H("path", { key: "h", d: "M50 12 Q78 14 78 44 Q78 74 50 92 Q22 74 22 44 Q22 14 50 12 Z", fill: "url(#mgFoeCab)" }),
+      // Hueco oscuro de la cara, con dos rejillas claras encima
+      H("path", { key: "f", d: "M32 38 Q50 32 68 38 L64 66 Q50 74 36 66 Z", fill: "#161d29" }),
+      H("rect", { key: "v1", x: 36, y: 43, width: 28, height: 5, rx: 2.5, fill: "#aebccf" }),
+      H("rect", { key: "v2", x: 38, y: 54, width: 24, height: 5, rx: 2.5, fill: "#aebccf" }),
+      // Escudo con el signo menos: es el jefe de las restas
+      H("circle", { key: "s", cx: 80, cy: 76, r: 17, fill: "#3b6fb5", stroke: "#e8eef7", strokeWidth: "3" }),
+      H("rect", { key: "mn", x: 70, y: 72.5, width: 20, height: 7, rx: 3.5, fill: "#fff" }),
+    );
+
+  if ("obsidiana" === id)
+    return lienzo(
+      H("defs", { key: "d" }, grad("mgFoeObs", [["0%", "#4a3f6b"], ["100%", "#15121f"]])),
+      H("path", { key: "c1", d: "M26 30 L16 4 L40 20 Z", fill: "#2a2340" }),
+      H("path", { key: "c2", d: "M74 30 L84 4 L60 20 Z", fill: "#2a2340" }),
+      // Cabeza angular: obsidiana es cristal, así que nada de curvas suaves
+      H("path", { key: "h", d: "M50 22 L82 40 L74 74 L50 94 L26 74 L18 40 Z", fill: "url(#mgFoeObs)" }),
+      H("path", { key: "f1", d: "M50 22 L50 94 M18 40 L82 40", stroke: "#6b5aa0", strokeWidth: "1.6", opacity: "0.5" }),
+      H("path", { key: "e1", d: "M32 48 L44 54 L32 58 Z", fill: "#c77dff" }),
+      H("path", { key: "e2", d: "M68 48 L56 54 L68 58 Z", fill: "#c77dff" }),
+      H("path", { key: "t", d: "M40 72 L44 82 L50 74 L56 82 L60 72 Z", fill: "#e8dcff" }),
+    );
+
+  if ("eclipse" === id)
+    return lienzo(
+      H("defs", { key: "d" }, grad("mgFoeEcl", [["0%", "#3a3f4a"], ["100%", "#0d0f14"]])),
+      H("path", { key: "cape", d: "M18 96 Q22 62 34 52 L66 52 Q78 62 82 96 Z", fill: "#141821" }),
+      // Casco angular, la silueta que hace al personaje
+      H("path", { key: "h", d: "M50 8 Q80 12 78 44 Q76 62 50 76 Q24 62 22 44 Q20 12 50 8 Z", fill: "url(#mgFoeEcl)" }),
+      H("path", { key: "v", d: "M30 40 Q50 34 70 40 L64 52 Q50 47 36 52 Z", fill: "#8d1220" }),
+      H("circle", { key: "e1", cx: 40, cy: 43, r: 3.4, fill: "#ff4d5e" }),
+      H("circle", { key: "e2", cx: 60, cy: 43, r: 3.4, fill: "#ff4d5e" }),
+      H("path", { key: "b", d: "M42 60 h16 v7 h-16 Z", fill: "#2b303b" }),
+    );
+
+  if ("acero" === id)
+    return lienzo(
+      H("defs", { key: "d" }, grad("mgFoeAce", [["0%", "#7fc4ff"], ["100%", "#1c4f8a"]])),
+      // Púas hacia atrás, gordas y bien separadas: antes casi no se leían
+      H("path", { key: "s1", d: "M40 24 L0 6 L30 40 Z", fill: "#1c4f8a" }),
+      H("path", { key: "s2", d: "M36 46 L-4 42 L30 60 Z", fill: "#2a6bb0" }),
+      H("path", { key: "s3", d: "M38 66 L2 76 L34 80 Z", fill: "#173f6e" }),
+      H("circle", { key: "h", cx: 56, cy: 48, r: 30, fill: "url(#mgFoeAce)" }),
+      H("path", { key: "pl", d: "M56 18 a30 30 0 0 1 26 15 L56 48 Z", fill: "#bfe3ff", opacity: "0.6" }),
+      H("circle", { key: "e", cx: 66, cy: 42, r: 8, fill: "#fff" }),
+      H("circle", { key: "p", cx: 68, cy: 42, r: 4, fill: "#e02a3c" }),
+      H("path", { key: "m", d: "M74 62 q-12 8 -22 4", stroke: "#123a66", strokeWidth: "4", strokeLinecap: "round" }),
+    );
+
+  if ("cascaron" === id)
+    return lienzo(
+      H("defs", { key: "d" }, grad("mgFoeCas", [["0%", "#fff6e2"], ["100%", "#e3c79a"]])),
+      H("ellipse", { key: "b", cx: 50, cy: 54, rx: 34, ry: 40, fill: "url(#mgFoeCas)" }),
+      H("circle", { key: "g1", cx: 37, cy: 42, r: 11, fill: "#eaf4ff", stroke: "#3a4557", strokeWidth: "3" }),
+      H("circle", { key: "g2", cx: 63, cy: 42, r: 11, fill: "#eaf4ff", stroke: "#3a4557", strokeWidth: "3" }),
+      H("path", { key: "br", d: "M48 42 h4", stroke: "#3a4557", strokeWidth: "3" }),
+      H("circle", { key: "p1", cx: 37, cy: 42, r: 3.5, fill: "#22303f" }),
+      H("circle", { key: "p2", cx: 63, cy: 42, r: 3.5, fill: "#22303f" }),
+      // Bigote enorme, la seña del personaje
+      H("path", { key: "m", d: "M18 62 Q34 54 50 64 Q66 54 82 62 Q66 78 50 70 Q34 78 18 62 Z", fill: "#c4531f" }),
+    );
+
+  if ("tricalavera" === id) {
+    let calavera = (cx, cy, r, k) =>
+      H(
+        "g",
+        { key: k },
+        H("circle", { cx: cx, cy: cy, r: r, fill: "#e9e4d4" }),
+        H("circle", { cx: cx - r * 0.36, cy: cy - r * 0.1, r: r * 0.24, fill: "#1b1a17" }),
+        H("circle", { cx: cx + r * 0.36, cy: cy - r * 0.1, r: r * 0.24, fill: "#1b1a17" }),
+        H("rect", { x: cx - r * 0.3, y: cy + r * 0.42, width: r * 0.6, height: r * 0.3, rx: 1.5, fill: "#1b1a17" }),
+      );
+    return lienzo(
+      H("path", { key: "r", d: "M50 62 v30 M36 72 h28 M38 84 h24", stroke: "#4a4636", strokeWidth: "6", strokeLinecap: "round" }),
+      calavera(50, 34, 20, "c1"),
+      calavera(20, 50, 14, "c2"),
+      calavera(80, 50, 14, "c3"),
+    );
+  }
+
+  if ("chispa" === id)
+    return lienzo(
+      H("defs", { key: "d" }, grad("mgFoeChi", [["0%", "#2f2836"], ["100%", "#100d15"]])),
+      H("path", { key: "c", d: "M22 96 Q24 56 40 44 L60 44 Q76 56 78 96 Z", fill: "url(#mgFoeChi)" }),
+      // Capucha con la cara en sombra: no hace falta cara
+      H("path", { key: "h", d: "M50 8 Q78 16 76 46 Q64 40 50 40 Q36 40 24 46 Q22 16 50 8 Z", fill: "#241e2c" }),
+      H("path", { key: "f", d: "M34 40 Q50 34 66 40 Q58 56 50 58 Q42 56 34 40 Z", fill: "#0a080d" }),
+      H("circle", { key: "e1", cx: 43, cy: 45, r: 2.8, fill: "#ff3b30" }),
+      H("circle", { key: "e2", cx: 57, cy: 45, r: 2.8, fill: "#ff3b30" }),
+      // Sable inestable, con chispas
+      H("path", { key: "s", d: "M84 88 L92 30", stroke: "#ff4436", strokeWidth: "7", strokeLinecap: "round" }),
+      H("path", { key: "s2", d: "M84 60 l10 -6 M86 46 l-9 -5", stroke: "#ff8a5c", strokeWidth: "3.4", strokeLinecap: "round" }),
+    );
+
+  if ("emperador" === id)
+    return lienzo(
+      H("defs", { key: "d" }, grad("mgFoeEmp", [["0%", "#6a6f7d"], ["100%", "#23262e"]])),
+      H("path", { key: "c", d: "M20 94 Q24 58 40 48 L60 48 Q76 58 80 94 Z", fill: "#191c22" }),
+      H("path", { key: "h", d: "M50 16 Q76 22 74 48 Q62 44 50 44 Q38 44 26 48 Q24 22 50 16 Z", fill: "url(#mgFoeEmp)" }),
+      H("path", { key: "f", d: "M34 44 Q50 38 66 44 Q58 60 50 62 Q42 60 34 44 Z", fill: "#0e1014" }),
+      H("circle", { key: "e1", cx: 43, cy: 48, r: 2.8, fill: "#ffd447" }),
+      H("circle", { key: "e2", cx: 57, cy: 48, r: 2.8, fill: "#ffd447" }),
+      // Corona de hierro
+      H("path", { key: "cr", d: "M26 18 L32 4 L40 14 L50 0 L60 14 L68 4 L74 18 Z", fill: "#b9963f" }),
+      H("circle", { key: "j", cx: 50, cy: 12, r: 3.6, fill: "#e04a5f" }),
+    );
+
+  if ("tiempo" === id)
+    return lienzo(
+      H("defs", { key: "d" }, grad("mgFoeTie", [["0%", "#8fd8ff"], ["100%", "#2b5f8f"]])),
+      H("path", { key: "c", d: "M20 96 Q24 60 38 50 L62 50 Q76 60 80 96 Z", fill: "#1d2b3d" }),
+      // Cabeza de reloj de arena: el arquetipo en una sola forma
+      H("path", { key: "h", d: "M28 8 h44 L52 44 L72 80 h-44 L48 44 Z", fill: "url(#mgFoeTie)" }),
+      H("path", { key: "s", d: "M34 14 h32 L50 40 Z", fill: "#ffe08a" }),
+      H("path", { key: "s2", d: "M36 74 h28 L50 56 Z", fill: "#ffe08a" }),
+      H("circle", { key: "g", cx: 50, cy: 44, r: 3.4, fill: "#fff" }),
+      H("path", { key: "t1", d: "M28 8 h44 M28 80 h44", stroke: "#cfe8ff", strokeWidth: "5", strokeLinecap: "round" }),
+    );
+
+  if ("sabio" === id)
+    return lienzo(
+      H("defs", { key: "d" }, grad("mgFoeSab", [["0%", "#6b5cc4"], ["100%", "#2a2160"]])),
+      H("path", { key: "hat", d: "M50 0 L82 44 H18 Z", fill: "url(#mgFoeSab)" }),
+      H("path", { key: "st", d: "M50 14 l3 6 6 3 -6 3 -3 6 -3 -6 -6 -3 6 -3 Z", fill: "#ffe08a" }),
+      H("circle", { key: "s1", cx: 34, cy: 34, r: 2.4, fill: "#ffe08a" }),
+      H("circle", { key: "s2", cx: 64, cy: 30, r: 2, fill: "#ffe08a" }),
+      H("circle", { key: "f", cx: 50, cy: 54, r: 15, fill: "#e8c9a8" }),
+      H("circle", { key: "e1", cx: 44, cy: 52, r: 2.4, fill: "#2a2160" }),
+      H("circle", { key: "e2", cx: 56, cy: 52, r: 2.4, fill: "#2a2160" }),
+      // Barba larga: lo que lo hace "sabio" de un vistazo
+      H("path", { key: "b", d: "M35 58 Q38 96 50 98 Q62 96 65 58 Q50 70 35 58 Z", fill: "#eef2f8" }),
+    );
+
+  return null;
+}
+// Cara de un nivel: retrato del jefe si lo tiene, y su emoji si no.
+function mgLevelFace(lvl) {
+  return (lvl && lvl.foe && mgFoeArt(lvl.foe)) || (lvl ? lvl.emoji : "");
+}
+
 function mgAmbArt(kind) {
   let H = MG_H,
     lienzo = (vb, ...hijos) =>
@@ -20766,7 +20969,7 @@ function e3({
                               children: [
                                 (0, s.jsx)("span", {
                                   className: "node-emoji",
-                                  children: r ? t.emoji : "🔒",
+                                  children: r ? mgLevelFace(t) : "🔒",
                                 }),
                                 l &&
                                   (0, s.jsx)("span", {
@@ -20846,7 +21049,7 @@ function e5({ level: e, progress: t, inv: n, onStart: a, onBack: r }) {
             onClick: r,
             children: "◀\ufe0e Camino",
           }),
-          (0, s.jsx)("div", { className: "pl-emoji", children: e.emoji }),
+          (0, s.jsx)("div", { className: "pl-emoji", children: mgLevelFace(e) }),
           (0, s.jsxs)("h2", {
             className: "panel-title",
             children: [d ? "⚠️ " : "", e.name],
@@ -21501,7 +21704,7 @@ function e8({
                     MG_H("span", { className: "bp bp3" }),
                   ),
                   MG_H("div", { className: "boss-aura" }),
-                  MG_H("span", { className: "boss-face-big" }, e.emoji),
+                  MG_H("span", { className: "boss-face-big" }, mgLevelFace(e)),
                   MG_H("div", { className: "boss-burst" }, "💥"),
                   "right" === U &&
                     MG_H("div", { className: "damage-float" }, "−1"),
