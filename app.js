@@ -21042,7 +21042,7 @@ function e5({ level: e, progress: t, inv: n, onStart: a, onBack: r }) {
     children: [
       (0, s.jsx)(eX, {}),
       (0, s.jsxs)("div", {
-        className: "panel prelevel",
+        className: "panel prelevel" + (d ? " prelevel-boss" : ""),
         children: [
           (0, s.jsx)("button", {
             className: "link-back",
