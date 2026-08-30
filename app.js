@@ -16684,6 +16684,20 @@ let ei = [
     { id: "feria", name: "Feria de juegos", emoji: "🎪" },
     { id: "mar", name: "Fondo del mar", emoji: "🐠" },
     { id: "taller", name: "Taller de robots", emoji: "🤖" },
+    // Mundos 13-25: el doble de aventura para el pequeño (ids nuevos al final).
+    { id: "nubes", name: "Ciudad de nubes", emoji: "☁️" },
+    { id: "dulces", name: "Montaña de dulces", emoji: "🍭" },
+    { id: "musica", name: "Valle musical", emoji: "🎵" },
+    { id: "desierto", name: "Desierto dorado", emoji: "🏜️" },
+    { id: "granja", name: "Granja alegre", emoji: "🚜" },
+    { id: "luna", name: "Base lunar", emoji: "🌕" },
+    { id: "dinos", name: "Valle de dinos", emoji: "🦕" },
+    { id: "piratas", name: "Bahía pirata", emoji: "🏴‍☠️" },
+    { id: "tren", name: "Estación del tren", emoji: "🚂" },
+    { id: "selva", name: "Selva tropical", emoji: "🌴" },
+    { id: "nieve", name: "Pueblo nevado", emoji: "⛄" },
+    { id: "estrellas", name: "Lluvia de estrellas", emoji: "🌟" },
+    { id: "galaxia", name: "Galaxia lejana", emoji: "🌌" },
   ],
   /* Niveles del mundo pequeño. IMPORTANTE: sus `id` son FIJOS y NO se
      reasignan por posición (a diferencia de `en`, que sí lo hace en
@@ -16731,6 +16745,8 @@ let ei = [
       id: 4,
       world: 0,
       name: "Reto de la playa",
+      foe: "cangrejin",
+      foeName: "Don Cangrejo",
       mode: "mix",
       max: 5,
       questions: 8,
@@ -16775,6 +16791,8 @@ let ei = [
       id: 8,
       world: 1,
       name: "Reto del bosque",
+      foe: "abeja",
+      foeName: "Zumbi",
       mode: "mix",
       max: 8,
       questions: 8,
@@ -16819,6 +16837,8 @@ let ei = [
       id: 12,
       world: 2,
       name: "Reto galáctico",
+      foe: "robotin",
+      foeName: "Robotín",
       mode: "mix",
       max: 10,
       questions: 8,
@@ -16863,6 +16883,8 @@ let ei = [
       id: 16,
       world: 3,
       name: "Reto de la pradera",
+      foe: "dino",
+      foeName: "Ñam-Ñam",
       mode: "mix",
       max: 8,
       questions: 8,
@@ -16908,6 +16930,8 @@ let ei = [
       id: 20,
       world: 4,
       name: "Reto de la cueva",
+      foe: "limo",
+      foeName: "Gotimo",
       mode: "mix",
       max: 10,
       questions: 8,
@@ -16956,6 +16980,8 @@ let ei = [
       id: 24,
       world: 5,
       name: "Gran reto del castillo",
+      foe: "fantasmita",
+      foeName: "Fantasmín",
       mode: "mix",
       max: 10,
       questions: 8,
@@ -17009,6 +17035,8 @@ let ei = [
       id: 28,
       world: 6,
       name: "Reto del volcán",
+      foe: "dragoncito",
+      foeName: "Chispas",
       mode: "mix",
       max: 10,
       questions: 8,
@@ -17054,6 +17082,8 @@ let ei = [
       id: 32,
       world: 7,
       name: "Reto arcoíris",
+      foe: "estrellon",
+      foeName: "Estrellón",
       mode: "mix",
       max: 10,
       questions: 8,
@@ -17099,6 +17129,8 @@ let ei = [
       id: 36,
       world: 8,
       name: "Gran reto helado",
+      foe: "yeti",
+      foeName: "Copito",
       mode: "mix",
       max: 12,
       questions: 8,
@@ -17152,6 +17184,8 @@ let ei = [
       id: 40,
       world: 9,
       name: "Gran reto del jardín",
+      foe: "abeja",
+      foeName: "Polen",
       mode: "mix",
       max: 12,
       questions: 8,
@@ -17166,15 +17200,71 @@ let ei = [
     { id: 41, world: 10, name: "Feria de juegos", mode: "mini", max: 10, questions: 4, emoji: "🎪", sticker: "🎡", stickerName: "Rueda de la fortuna" },
     { id: 42, world: 10, name: "Suma hasta 12", mode: "sumar", max: 12, questions: 8, emoji: "🍿", sticker: "🎢", stickerName: "Montaña rusa" },
     { id: 43, world: 10, name: "Cuenta hasta 15", mode: "contar", max: 15, questions: 8, emoji: "🎈", sticker: "🤹", stickerName: "Malabarista" },
-    { id: 44, world: 10, name: "Gran reto de la feria", mode: "mix", max: 12, questions: 8, emoji: "🏆", sticker: "🎨", stickerName: "Pintacaritas" },
+    { id: 44, world: 10, name: "Gran reto de la feria", foe: "estrellon", foeName: "Lucero", mode: "mix", max: 12, questions: 8, emoji: "🏆", sticker: "🎨", stickerName: "Pintacaritas" },
     { id: 45, world: 11, name: "Cuenta los peces", mode: "contar", max: 15, questions: 8, emoji: "🐟", sticker: "🐙", stickerName: "Pulpo curioso" },
     { id: 46, world: 11, name: "Quedan en el mar", mode: "restar", max: 12, questions: 8, emoji: "🌊", sticker: "🦈", stickerName: "Tiburón amistoso" },
     { id: 47, world: 11, name: "Juegos del mar", mode: "mini", max: 12, questions: 4, emoji: "🫧", sticker: "🐡", stickerName: "Pez globo" },
-    { id: 48, world: 11, name: "Gran reto del mar", mode: "mix", max: 15, questions: 8, emoji: "🔱", sticker: "🐳", stickerName: "Ballena gigante" },
+    { id: 48, world: 11, name: "Gran reto del mar", foe: "pulpito", foeName: "Tinta", mode: "mix", max: 15, questions: 8, emoji: "🔱", sticker: "🐳", stickerName: "Ballena gigante" },
     { id: 49, world: 12, name: "Patrones de robot", mode: "patron", max: 3, questions: 8, emoji: "🔩", sticker: "🦾", stickerName: "Brazo robot" },
     { id: 50, world: 12, name: "Ordena hasta 6", mode: "orden", max: 6, questions: 6, emoji: "🔧", sticker: "🛰️", stickerName: "Satélite" },
     { id: 51, world: 12, name: "Juegos del taller", mode: "mini", max: 15, questions: 4, emoji: "⚙️", sticker: "🚁", stickerName: "Helicóptero" },
-    { id: 52, world: 12, name: "Gran reto final", mode: "mix", max: 15, questions: 8, emoji: "🎖️", sticker: "🏆", stickerName: "Trofeo de campeón" },
+    { id: 52, world: 12, name: "Gran reto final", foe: "robotin", foeName: "Tuercas", mode: "mix", max: 15, questions: 8, emoji: "🎖️", sticker: "🏆", stickerName: "Trofeo de campeón" },
+    /* ── Mundos 13-25 (niveles 53-104): duplican el camino del pequeño. Misma
+       regla de siempre: ids NUEVOS al final, jamás renumerar. Cada mundo cierra
+       con un enemigo (foe) tal como pidió el peque, y los números se quedan
+       ≤15 para no chocar con el techo de la banda "Normal". */
+    { id: 53, world: 13, name: "Nubes hasta 12", mode: "contar", max: 12, questions: 8, emoji: "☁️", sticker: "🌤️", stickerName: "Solecito tímido" },
+    { id: 54, world: 13, name: "Suma en las nubes", mode: "sumar", max: 12, questions: 8, emoji: "🌥️", sticker: "🕊️", stickerName: "Paloma mensajera" },
+    { id: 55, world: 13, name: "Faltan en el cielo", mode: "falta", max: 10, questions: 8, emoji: "💨", sticker: "🎐", stickerName: "Campana de viento" },
+    { id: 56, world: 13, name: "Reto de las nubes", foe: "fantasmita", foeName: "Nubarrón", mode: "mix", max: 12, questions: 8, emoji: "🏆", sticker: "🌈", stickerName: "Puente de colores", pool: ["contar", "sumar", "falta", "comparar"] },
+    { id: 57, world: 14, name: "Cuenta dulces", mode: "contar", max: 12, questions: 8, emoji: "🍬", sticker: "🧁", stickerName: "Panquecito feliz" },
+    { id: 58, world: 14, name: "Restas de caramelo", mode: "restar", max: 12, questions: 8, emoji: "🍭", sticker: "🍩", stickerName: "Dona glaseada" },
+    { id: 59, world: 14, name: "De 2 en 2 con gomitas", mode: "depar", max: 6, questions: 8, emoji: "🐻", sticker: "🍪", stickerName: "Galleta con chispas" },
+    { id: 60, world: 14, name: "Reto de dulces", foe: "limo", foeName: "Gomín", mode: "mix", max: 12, questions: 8, emoji: "🏆", sticker: "🍰", stickerName: "Pastel de fiesta", pool: ["contar", "restar", "depar", "sumar"] },
+    { id: 61, world: 15, name: "Patrón musical", mode: "patron", max: 3, questions: 8, emoji: "🎵", sticker: "🎸", stickerName: "Guitarra estrella" },
+    { id: 62, world: 15, name: "Ordena las notas", mode: "orden", max: 6, questions: 6, emoji: "🎶", sticker: "🥁", stickerName: "Tambor alegre" },
+    { id: 63, world: 15, name: "¿Suena igual?", mode: "vf", max: 10, questions: 8, emoji: "🎤", sticker: "🎹", stickerName: "Piano brillante" },
+    { id: 64, world: 15, name: "Reto musical", foe: "robotin", foeName: "Tam-Tam", mode: "mix", max: 10, questions: 8, emoji: "🏆", sticker: "🎧", stickerName: "Auriculares mágicos", pool: ["patron", "orden", "vf", "sumar"] },
+    { id: 65, world: 16, name: "Cuenta en la arena", mode: "contar", max: 15, questions: 8, emoji: "🏜️", sticker: "🐪", stickerName: "Camello viajero" },
+    { id: 66, world: 16, name: "Puntos del oasis", mode: "puntos", max: 10, questions: 8, emoji: "🌵", sticker: "🦂", stickerName: "Escorpión amable" },
+    { id: 67, world: 16, name: "Suma en el desierto", mode: "sumar", max: 14, questions: 8, emoji: "☀️", sticker: "🏺", stickerName: "Vasija dorada" },
+    { id: 68, world: 16, name: "Reto del desierto", foe: "dino", foeName: "Arenoso", mode: "mix", max: 14, questions: 8, emoji: "🏆", sticker: "🔮", stickerName: "Bola del tesoro", pool: ["contar", "puntos", "sumar", "falta"] },
+    { id: 69, world: 17, name: "Cuenta animalitos", mode: "contar", max: 12, questions: 8, emoji: "🐔", sticker: "🐣", stickerName: "Pollito recién nacido" },
+    { id: 70, world: 17, name: "Restas en la granja", mode: "restar", max: 12, questions: 8, emoji: "🐷", sticker: "🐑", stickerName: "Oveja esponjosa" },
+    { id: 71, world: 17, name: "¿Cuántos faltan para 5?", mode: "para5", max: 5, questions: 8, emoji: "🥚", sticker: "🐴", stickerName: "Caballito veloz" },
+    { id: 72, world: 17, name: "Reto de la granja", foe: "abeja", foeName: "Zumbón", mode: "mix", max: 12, questions: 8, emoji: "🏆", sticker: "🚜", stickerName: "Tractor rojo", pool: ["contar", "restar", "para5", "sumar"] },
+    { id: 73, world: 18, name: "Cuenta estrellas", mode: "contar", max: 15, questions: 8, emoji: "🌙", sticker: "🌠", stickerName: "Estrella fugaz" },
+    { id: 74, world: 18, name: "Suma lunar", mode: "sumar", max: 14, questions: 8, emoji: "🌕", sticker: "🛰️", stickerName: "Satélite viajero" },
+    { id: 75, world: 18, name: "Ordena los cohetes", mode: "orden", max: 6, questions: 6, emoji: "🚀", sticker: "👨‍🚀", stickerName: "Astronauta valiente" },
+    { id: 76, world: 18, name: "Reto lunar", foe: "estrellon", foeName: "Lunero", mode: "mix", max: 14, questions: 8, emoji: "🏆", sticker: "🌗", stickerName: "Media luna", pool: ["contar", "sumar", "orden", "falta"] },
+    { id: 77, world: 19, name: "Cuenta dinos", mode: "contar", max: 15, questions: 8, emoji: "🦕", sticker: "🥚", stickerName: "Huevo de dino" },
+    { id: 78, world: 19, name: "Restas prehistóricas", mode: "restar", max: 12, questions: 8, emoji: "🦴", sticker: "🦖", stickerName: "T-Rex bebé" },
+    { id: 79, world: 19, name: "¿Qué falta, dino?", mode: "falta", max: 12, questions: 8, emoji: "🌿", sticker: "🐊", stickerName: "Coco prehistórico" },
+    { id: 80, world: 19, name: "Reto de los dinos", foe: "dragoncito", foeName: "Rexy", mode: "mix", max: 14, questions: 8, emoji: "🏆", sticker: "🌋", stickerName: "Volcán humeante", pool: ["contar", "restar", "falta", "sumar"] },
+    { id: 81, world: 20, name: "Cuenta el tesoro", mode: "contar", max: 15, questions: 8, emoji: "💰", sticker: "🦜", stickerName: "Loro pirata" },
+    { id: 82, world: 20, name: "Monedas de oro", mode: "sumar", max: 14, questions: 8, emoji: "🪙", sticker: "🗺️", stickerName: "Mapa del tesoro" },
+    { id: 83, world: 20, name: "Patrón pirata", mode: "patron", max: 3, questions: 8, emoji: "🏴‍☠️", sticker: "⚓", stickerName: "Ancla brillante" },
+    { id: 84, world: 20, name: "Reto pirata", foe: "pulpito", foeName: "Kraken", mode: "mix", max: 14, questions: 8, emoji: "🏆", sticker: "💎", stickerName: "Diamante pirata", pool: ["contar", "sumar", "patron", "restar"] },
+    { id: 85, world: 21, name: "Cuenta vagones", mode: "contar", max: 15, questions: 8, emoji: "🚂", sticker: "🚋", stickerName: "Vagón alegre" },
+    { id: 86, world: 21, name: "Ordena el tren", mode: "orden", max: 6, questions: 6, emoji: "🛤️", sticker: "🚦", stickerName: "Semáforo amigo" },
+    { id: 87, world: 21, name: "Suma en la estación", mode: "sumar", max: 15, questions: 8, emoji: "🎫", sticker: "🕰️", stickerName: "Reloj de estación" },
+    { id: 88, world: 21, name: "Reto del tren", foe: "robotin", foeName: "Vagón", mode: "mix", max: 15, questions: 8, emoji: "🏆", sticker: "🚄", stickerName: "Tren bala", pool: ["contar", "orden", "sumar", "falta"] },
+    { id: 89, world: 22, name: "Cuenta en la selva", mode: "contar", max: 15, questions: 8, emoji: "🌴", sticker: "🐒", stickerName: "Monito travieso" },
+    { id: 90, world: 22, name: "Restas salvajes", mode: "restar", max: 14, questions: 8, emoji: "🍌", sticker: "🐆", stickerName: "Leopardo veloz" },
+    { id: 91, world: 22, name: "De 2 en 2 en la selva", mode: "depar", max: 7, questions: 8, emoji: "🦧", sticker: "🦥", stickerName: "Perezoso dormilón" },
+    { id: 92, world: 22, name: "Reto de la selva", foe: "dino", foeName: "Selvón", mode: "mix", max: 15, questions: 8, emoji: "🏆", sticker: "🦁", stickerName: "León melenudo", pool: ["contar", "restar", "depar", "sumar"] },
+    { id: 93, world: 23, name: "Copos de nieve", mode: "contar", max: 15, questions: 8, emoji: "❄️", sticker: "⛄", stickerName: "Muñeco de nieve" },
+    { id: 94, world: 23, name: "Restas heladas", mode: "restar", max: 14, questions: 8, emoji: "🧊", sticker: "🐧", stickerName: "Pingüino patinador" },
+    { id: 95, world: 23, name: "Faltan copitos", mode: "falta", max: 12, questions: 8, emoji: "🌨️", sticker: "🦌", stickerName: "Reno amistoso" },
+    { id: 96, world: 23, name: "Reto nevado", foe: "yeti", foeName: "Nievín", mode: "mix", max: 14, questions: 8, emoji: "🏆", sticker: "🛷", stickerName: "Trineo veloz", pool: ["contar", "restar", "falta", "sumar"] },
+    { id: 97, world: 24, name: "Lluvia de estrellas", mode: "contar", max: 15, questions: 8, emoji: "🌟", sticker: "✨", stickerName: "Destellos mágicos" },
+    { id: 98, world: 24, name: "Suma estelar", mode: "sumar", max: 15, questions: 8, emoji: "💫", sticker: "🌌", stickerName: "Vía láctea" },
+    { id: 99, world: 24, name: "Patrón de estrellas", mode: "patron", max: 3, questions: 8, emoji: "⭐", sticker: "🔭", stickerName: "Telescopio dorado" },
+    { id: 100, world: 24, name: "Reto estelar", foe: "estrellon", foeName: "Lucero Real", mode: "mix", max: 15, questions: 8, emoji: "🏆", sticker: "🌟", stickerName: "Superestrella real", pool: ["contar", "sumar", "patron", "orden"] },
+    { id: 101, world: 25, name: "Cuenta planetas", mode: "contar", max: 15, questions: 8, emoji: "🪐", sticker: "🌍", stickerName: "Planeta Tierra" },
+    { id: 102, world: 25, name: "Suma galáctica", mode: "sumar", max: 15, questions: 8, emoji: "🌠", sticker: "☄️", stickerName: "Cometa veloz" },
+    { id: 103, world: 25, name: "Gran orden cósmico", mode: "orden", max: 6, questions: 6, emoji: "🌌", sticker: "👾", stickerName: "Marcianito amigo" },
+    { id: 104, world: 25, name: "Gran reto cósmico", foe: "dragoncito", foeName: "Dragón Cósmico", mode: "mix", max: 15, questions: 8, emoji: "🎖️", sticker: "👑", stickerName: "Corona del universo", pool: ["contar", "sumar", "orden", "restar", "falta", "patron"] },
   ],
   ec = ["💍", "🟦", "⭐", "🍎", "💎", "🪙"];
 // Práctica intercalada: todo nivel del camino pequeño lleva un pool de
@@ -17754,6 +17844,175 @@ function mgFoeArt(id) {
       H("circle", { key: "e2", cx: 56, cy: 52, r: 2.4, fill: "#2a2160" }),
       // Barba larga: lo que lo hace "sabio" de un vistazo
       H("path", { key: "b", d: "M35 58 Q38 96 50 98 Q62 96 65 58 Q50 70 35 58 Z", fill: "#eef2f8" }),
+    );
+
+  return null;
+}
+/* Enemigos TIERNOS del camino del pequeño. Son aparte de mgFoeArt (que hace
+   los jefes del hermano mayor, más rudos): aquí todo es monstruito simpático
+   con cachetes y sonrisa, porque el fin es celebrar, no asustar. Se dibujan
+   con el mismo lienzo 0 0 100 100 y se muestran a ~3.4rem en la arena. */
+function mgLilFoe(id) {
+  let H = MG_H,
+    lienzo = (...hijos) =>
+      H(
+        "svg",
+        {
+          viewBox: "0 0 100 100",
+          width: "1em",
+          height: "1em",
+          fill: "none",
+          xmlns: "http://www.w3.org/2000/svg",
+          style: { display: "block", overflow: "visible" },
+        },
+        ...hijos,
+      ),
+    grad = (gid, c0, c1) =>
+      H(
+        "linearGradient",
+        { key: gid, id: gid, x1: "0", y1: "0", x2: "0", y2: "1" },
+        H("stop", { key: "a", offset: "0", stopColor: c0 }),
+        H("stop", { key: "b", offset: "1", stopColor: c1 }),
+      ),
+    // Ojos grandes con brillo: el rasgo que los vuelve tiernos.
+    oj = (a, b, y, r = 7.5) => [
+      H("circle", { key: "w1", cx: a, cy: y, r: r, fill: "#fff" }),
+      H("circle", { key: "w2", cx: b, cy: y, r: r, fill: "#fff" }),
+      H("circle", { key: "p1", cx: a + 1, cy: y + 1.5, r: r * 0.52, fill: "#2b2440" }),
+      H("circle", { key: "p2", cx: b + 1, cy: y + 1.5, r: r * 0.52, fill: "#2b2440" }),
+      H("circle", { key: "g1", cx: a + 3, cy: y - 1.5, r: r * 0.2, fill: "#fff" }),
+      H("circle", { key: "g2", cx: b + 3, cy: y - 1.5, r: r * 0.2, fill: "#fff" }),
+    ],
+    ch = (a, b, y) => [
+      H("circle", { key: "k1", cx: a, cy: y, r: 5, fill: "#ff9db0", opacity: "0.65" }),
+      H("circle", { key: "k2", cx: b, cy: y, r: 5, fill: "#ff9db0", opacity: "0.65" }),
+    ],
+    sm = (d) =>
+      H("path", { key: "sm", d: d, stroke: "#2b2440", strokeWidth: "2.6", strokeLinecap: "round", fill: "none" });
+
+  if ("limo" === id)
+    return lienzo(
+      H("defs", { key: "d" }, grad("glimo", "#8ee36a", "#3f9e3a")),
+      H("path", { key: "b", d: "M14 84 Q9 44 50 40 Q91 44 86 84 Q86 90 78 87 Q71 93 63 87 Q56 93 50 87 Q44 93 37 87 Q29 93 22 87 Q14 90 14 84 Z", fill: "url(#glimo)", stroke: "#2e7a2b", strokeWidth: "2.5" }),
+      H("ellipse", { key: "s", cx: 34, cy: 52, rx: 9, ry: 6, fill: "#ffffff", opacity: "0.25" }),
+      ...oj(40, 62, 62),
+      ...ch(31, 71, 72),
+      sm("M43 76 Q51 83 59 76"),
+    );
+
+  if ("fantasmita" === id)
+    return lienzo(
+      H("defs", { key: "d" }, grad("gfan", "#f3edff", "#c9b8f0")),
+      H("path", { key: "b", d: "M22 86 V46 Q22 13 50 13 Q78 13 78 46 V86 Q71 79 64 86 Q57 92 50 85 Q43 92 36 86 Q29 79 22 86 Z", fill: "url(#gfan)", stroke: "#a690d8", strokeWidth: "2.5" }),
+      ...oj(40, 60, 48),
+      ...ch(33, 67, 58),
+      sm("M45 60 Q50 66 55 60"),
+    );
+
+  if ("robotin" === id)
+    return lienzo(
+      H("defs", { key: "d" }, grad("grob", "#8fd6ff", "#3f86d8")),
+      H("line", { key: "an", x1: 50, y1: 18, x2: 50, y2: 8, stroke: "#9fbbd6", strokeWidth: "3" }),
+      H("circle", { key: "ad", cx: 50, cy: 6, r: 4, fill: "#ff5b5b" }),
+      H("rect", { key: "e1", x: 14, y: 40, width: 8, height: 18, rx: 3, fill: "#2c5a8c" }),
+      H("rect", { key: "e2", x: 78, y: 40, width: 8, height: 18, rx: 3, fill: "#2c5a8c" }),
+      H("rect", { key: "hd", x: 20, y: 18, width: 60, height: 62, rx: 15, fill: "url(#grob)", stroke: "#2c5a8c", strokeWidth: "3" }),
+      H("rect", { key: "sc", x: 28, y: 32, width: 44, height: 36, rx: 9, fill: "#15263b" }),
+      H("circle", { key: "y1", cx: 41, cy: 48, r: 6, fill: "#68f0ff" }),
+      H("circle", { key: "y2", cx: 59, cy: 48, r: 6, fill: "#68f0ff" }),
+      H("circle", { key: "z1", cx: 41, cy: 48, r: 2.4, fill: "#0a1620" }),
+      H("circle", { key: "z2", cx: 59, cy: 48, r: 2.4, fill: "#0a1620" }),
+      H("path", { key: "m", d: "M42 60 Q50 65 58 60", stroke: "#68f0ff", strokeWidth: "2.4", fill: "none", strokeLinecap: "round" }),
+    );
+
+  if ("dino" === id)
+    return lienzo(
+      H("defs", { key: "d" }, grad("gdin", "#9ce86f", "#4aa63e")),
+      H("path", { key: "sp", d: "M40 30 L46 20 L52 30 M52 28 L58 18 L64 30", fill: "#2e7a2b" }),
+      H("path", { key: "b", d: "M20 80 Q16 42 50 36 Q84 42 80 80 Q80 86 50 86 Q20 86 20 80 Z", fill: "url(#gdin)", stroke: "#2e7a2b", strokeWidth: "2.5" }),
+      H("ellipse", { key: "be", cx: 50, cy: 74, rx: 20, ry: 10, fill: "#e9f7c8" }),
+      ...oj(40, 62, 54),
+      ...ch(31, 71, 66),
+      sm("M44 68 Q50 74 56 68"),
+      H("path", { key: "t", d: "M50 68 v5", stroke: "#fff", strokeWidth: "3", strokeLinecap: "round" }),
+    );
+
+  if ("estrellon" === id)
+    return lienzo(
+      H("defs", { key: "d" }, grad("gest", "#ffe680", "#ffb03a")),
+      H("path", { key: "b", d: "M50 8 L61 38 L93 40 L68 60 L77 92 L50 73 L23 92 L32 60 L7 40 L39 38 Z", fill: "url(#gest)", stroke: "#e0902a", strokeWidth: "2.5", strokeLinejoin: "round" }),
+      ...oj(41, 59, 50, 6.5),
+      ...ch(33, 67, 58),
+      sm("M44 60 Q50 67 56 60"),
+    );
+
+  if ("pulpito" === id)
+    return lienzo(
+      H("defs", { key: "d" }, grad("gpul", "#d29bff", "#8a4fd0")),
+      H("path", { key: "b", d: "M24 56 Q24 20 50 20 Q76 20 76 56 Q74 76 84 82 Q74 82 68 70 Q64 82 57 70 Q53 84 50 70 Q47 84 43 70 Q36 82 32 70 Q26 82 16 82 Q26 76 24 56 Z", fill: "url(#gpul)", stroke: "#6a3aa8", strokeWidth: "2.5" }),
+      ...oj(40, 60, 44),
+      ...ch(32, 68, 54),
+      sm("M44 56 Q50 62 56 56"),
+    );
+
+  if ("abeja" === id)
+    return lienzo(
+      H("defs", { key: "d" }, grad("gabe", "#ffe066", "#f5b820")),
+      H("line", { key: "a1", x1: 42, y1: 30, x2: 36, y2: 16, stroke: "#3a2f1a", strokeWidth: "2.5" }),
+      H("line", { key: "a2", x1: 58, y1: 30, x2: 64, y2: 16, stroke: "#3a2f1a", strokeWidth: "2.5" }),
+      H("circle", { key: "a3", cx: 35, cy: 14, r: 3, fill: "#3a2f1a" }),
+      H("circle", { key: "a4", cx: 65, cy: 14, r: 3, fill: "#3a2f1a" }),
+      H("ellipse", { key: "w1", cx: 30, cy: 40, rx: 14, ry: 18, fill: "#ffffff", opacity: "0.8" }),
+      H("ellipse", { key: "w2", cx: 70, cy: 40, rx: 14, ry: 18, fill: "#ffffff", opacity: "0.8" }),
+      H("ellipse", { key: "b", cx: 50, cy: 58, rx: 27, ry: 24, fill: "url(#gabe)", stroke: "#3a2f1a", strokeWidth: "2.5" }),
+      H("path", { key: "s1", d: "M40 40 Q50 37 60 40", stroke: "#3a2f1a", strokeWidth: "6", fill: "none" }),
+      H("path", { key: "s2", d: "M32 60 Q50 56 68 60", stroke: "#3a2f1a", strokeWidth: "6", fill: "none" }),
+      ...oj(42, 58, 52, 6),
+      sm("M45 66 Q50 71 55 66"),
+    );
+
+  if ("cangrejin" === id)
+    return lienzo(
+      H("defs", { key: "d" }, grad("gcan", "#ff8a6a", "#e0402a")),
+      H("path", { key: "lg", d: "M22 84 l-8 6 M30 86 l-6 8 M70 86 l6 8 M78 84 l8 6", stroke: "#c0331f", strokeWidth: "3", strokeLinecap: "round" }),
+      H("line", { key: "s1", x1: 40, y1: 52, x2: 36, y2: 30, stroke: "#e0402a", strokeWidth: "3" }),
+      H("line", { key: "s2", x1: 60, y1: 52, x2: 64, y2: 30, stroke: "#e0402a", strokeWidth: "3" }),
+      H("circle", { key: "e1", cx: 35, cy: 27, r: 6, fill: "#fff" }),
+      H("circle", { key: "e2", cx: 65, cy: 27, r: 6, fill: "#fff" }),
+      H("circle", { key: "p1", cx: 35, cy: 28, r: 3, fill: "#2b2440" }),
+      H("circle", { key: "p2", cx: 65, cy: 28, r: 3, fill: "#2b2440" }),
+      H("path", { key: "b", d: "M20 62 Q20 46 50 46 Q80 46 80 62 Q80 80 50 80 Q20 80 20 62 Z", fill: "url(#gcan)", stroke: "#c0331f", strokeWidth: "2.5" }),
+      H("path", { key: "cl", d: "M18 56 Q4 52 8 64 Q10 72 18 68 Q12 62 18 56 Z", fill: "url(#gcan)", stroke: "#c0331f", strokeWidth: "2" }),
+      H("path", { key: "cr", d: "M82 56 Q96 52 92 64 Q90 72 82 68 Q88 62 82 56 Z", fill: "url(#gcan)", stroke: "#c0331f", strokeWidth: "2" }),
+      ...ch(33, 67, 66),
+      sm("M42 66 Q50 73 58 66"),
+    );
+
+  if ("yeti" === id)
+    return lienzo(
+      H("defs", { key: "d" }, grad("gyet", "#f4fbff", "#c3e4f7")),
+      H("path", { key: "br", d: "M18 40 Q26 34 32 40 M68 40 Q74 34 82 40", stroke: "#9fc6de", strokeWidth: "3", fill: "none" }),
+      H("path", { key: "b", d: "M16 82 Q10 40 24 30 Q30 24 34 32 Q42 26 50 32 Q58 26 66 32 Q70 24 76 30 Q90 40 84 82 Q84 88 50 88 Q16 88 16 82 Z", fill: "url(#gyet)", stroke: "#9fc6de", strokeWidth: "2.5" }),
+      H("ellipse", { key: "fc", cx: 50, cy: 62, rx: 24, ry: 20, fill: "#dff0fb" }),
+      H("path", { key: "h", d: "M34 42 l3 -10 4 9 M62 42 l3 -9 4 10", fill: "#eef8ff", stroke: "#9fc6de", strokeWidth: "1.5" }),
+      ...oj(41, 59, 56),
+      ...ch(32, 68, 66),
+      sm("M43 70 Q50 77 57 70"),
+    );
+
+  if ("dragoncito" === id)
+    return lienzo(
+      H("defs", { key: "d" }, grad("gdra", "#ff9a6a", "#e0442a")),
+      H("path", { key: "hr", d: "M34 40 L28 24 L44 34 M66 40 L72 24 L56 34", fill: "#c0331f" }),
+      H("path", { key: "wl", d: "M14 66 Q4 52 12 46 Q16 56 26 58 Z", fill: "#ffb36a", stroke: "#c0331f", strokeWidth: "2" }),
+      H("path", { key: "wr", d: "M86 66 Q96 52 88 46 Q84 56 74 58 Z", fill: "#ffb36a", stroke: "#c0331f", strokeWidth: "2" }),
+      H("path", { key: "b", d: "M22 80 Q18 42 50 38 Q82 42 78 80 Q78 86 50 86 Q22 86 22 80 Z", fill: "url(#gdra)", stroke: "#c0331f", strokeWidth: "2.5" }),
+      H("ellipse", { key: "be", cx: 50, cy: 74, rx: 18, ry: 9, fill: "#ffd9a8" }),
+      ...oj(40, 62, 54),
+      H("circle", { key: "n1", cx: 44, cy: 66, r: 1.6, fill: "#2b2440" }),
+      H("circle", { key: "n2", cx: 56, cy: 66, r: 1.6, fill: "#2b2440" }),
+      sm("M44 70 Q50 76 56 70"),
+      H("path", { key: "tt", d: "M47 70 v4 M53 70 v4", stroke: "#fff", strokeWidth: "2.4", strokeLinecap: "round" }),
     );
 
   return null;
@@ -19901,7 +20160,7 @@ function eZ({ progress: e, onLevel: t, onStickers: n, onBrain: a, onBack: r }) {
                           className: `node-wrap ${a % 2 == 0 ? "nleft" : "nright"}`,
                           children: [
                             (0, s.jsxs)("button", {
-                              className: `level-node ${!i ? "locked" : l?.done ? "done" : "next"}`,
+                              className: `level-node ${!i ? "locked" : l?.done ? "done" : "next"}${n.foe ? " boss" : ""}`,
                               disabled: !i,
                               onClick: () => t(n),
                               children: [
@@ -19910,7 +20169,9 @@ function eZ({ progress: e, onLevel: t, onStickers: n, onBrain: a, onBack: r }) {
                                   children: i
                                     ? l?.done
                                       ? n.sticker
-                                      : n.emoji
+                                      : n.foe
+                                        ? mgLilFoe(n.foe)
+                                        : n.emoji
                                     : "🔒",
                                 }),
                                 o &&
@@ -20183,6 +20444,57 @@ function e1({ level: e, onDone: t, onSkill: onSkill }) {
           (0, s.jsxs)("span", { children: ["⭐ ", f] }),
         ],
       }),
+      /* Arena del enemigo (solo niveles de fin de mundo, con `foe`). Es el
+         espejo tierno del jefe del hermano mayor: la vida del enemigo baja
+         con CADA pregunta contestada, así que siempre se derrota al terminar
+         el nivel — nunca hay derrota, fiel al camino sin vidas del pequeño.
+         Un acierto es un golpe fuerte (Turbo festeja); un fallo, el enemigo
+         lo esquiva pero la batalla igual avanza. */
+      e.foe &&
+        (() => {
+          let contestada = "ask" !== c,
+            hp = Math.max(0, e.questions - (a + (contestada ? 1 : 0))),
+            derrotado = 0 === hp;
+          return MG_H(
+            "div",
+            { className: "lil-arena" + (derrotado ? " down" : "") },
+            MG_H(
+              "div",
+              { className: "lil-duel" },
+              MG_H(
+                "div",
+                { className: "lil-hero" + ("right" === c ? " cheer" : "") },
+                MG_H(d, { mood: "right" === c ? "excited" : "wrong" === c ? "sad" : "happy", size: 42 }),
+              ),
+              MG_H(
+                "div",
+                { className: "lil-vs" + ("right" === c ? " boom" : "") },
+                "right" === c ? "💥" : "⚔️",
+              ),
+              MG_H(
+                "div",
+                {
+                  className:
+                    "lil-foe" +
+                    ("right" === c ? " hit" : "") +
+                    ("wrong" === c ? " block" : "") +
+                    (derrotado ? " down" : ""),
+                },
+                MG_H("div", { className: "lil-foe-art" }, mgLilFoe(e.foe)),
+                MG_H("div", { className: "lil-foe-name" }, e.foeName || "Enemigo"),
+              ),
+            ),
+            MG_H(
+              "div",
+              { className: "lil-hp" },
+              ...Array.from({ length: e.questions }, (_, hi) =>
+                MG_H("span", { key: "hp" + hi, className: "lil-hp-heart" + (hi < hp ? "" : " gone") }, "❤️"),
+              ),
+            ),
+            derrotado &&
+              MG_H("div", { className: "lil-victory" }, "🎉 ¡Lo venciste!"),
+          );
+        })(),
       (0, s.jsxs)("div", {
         className: "stack center little-play",
         children: [
@@ -20767,6 +21079,17 @@ function e2({
             className: "title-pixel accent",
             children: "¡Lo lograste!",
           }),
+          e.foe &&
+            MG_H(
+              "div",
+              { className: "lil-win-foe" },
+              MG_H("div", { className: "lil-win-art" }, mgLilFoe(e.foe)),
+              MG_H(
+                "div",
+                { className: "lil-win-line" },
+                "🏆 ¡Venciste a " + (e.foeName || "el enemigo") + "!",
+              ),
+            ),
           (0, s.jsx)("div", {
             className: "big-stars",
             children: Array.from({ length: 3 }).map((e, t) =>

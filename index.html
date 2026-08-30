@@ -619,6 +619,44 @@ button.pm-band.sel { background: #ffd447; border-color: #b8860b; color: #2a1a4a;
 .lws-feria { background: linear-gradient(#ffd16b4d, #e0559e4d); }
 .lws-mar { background: linear-gradient(#2ea9c94d, #10406b5c); }
 .lws-taller { background: linear-gradient(#9aa5b84d, #4a54685c); }
+/* Fondos de los mundos 13-25 (el doble de aventura del pequeño). */
+.lws-nubes { background: linear-gradient(#bfe3ff4d, #8fb8e04d); }
+.lws-dulces { background: linear-gradient(#ffc2e04d, #ff8fb84d); }
+.lws-musica { background: linear-gradient(#c9a8ff4d, #6a4fc059); }
+.lws-desierto { background: linear-gradient(#ffd98a4d, #d99a4a52); }
+.lws-granja { background: linear-gradient(#a8d96a4d, #d9b84a47); }
+.lws-luna { background: linear-gradient(#8fa8d94d, #2e3a6659); }
+.lws-dinos { background: linear-gradient(#7fd98a4d, #3a7a4a5c); }
+.lws-piratas { background: linear-gradient(#4a9ac94d, #1a3a5c66); }
+.lws-tren { background: linear-gradient(#ff9a7a4d, #b8544452); }
+.lws-selva { background: linear-gradient(#5ec96a4d, #1f5c2e66); }
+.lws-nieve { background: linear-gradient(#d8f0ff4d, #7aa8cc59); }
+.lws-estrellas { background: linear-gradient(#ffe0804d, #5c4fb859); }
+.lws-galaxia { background: linear-gradient(#a87fff4d, #1a1450aa); }
+/* ── Arena del enemigo del pequeño (tierna, sin castigo) ─────────────── */
+.lil-arena { position: relative; flex-shrink: 0; width: 94%; max-width: 430px; margin: 2px auto 4px; padding: 8px 12px 10px; border: 4px solid #ffd36b; border-radius: 20px; background: linear-gradient(#2a1f52ee, #17103aee); box-shadow: 0 4px 0 #b98a2e, 0 0 22px #ffd36b55; }
+.lil-arena.down { border-color: #7be0a0; box-shadow: 0 4px 0 #2e8a55, 0 0 26px #7be0a099; animation: arenaFlash .55s ease; }
+.lil-duel { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+.lil-hero { display: flex; animation: champFloat 2.8s ease-in-out infinite; }
+.lil-hero.cheer { animation: champCheer .45s; }
+.lil-vs { font-size: 1.4rem; opacity: .5; }
+.lil-vs.boom { opacity: 1; font-size: 1.8rem; animation: sparkBoom .45s; }
+.lil-foe { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.lil-foe-art { font-size: 3.4rem; line-height: 1; filter: drop-shadow(0 3px 4px #0005); animation: lilFoeBob 3s ease-in-out infinite; }
+.lil-foe.hit .lil-foe-art { animation: champShake .4s; }
+.lil-foe.block .lil-foe-art { animation: lilFoeBlock .5s; }
+.lil-foe.down .lil-foe-art { animation: lilFoeOut .8s forwards; }
+.lil-foe-name { font-family: 'Press Start 2P', monospace; font-size: .52rem; color: #ffd36b; letter-spacing: .5px; }
+.lil-hp { display: flex; gap: 3px; justify-content: center; flex-wrap: wrap; margin-top: 6px; }
+.lil-hp-heart { font-size: 1rem; transition: transform .35s cubic-bezier(.4,1.4,.6,1), opacity .35s, filter .35s; }
+.lil-hp-heart.gone { opacity: .28; transform: scale(.62) rotate(24deg); filter: grayscale(1); }
+.lil-victory { text-align: center; font-family: 'Press Start 2P', monospace; font-size: .66rem; color: #7be0a0; text-shadow: 0 0 10px #7be0a077; margin-top: 5px; animation: bannerPop .5s ease; }
+.lil-win-foe { display: flex; flex-direction: column; align-items: center; gap: 4px; margin: 2px 0; }
+.lil-win-art { font-size: 3.8rem; line-height: 1; filter: drop-shadow(0 3px 5px #0005); animation: lilFoeBob 3s ease-in-out infinite; }
+.lil-win-line { font-family: 'Press Start 2P', monospace; font-size: .68rem; color: #ffd36b; text-shadow: 0 0 10px #ffd36b66; text-align: center; }
+@keyframes lilFoeBob { 0%,100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-5px) rotate(2deg); } }
+@keyframes lilFoeBlock { 0%,100% { transform: translateX(0); } 40% { transform: translateX(8px) rotate(4deg); } }
+@keyframes lilFoeOut { 0% { transform: scale(1); } 40% { transform: scale(1.22) rotate(-8deg); } 100% { transform: scale(.3) rotate(30deg); opacity: 0; } }
 /* ── Potenciador del acompañante: el pug te salva de perder un corazón ── */
 .pugmsg { display: flex; flex-direction: column; gap: 8px; }
 .pugmsg .wrong-answer { color: #ffd447; }
