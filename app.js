@@ -13840,6 +13840,8 @@ let y = {
     puntos: 0,
     pesca: 0,
     quecambio: 0,
+    melodia: 0,
+    pizza: 0,
   },
   x = (e, t) => Math.floor(Math.random() * (t - e + 1)) + e,
   k = (e) => e[Math.floor(Math.random() * e.length)];
@@ -13923,6 +13925,18 @@ let w = [
     name: "¿Qué cambió?",
     emoji: "🔎",
     desc: "Observa bien y descubre qué cambió",
+  },
+  {
+    id: "melodia",
+    name: "Secuencia musical",
+    emoji: "🎹",
+    desc: "Escucha la melodía y repítela",
+  },
+  {
+    id: "pizza",
+    name: "Fracciones de pizza",
+    emoji: "🍕",
+    desc: "Pedazos, conteo y fracciones",
   },
 ];
 function N({ success: e, coins: t, onRetry: n, onHub: a }) {
@@ -14729,6 +14743,10 @@ function q({ levels: e, onReward: t, onBack: n }) {
                 (0, s.jsx)(MgPesca, { level: e.pesca, onFinish: d("pesca") }, c),
               "quecambio" === a &&
                 (0, s.jsx)(MgQueCambio, { level: e.quecambio, onFinish: d("quecambio") }, c),
+              "melodia" === a &&
+                (0, s.jsx)(MgMelodia, { level: e.melodia, onFinish: d("melodia") }, c),
+              "pizza" === a &&
+                (0, s.jsx)(MgPizza, { level: e.pizza, onFinish: d("pizza") }, c),
             ],
           }),
       l &&
@@ -14748,7 +14766,7 @@ function q({ levels: e, onReward: t, onBack: n }) {
    rompería el generador del juego. */
 let R = { luces: 0, parejitas: 0, diferente: 0, sombras: 0, tren: 0, cajas: 0,
     cubos: 0, recta: 0, ordena: 0, memoria: 0, balanza: 0, reloj: 0, sudoku: 0, sumapar: 0,
-    globos: 0, puntos: 0, pesca: 0, quecambio: 0 },
+    globos: 0, puntos: 0, pesca: 0, quecambio: 0, melodia: 0, pizza: 0 },
   D = [
     { id: "luces", name: "Memoria de luces", emoji: "✨" },
     { id: "parejitas", name: "Parejas", emoji: "🃏" },
@@ -17821,6 +17839,152 @@ function MgQueCambio({ level: e, onFinish: t }) {
     ),
   );
 }
+// 🎹 Secuencia musical: escuchar/ver una melodía y repetirla (estilo Simón,
+// pero con teclas que suenan). Usa el reproductor de tonos `b`; si el sonido
+// está apagado, las teclas igual se iluminan, así que se juega sin audio.
+const MG_MUS_NOTES = [
+  { f: 261.63, c: "#ff5b6e", n: "do" },
+  { f: 329.63, c: "#ffd93a", n: "mi" },
+  { f: 392.0, c: "#5ec96a", n: "sol" },
+  { f: 523.25, c: "#4aa8ff", n: "do²" },
+];
+function MgMelodia({ level: e, onFinish: t }) {
+  let lv = Math.min(6, e || 0),
+    largo = Math.min(6, 2 + Math.floor(lv / 1.5)),
+    [seq] = (0, i.useState)(() => Array.from({ length: largo }, () => mgGRnd(0, MG_MUS_NOTES.length - 1))),
+    [showing, setShowing] = (0, i.useState)(true),
+    [lit, setLit] = (0, i.useState)(null),
+    [pos, setPos] = (0, i.useState)(0),
+    [fb, setFb] = (0, i.useState)(null),
+    timers = (0, i.useRef)([]),
+    doneRef = (0, i.useRef)(false),
+    playNote = (idx) => { try { b(MG_MUS_NOTES[idx].f, 0, 0.42, "sine", 0.16); } catch {} };
+  (0, i.useEffect)(() => {
+    seq.forEach((idx, k) => {
+      timers.current.push(setTimeout(() => { setLit(idx); playNote(idx); }, 750 + 780 * k));
+      timers.current.push(setTimeout(() => setLit(null), 750 + 780 * k + 430));
+    });
+    timers.current.push(setTimeout(() => setShowing(false), 750 + 780 * seq.length));
+    return () => timers.current.forEach(clearTimeout);
+  }, []);
+  let tap = (idx) => {
+    if (showing || fb || doneRef.current) return;
+    playNote(idx);
+    if (idx === seq[pos]) {
+      setFb({ i: idx, ok: true });
+      setTimeout(() => { setFb(null); let np = pos + 1; if (np >= seq.length) { doneRef.current = true; t(true); } else setPos(np); }, 320);
+    } else { setFb({ i: idx, ok: false }); mgGBeep(false); doneRef.current = true; setTimeout(() => t(false), 700); }
+  };
+  return MG_H(
+    "div",
+    { className: "brain-game" },
+    MG_H("p", { className: "brain-instr" }, showing ? "🎧 Escucha y mira la melodía…" : "¡Tu turno! Repite la melodía 🎹"),
+    MG_H(
+      "div",
+      { className: "piano-row" },
+      ...MG_MUS_NOTES.map((note, idx) =>
+        MG_H(
+          "button",
+          {
+            key: idx,
+            className: "piano-key" + (lit === idx ? " lit" : "") + (fb && fb.i === idx ? (fb.ok ? " ok" : " no") : ""),
+            style: { "--pk": note.c },
+            disabled: showing,
+            onClick: () => tap(idx),
+          },
+          MG_H("span", { className: "piano-note" }, note.n),
+        ),
+      ),
+    ),
+  );
+}
+
+/* 🍕 Fracciones de pizza: una pizza partida en `d` pedazos con `k` con pepperoni.
+   La pregunta escala: cuántos pedazos hay (denominador), cuántos con pepperoni,
+   o qué fracción tiene pepperoni. Helpers de dibujo y de opciones aquí abajo. */
+function mgWedgePath(cx, cy, r, a0, a1) {
+  let rad = (a) => ((a - 90) * Math.PI) / 180,
+    x0 = cx + r * Math.cos(rad(a0)),
+    y0 = cy + r * Math.sin(rad(a0)),
+    x1 = cx + r * Math.cos(rad(a1)),
+    y1 = cy + r * Math.sin(rad(a1)),
+    large = a1 - a0 > 180 ? 1 : 0;
+  return `M${cx} ${cy} L${x0.toFixed(2)} ${y0.toFixed(2)} A${r} ${r} 0 ${large} 1 ${x1.toFixed(2)} ${y1.toFixed(2)} Z`;
+}
+function mgPizzaSvg(d, k) {
+  let H = MG_H, cx = 50, cy = 50, r = 40, step = 360 / d, kids = [];
+  kids.push(H("circle", { key: "crust", cx: cx, cy: cy, r: r + 4, fill: "#e0a856", stroke: "#b5762e", strokeWidth: "2.5" }));
+  for (let sN = 0; sN < d; sN++) {
+    let a0 = sN * step, a1 = (sN + 1) * step, shaded = sN < k;
+    kids.push(H("path", { key: "w" + sN, d: mgWedgePath(cx, cy, r, a0, a1), fill: shaded ? "#ffc94a" : "#ffe7b3", stroke: "#c98a3a", strokeWidth: "1.3" }));
+    if (shaded) {
+      let mid = (a0 + a1) / 2, rr = r * 0.6, rad = ((mid - 90) * Math.PI) / 180;
+      kids.push(H("circle", { key: "p" + sN, cx: (cx + rr * Math.cos(rad)).toFixed(2), cy: (cy + rr * Math.sin(rad)).toFixed(2), r: Math.max(3, Math.min(5.5, 30 / d)), fill: "#e0402a", stroke: "#a52d1c", strokeWidth: "0.9" }));
+    }
+  }
+  return H("svg", { viewBox: "0 0 100 100", className: "pizza-svg" }, ...kids);
+}
+function mgNumChoices(answer, lo, hi) {
+  let set = new Set([answer]), guard = 0;
+  while (set.size < 3 && guard++ < 60) { let vv = mgGRnd(Math.max(0, lo), hi); if (vv > 0) set.add(vv); }
+  return mgGShuf([...set]).map(String);
+}
+function mgFracChoices(k, d) {
+  let good = k + "/" + d, set = new Set([good]),
+    cand = mgGShuf([(k + 1) + "/" + d, Math.max(1, k - 1) + "/" + d, k + "/" + (d + 1), k + "/" + Math.max(2, d - 1)]);
+  for (let c of cand) { if (set.size >= 3) break; if (c !== good) set.add(c); }
+  return mgGShuf([...set]);
+}
+function MgPizza({ level: e, onFinish: t }) {
+  let lv = Math.min(6, e || 0),
+    [st] = (0, i.useState)(() => {
+      let d = mgGPick(lv <= 1 ? [2, 3, 4] : 2 === lv ? [2, 3, 4, 6] : [2, 3, 4, 6, 8]),
+        modo = lv <= 1 ? "denom" : 2 === lv ? "cuenta" : "fraccion",
+        k = mgGRnd(1, "fraccion" === modo ? d - 1 : d),
+        answer,
+        prompt,
+        choices;
+      if ("denom" === modo) { answer = String(d); prompt = "¿En cuántos pedazos está partida? 🍕"; choices = mgNumChoices(d, 2, d + 2); }
+      else if ("cuenta" === modo) { answer = String(k); prompt = "¿Cuántos pedazos tienen pepperoni? 🍕"; choices = mgNumChoices(k, 1, d); }
+      else { answer = k + "/" + d; prompt = "¿Qué fracción tiene pepperoni? 🍕"; choices = mgFracChoices(k, d); }
+      return { d, k, modo, answer, prompt, choices };
+    }),
+    [chosen, setChosen] = (0, i.useState)(null),
+    doneRef = (0, i.useRef)(false),
+    pick = (val) => {
+      if (doneRef.current) return;
+      doneRef.current = true;
+      setChosen(val);
+      let ok = val === st.answer;
+      mgGBeep(ok);
+      setTimeout(() => t(ok), 850);
+    };
+  return MG_H(
+    "div",
+    { className: "brain-game" },
+    MG_H("p", { className: "brain-instr" }, st.prompt),
+    MG_H("div", { className: "pizza-wrap" }, mgPizzaSvg(st.d, st.k)),
+    MG_H(
+      "div",
+      { className: "frac-choices" },
+      ...st.choices.map((val, idx) =>
+        MG_H(
+          "button",
+          {
+            key: idx,
+            className:
+              "frac-choice" +
+              (chosen === val ? (val === st.answer ? " ok" : " no") : "") +
+              (null !== chosen && val === st.answer ? " reveal" : ""),
+            disabled: doneRef.current,
+            onClick: () => pick(val),
+          },
+          val,
+        ),
+      ),
+    ),
+  );
+}
 /* `min` = banda mínima en la que se ofrece el juego, y `props` = ajustes que
    dependen del techo del niño. Hacen falta porque cada minijuego escala con
    su propio `level`, que significa cosas distintas en cada uno (largo de una
@@ -17829,6 +17993,8 @@ function MgQueCambio({ level: e, onFinish: t }) {
    tope en 8. Por eso el límite se pone por juego y no con un recorte global,
    que falsearía juegos donde `level` no es una cantidad. */
 const MG_MINIS = [
+  { id: "melodia", comp: MgMelodia, name: "Secuencia musical", emoji: "🎹" },
+  { id: "pizza", comp: MgPizza, name: "Fracciones de pizza", emoji: "🍕" },
   { id: "globos", comp: MgGlobos, name: "Revienta globos", emoji: "🎈" },
   { id: "puntos", comp: MgPuntos, name: "Une los puntos", emoji: "🔗" },
   { id: "pesca", comp: MgPesca, name: "Pesca números", emoji: "🐟" },
