@@ -657,6 +657,48 @@ button.pm-band.sel { background: #ffd447; border-color: #b8860b; color: #2a1a4a;
 @keyframes lilFoeBob { 0%,100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-5px) rotate(2deg); } }
 @keyframes lilFoeBlock { 0%,100% { transform: translateX(0); } 40% { transform: translateX(8px) rotate(4deg); } }
 @keyframes lilFoeOut { 0% { transform: scale(1); } 40% { transform: scale(1.22) rotate(-8deg); } 100% { transform: scale(.3) rotate(30deg); opacity: 0; } }
+/* ── Minijuegos nuevos: globos, puntos, pesca, ¿qué cambió? ──────────── */
+/* 🎈 Revienta globos */
+.globo-field { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; max-width: 340px; }
+.globo { position: relative; width: 64px; height: 82px; border: 0; background: transparent; cursor: pointer; padding: 0; animation: globoFloat 3s ease-in-out infinite; transition: transform .12s; }
+.globo:hover:not(:disabled) { transform: scale(1.08); }
+.globo:before { content: ""; position: absolute; left: 3px; right: 3px; top: 0; bottom: 12px; border-radius: 50% 50% 48% 52% / 54% 54% 46% 46%; background: radial-gradient(circle at 34% 28%, #ffffffdd, var(--gc, #ff5b6e) 62%); box-shadow: inset -6px -8px 12px #00000033, 0 4px 10px #00000044; }
+.globo-num { position: absolute; top: 26px; left: 0; right: 0; text-align: center; font-family: 'Press Start 2P', monospace; font-size: 1.05rem; color: #fff; text-shadow: 0 2px 3px #0007; z-index: 1; }
+.globo-str { position: absolute; bottom: 0; left: 50%; width: 2px; height: 12px; background: #ffffffaa; transform: translateX(-50%); }
+.globo.pop { animation: globoPop .5s forwards; }
+.globo.bad { animation: globoBad .5s; }
+@keyframes globoFloat { 0%,100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-6px) rotate(2deg); } }
+@keyframes globoPop { 0% { transform: scale(1); } 30% { transform: scale(1.3); filter: brightness(1.7); } 100% { transform: scale(0); opacity: 0; } }
+@keyframes globoBad { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+/* 🔗 Une los puntos */
+.dots-wrap { position: relative; width: min(78vw, 280px); aspect-ratio: 1 / 1; margin: 0 auto; }
+.dots-svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.dots-line { stroke: #ffd93a; stroke-width: 2.5; stroke-linecap: round; filter: drop-shadow(0 0 4px #ffd93a88); }
+.dots-reward { font-size: 34px; }
+.dot { position: absolute; transform: translate(-50%, -50%); width: 34px; height: 34px; border-radius: 50%; border: 3px solid #ffffffcc; background: #3a3a72; color: #fff; font-family: 'Press Start 2P', monospace; font-size: .62rem; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; transition: transform .1s; }
+.dot.on { background: var(--green, #4ade80); border-color: #fff; }
+.dot.next { background: var(--accent, #ffd700); color: #2a1150; border-color: #fff; animation: dotPulse 1s ease-in-out infinite; }
+.dot.wrong { animation: champShake .38s; }
+@keyframes dotPulse { 0%,100% { box-shadow: 0 0 0 0 #ffd70099; } 50% { box-shadow: 0 0 0 9px #ffd70000; } }
+/* 🐟 Pesca números */
+.pesca-pond { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; max-width: 340px; padding: 12px; border-radius: 18px; background: linear-gradient(#2a6a9e55, #12405f66); }
+.pez { position: relative; border: 0; background: transparent; cursor: pointer; padding: 4px; display: flex; align-items: center; justify-content: center; animation: pezBob 2.6s ease-in-out infinite; transition: transform .12s; }
+.pez:hover:not(:disabled) { transform: scale(1.1); }
+.pez-emoji { font-size: 2.9rem; line-height: 1; filter: drop-shadow(0 2px 4px #0006); }
+.pez-num { position: absolute; top: 2px; left: 50%; transform: translateX(-50%); font-family: 'Press Start 2P', monospace; font-size: .68rem; color: #2a1150; background: #fff; border-radius: 8px; padding: 2px 5px; box-shadow: 0 1px 3px #0006; }
+.pez.ok { animation: pezCatch .6s; }
+.pez.no { animation: champShake .4s; opacity: .55; }
+.pez.reveal .pez-num { background: #4ade80; color: #fff; }
+@keyframes pezBob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+@keyframes pezCatch { 0% { transform: scale(1); } 40% { transform: scale(1.25) translateY(-10px); } 100% { transform: scale(1); } }
+/* 🔎 ¿Qué cambió? */
+.cambio-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; max-width: 360px; }
+.cambio-card { width: 62px; height: 62px; border-radius: 16px; border: 4px solid #ffffff55; background: #ffffff14; font-size: 2.1rem; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform .12s, border-color .15s, background .15s; padding: 0; }
+.cambio-row.peeking .cambio-card { border-color: #ffd70088; background: #ffd7001f; }
+.cambio-card:hover:not(:disabled) { transform: scale(1.08); }
+.cambio-card.ok { border-color: var(--green, #4ade80); background: #4ade804d; animation: pop .35s; }
+.cambio-card.no { border-color: var(--red, #ff5b6e); background: #ff5b6e40; }
+.cambio-card.reveal { border-color: var(--green, #4ade80); box-shadow: 0 0 14px #4ade8099; }
 /* ── Potenciador del acompañante: el pug te salva de perder un corazón ── */
 .pugmsg { display: flex; flex-direction: column; gap: 8px; }
 .pugmsg .wrong-answer { color: #ffd447; }
