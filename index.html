@@ -716,6 +716,47 @@ button.pm-band.sel { background: #ffd447; border-color: #b8860b; color: #2a1a4a;
 .frac-choice.ok { border-color: var(--green, #4ade80); background: #4ade804d; animation: pop .35s; }
 .frac-choice.no { border-color: var(--red, #ff5b6e); background: #ff5b6e40; opacity: .7; }
 .frac-choice.reveal { border-color: var(--green, #4ade80); box-shadow: 0 0 14px #4ade8099; }
+/* 🎯 Tiro al blanco */
+.diana-field { display: flex; flex-wrap: wrap; justify-content: center; gap: 16px; max-width: 340px; }
+.diana { position: relative; width: 78px; height: 78px; border: 0; background: transparent; cursor: pointer; padding: 0; animation: dianaBob 2.8s ease-in-out infinite; transition: transform .12s; }
+.diana:hover:not(:disabled) { transform: scale(1.08); }
+.diana-ring { position: absolute; border-radius: 50%; left: 50%; top: 50%; transform: translate(-50%, -50%); }
+.diana-ring.r1 { width: 78px; height: 78px; background: #e0402a; box-shadow: 0 3px 8px #0005; }
+.diana-ring.r2 { width: 52px; height: 52px; background: #fff; }
+.diana-ring.r3 { width: 26px; height: 26px; background: #e0402a; }
+.diana-num { position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-50%); text-align: center; font-family: 'Press Start 2P', monospace; font-size: .8rem; color: #fff; text-shadow: 0 1px 2px #000; z-index: 1; }
+.diana.hit { animation: pop .4s; }
+.diana.miss { animation: champShake .4s; opacity: .55; }
+.diana.reveal .diana-ring.r1 { box-shadow: 0 0 16px #4ade80, 0 3px 8px #0005; }
+.diana-dart { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); font-size: 1.6rem; z-index: 2; animation: pop .4s; }
+@keyframes dianaBob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+/* ⚖️ ¿Cuál pesa más? */
+.pesa-wrap { position: relative; width: min(80vw, 300px); margin: 6px auto 0; }
+.pesa-beam { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; transition: transform .5s cubic-bezier(.4,1.4,.6,1); transform-origin: 50% 60px; }
+.pesa-pan { flex: 1; min-height: 74px; border-radius: 12px 12px 20px 20px; border: 3px solid #b9863a; background: linear-gradient(#ffe6a8, #e0a856); cursor: pointer; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 3px; padding: 8px; transition: border-color .15s, box-shadow .15s; }
+.pesa-pan:hover:not(:disabled) { box-shadow: 0 0 14px #ffd70088; }
+.pesa-item { font-size: 1.2rem; line-height: 1; }
+.pesa-num { font-family: 'Press Start 2P', monospace; font-size: 1.4rem; color: #2a1150; }
+.pesa-pan.ok { border-color: var(--green, #4ade80); box-shadow: 0 0 16px #4ade8099; }
+.pesa-pan.no { border-color: var(--red, #ff5b6e); opacity: .7; }
+.pesa-base { width: 60%; height: 10px; margin: 0 auto; border-radius: 0 0 8px 8px; background: #8a6a2e; box-shadow: 0 6px 10px #0004; }
+.pesa-base:before { content: ""; display: block; width: 8px; height: 46px; margin: -46px auto 0; background: #8a6a2e; }
+/* 🧩 ¿Qué pieza encaja? */
+.encaja-main { width: min(46vw, 160px); height: auto; margin: 0 auto; display: block; filter: drop-shadow(0 3px 6px #0004); }
+.encaja-opts { display: flex; justify-content: center; gap: 14px; }
+.encaja-opt { width: 74px; height: 74px; border-radius: 14px; border: 4px solid #ffffff55; background: #ffffff14; cursor: pointer; padding: 6px; transition: transform .1s, border-color .15s; }
+.encaja-opt svg { width: 100%; height: 100%; }
+.encaja-opt:hover:not(:disabled) { transform: scale(1.08); }
+.encaja-opt.ok { border-color: var(--green, #4ade80); background: #4ade804d; animation: pop .35s; }
+.encaja-opt.no { border-color: var(--red, #ff5b6e); opacity: .6; }
+.encaja-opt.reveal { border-color: var(--green, #4ade80); box-shadow: 0 0 14px #4ade8099; }
+/* 🕹️ Laberinto de números */
+.lab-grid { display: grid; gap: 8px; justify-content: center; max-width: 280px; margin: 0 auto; }
+.lab-cell { width: 100%; aspect-ratio: 1 / 1; min-width: 58px; border-radius: 12px; border: 3px solid #ffffff44; background: #ffffff12; color: #fff; font-family: 'Press Start 2P', monospace; font-size: .9rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: transform .1s, background .15s, border-color .15s; }
+.lab-cell.done { background: #4ade8033; border-color: var(--green, #4ade80); }
+.lab-cell.here { background: var(--accent, #ffd700); border-color: #fff; box-shadow: 0 0 12px #ffd70099; }
+.lab-cell.wrong { animation: champShake .38s; border-color: var(--red, #ff5b6e); }
+.lab-hero { font-size: 1.5rem; }
 /* ── Potenciador del acompañante: el pug te salva de perder un corazón ── */
 .pugmsg { display: flex; flex-direction: column; gap: 8px; }
 .pugmsg .wrong-answer { color: #ffd447; }
