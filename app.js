@@ -13842,6 +13842,10 @@ let y = {
     quecambio: 0,
     melodia: 0,
     pizza: 0,
+    diana: 0,
+    pesas: 0,
+    encaja: 0,
+    laberinto: 0,
   },
   x = (e, t) => Math.floor(Math.random() * (t - e + 1)) + e,
   k = (e) => e[Math.floor(Math.random() * e.length)];
@@ -13937,6 +13941,30 @@ let w = [
     name: "Fracciones de pizza",
     emoji: "🍕",
     desc: "Pedazos, conteo y fracciones",
+  },
+  {
+    id: "diana",
+    name: "Tiro al blanco",
+    emoji: "🎯",
+    desc: "Dispara a la diana con el resultado",
+  },
+  {
+    id: "pesas",
+    name: "¿Cuál pesa más?",
+    emoji: "⚖️",
+    desc: "Descubre qué lado pesa más",
+  },
+  {
+    id: "encaja",
+    name: "¿Qué pieza encaja?",
+    emoji: "🧩",
+    desc: "Elige el pedazo que completa el círculo",
+  },
+  {
+    id: "laberinto",
+    name: "Laberinto de números",
+    emoji: "🕹️",
+    desc: "Sigue el camino: 1, 2, 3...",
   },
 ];
 function N({ success: e, coins: t, onRetry: n, onHub: a }) {
@@ -14747,6 +14775,14 @@ function q({ levels: e, onReward: t, onBack: n }) {
                 (0, s.jsx)(MgMelodia, { level: e.melodia, onFinish: d("melodia") }, c),
               "pizza" === a &&
                 (0, s.jsx)(MgPizza, { level: e.pizza, onFinish: d("pizza") }, c),
+              "diana" === a &&
+                (0, s.jsx)(MgDiana, { level: e.diana, onFinish: d("diana") }, c),
+              "pesas" === a &&
+                (0, s.jsx)(MgPesas, { level: e.pesas, onFinish: d("pesas") }, c),
+              "encaja" === a &&
+                (0, s.jsx)(MgEncaja, { level: e.encaja, onFinish: d("encaja") }, c),
+              "laberinto" === a &&
+                (0, s.jsx)(MgLaberinto, { level: e.laberinto, onFinish: d("laberinto") }, c),
             ],
           }),
       l &&
@@ -14766,7 +14802,8 @@ function q({ levels: e, onReward: t, onBack: n }) {
    rompería el generador del juego. */
 let R = { luces: 0, parejitas: 0, diferente: 0, sombras: 0, tren: 0, cajas: 0,
     cubos: 0, recta: 0, ordena: 0, memoria: 0, balanza: 0, reloj: 0, sudoku: 0, sumapar: 0,
-    globos: 0, puntos: 0, pesca: 0, quecambio: 0, melodia: 0, pizza: 0 },
+    globos: 0, puntos: 0, pesca: 0, quecambio: 0, melodia: 0, pizza: 0,
+    diana: 0, pesas: 0, encaja: 0, laberinto: 0 },
   D = [
     { id: "luces", name: "Memoria de luces", emoji: "✨" },
     { id: "parejitas", name: "Parejas", emoji: "🃏" },
@@ -17985,6 +18022,235 @@ function MgPizza({ level: e, onFinish: t }) {
     ),
   );
 }
+// 🎯 Tiro al blanco: dispara a la diana con el número correcto (valor o suma).
+function MgDiana({ level: e, onFinish: t }) {
+  let lv = Math.min(6, e || 0),
+    [st] = (0, i.useState)(() => {
+      let usaSuma = lv >= 2,
+        total = Math.min(6, 4 + Math.floor(lv / 2)),
+        answer,
+        prompt;
+      if (usaSuma) { let a = mgGRnd(1, 4 + lv), b = mgGRnd(1, 4); answer = a + b; prompt = `🎯 ¡Dispara al ${a} + ${b}!`; }
+      else { answer = mgGRnd(1, 5 + lv); prompt = `🎯 ¡Dispara al ${answer}!`; }
+      let vals = [answer], guard = 0;
+      while (vals.length < total && guard++ < 60) { let d = mgGRnd(Math.max(0, answer - 3), answer + 3); if (!vals.includes(d)) vals.push(d); }
+      return { vals: mgGShuf(vals), answer };
+    }),
+    [chosen, setChosen] = (0, i.useState)(null),
+    doneRef = (0, i.useRef)(false),
+    shoot = (idx) => {
+      if (doneRef.current) return;
+      doneRef.current = true;
+      setChosen(idx);
+      let ok = st.vals[idx] === st.answer;
+      mgGBeep(ok);
+      setTimeout(() => t(ok), 850);
+    };
+  return MG_H(
+    "div",
+    { className: "brain-game" },
+    MG_H("p", { className: "brain-instr" }, st.prompt),
+    MG_H(
+      "div",
+      { className: "diana-field" },
+      ...st.vals.map((val, idx) =>
+        MG_H(
+          "button",
+          {
+            key: idx,
+            className: "diana" + (chosen === idx ? (st.vals[idx] === st.answer ? " hit" : " miss") : "") + (null !== chosen && st.vals[idx] === st.answer ? " reveal" : ""),
+            style: { animationDelay: `${idx * 0.18}s` },
+            disabled: doneRef.current,
+            onClick: () => shoot(idx),
+          },
+          MG_H("span", { className: "diana-ring r1" }),
+          MG_H("span", { className: "diana-ring r2" }),
+          MG_H("span", { className: "diana-ring r3" }),
+          MG_H("span", { className: "diana-num" }, val),
+          chosen === idx && st.vals[idx] === st.answer && MG_H("span", { className: "diana-dart" }, "🎯"),
+        ),
+      ),
+    ),
+  );
+}
+
+// ⚖️ ¿Cuál pesa más?: el balancín se inclina; toca el plato más pesado.
+function MgPesas({ level: e, onFinish: t }) {
+  let lv = Math.min(6, e || 0),
+    [st] = (0, i.useState)(() => {
+      let usaNum = lv >= 3,
+        tope = Math.min(9, 3 + lv),
+        L = mgGRnd(1, tope),
+        R = mgGRnd(1, tope),
+        guard = 0;
+      while (L === R && guard++ < 30) R = mgGRnd(1, tope);
+      if (L === R) R = L + 1;
+      let masMenos = lv >= 2 && Math.random() < 0.4 ? "menos" : "mas",
+        heavy = L > R ? "L" : "R",
+        answer = "menos" === masMenos ? (heavy === "L" ? "R" : "L") : heavy;
+      return { L, R, usaNum, prompt: "menos" === masMenos ? "⚖️ ¿Qué lado pesa MENOS?" : "⚖️ ¿Qué lado pesa MÁS?", answer };
+    }),
+    [chosen, setChosen] = (0, i.useState)(null),
+    doneRef = (0, i.useRef)(false),
+    tilt = st.L > st.R ? -8 : 8,
+    pick = (side) => {
+      if (doneRef.current) return;
+      doneRef.current = true;
+      setChosen(side);
+      let ok = side === st.answer;
+      mgGBeep(ok);
+      setTimeout(() => t(ok), 850);
+    },
+    pan = (side, count) =>
+      MG_H(
+        "button",
+        {
+          className: "pesa-pan" + (chosen === side ? (side === st.answer ? " ok" : " no") : ""),
+          disabled: doneRef.current,
+          onClick: () => pick(side),
+        },
+        st.usaNum
+          ? MG_H("span", { className: "pesa-num" }, count)
+          : MG_H("span", { className: "pesa-items" }, ...Array.from({ length: count }, (_, k) => MG_H("span", { key: k, className: "pesa-item" }, "🍎"))),
+      );
+  return MG_H(
+    "div",
+    { className: "brain-game" },
+    MG_H("p", { className: "brain-instr" }, st.prompt),
+    MG_H(
+      "div",
+      { className: "pesa-wrap" },
+      MG_H("div", { className: "pesa-beam", style: { transform: `rotate(${tilt}deg)` } }, pan("L", st.L), pan("R", st.R)),
+      MG_H("div", { className: "pesa-base" }),
+    ),
+  );
+}
+
+// 🧩 ¿Qué pieza encaja?: elige el pedazo que completa el círculo (por tamaño).
+function MgEncaja({ level: e, onFinish: t }) {
+  let lv = Math.min(6, e || 0),
+    [st] = (0, i.useState)(() => {
+      let tamanos = [60, 90, 120, 150],
+        gap = mgGPick(lv <= 1 ? [90, 120, 150] : tamanos),
+        opts = mgGShuf(tamanos.filter((x) => x !== gap)).slice(0, 2).concat(gap);
+      return { gap, opts: mgGShuf(opts) };
+    }),
+    [chosen, setChosen] = (0, i.useState)(null),
+    doneRef = (0, i.useRef)(false),
+    pick = (val) => {
+      if (doneRef.current) return;
+      doneRef.current = true;
+      setChosen(val);
+      let ok = val === st.gap;
+      mgGBeep(ok);
+      setTimeout(() => t(ok), 850);
+    },
+    // Pac-man: círculo al que le falta una "boca" de `gap` grados centrada arriba.
+    mainWedge = mgWedgePath(50, 50, 40, st.gap / 2, 360 - st.gap / 2);
+  return MG_H(
+    "div",
+    { className: "brain-game" },
+    MG_H("p", { className: "brain-instr" }, "🧩 ¿Qué pieza completa el círculo?"),
+    MG_H(
+      "svg",
+      { viewBox: "0 0 100 100", className: "encaja-main" },
+      MG_H("circle", { key: "g", cx: 50, cy: 50, r: 41, fill: "none", stroke: "#ffffff33", strokeWidth: "1.5", strokeDasharray: "3 3" }),
+      MG_H("path", { key: "m", d: mainWedge, fill: "#7ec8ff", stroke: "#3f86d8", strokeWidth: "2" }),
+    ),
+    MG_H(
+      "div",
+      { className: "encaja-opts" },
+      ...st.opts.map((val, idx) =>
+        MG_H(
+          "button",
+          {
+            key: idx,
+            className: "encaja-opt" + (chosen === val ? (val === st.gap ? " ok" : " no") : "") + (null !== chosen && val === st.gap ? " reveal" : ""),
+            disabled: doneRef.current,
+            onClick: () => pick(val),
+          },
+          MG_H(
+            "svg",
+            { viewBox: "0 0 60 60" },
+            MG_H("path", { d: mgWedgePath(30, 30, 26, -val / 2, val / 2), fill: "#ffd93a", stroke: "#c98a3a", strokeWidth: "2" }),
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
+/* Camino hamiltoniano para el laberinto: numera las celdas a lo largo de un
+   recorrido, así el número siguiente siempre está pegado al anterior. */
+function mgHamPath(cols, rows) {
+  let total = cols * rows,
+    id = (r, c) => r * cols + c,
+    vecinos = (r, c) => mgGShuf([[r - 1, c], [r + 1, c], [r, c - 1], [r, c + 1]].filter(([rr, cc]) => rr >= 0 && rr < rows && cc >= 0 && cc < cols));
+  for (let intento = 0; intento < 60; intento++) {
+    let start = [mgGRnd(0, rows - 1), mgGRnd(0, cols - 1)],
+      vis = new Set([id(start[0], start[1])]),
+      path = [start],
+      dfs = (r, c) => {
+        if (path.length === total) return true;
+        for (let [rr, cc] of vecinos(r, c)) {
+          let k = id(rr, cc);
+          if (!vis.has(k)) { vis.add(k); path.push([rr, cc]); if (dfs(rr, cc)) return true; path.pop(); vis.delete(k); }
+        }
+        return false;
+      };
+    if (dfs(start[0], start[1])) return path;
+  }
+  let path = [];
+  for (let r = 0; r < rows; r++) { let cs = [...Array(cols).keys()]; if (r % 2) cs.reverse(); for (let c of cs) path.push([r, c]); }
+  return path;
+}
+// 🕹️ Laberinto de números: toca 1→2→3… (cada uno pegado al anterior) hasta la meta.
+function MgLaberinto({ level: e, onFinish: t }) {
+  let lv = Math.min(6, e || 0),
+    [g] = (0, i.useState)(() => {
+      let cols = 3,
+        rows = lv <= 1 ? 2 : lv <= 3 ? 3 : 4,
+        path = mgHamPath(cols, rows),
+        num = Array.from({ length: rows }, () => Array(cols).fill(0));
+      path.forEach(([r, c], k) => (num[r][c] = k + 1));
+      return { cols, rows, num, total: cols * rows };
+    }),
+    [next, setNext] = (0, i.useState)(1),
+    [wrong, setWrong] = (0, i.useState)(null),
+    doneRef = (0, i.useRef)(false),
+    tap = (val) => {
+      if (doneRef.current) return;
+      if (val === next) {
+        mgGBeep(true);
+        let nn = next + 1;
+        setNext(nn);
+        if (nn > g.total) { doneRef.current = true; setTimeout(() => t(true), 850); }
+      } else { mgGBeep(false); setWrong(val); setTimeout(() => setWrong(null), 380); }
+    };
+  return MG_H(
+    "div",
+    { className: "brain-game" },
+    MG_H("p", { className: "brain-instr" }, next > g.total ? "¡Llegaste a la meta! 🏁" : "🕹️ Toca los números en orden: 1, 2, 3…"),
+    MG_H(
+      "div",
+      { className: "lab-grid", style: { gridTemplateColumns: `repeat(${g.cols}, 1fr)` } },
+      ...g.num.flatMap((row, r) =>
+        row.map((val, c) =>
+          MG_H(
+            "button",
+            {
+              key: r + "-" + c,
+              className: "lab-cell" + (val < next ? " done" : "") + (val === next ? " here" : "") + (wrong === val ? " wrong" : ""),
+              disabled: doneRef.current,
+              onClick: () => tap(val),
+            },
+            val === next - 1 || (next > g.total && val === g.total) ? MG_H("span", { className: "lab-hero" }, "🐢") : val,
+          ),
+        ),
+      ),
+    ),
+  );
+}
 /* `min` = banda mínima en la que se ofrece el juego, y `props` = ajustes que
    dependen del techo del niño. Hacen falta porque cada minijuego escala con
    su propio `level`, que significa cosas distintas en cada uno (largo de una
@@ -17993,6 +18259,10 @@ function MgPizza({ level: e, onFinish: t }) {
    tope en 8. Por eso el límite se pone por juego y no con un recorte global,
    que falsearía juegos donde `level` no es una cantidad. */
 const MG_MINIS = [
+  { id: "diana", comp: MgDiana, name: "Tiro al blanco", emoji: "🎯" },
+  { id: "pesas", comp: MgPesas, name: "¿Cuál pesa más?", emoji: "⚖️" },
+  { id: "encaja", comp: MgEncaja, name: "¿Qué pieza encaja?", emoji: "🧩" },
+  { id: "laberinto", comp: MgLaberinto, name: "Laberinto de números", emoji: "🕹️" },
   { id: "melodia", comp: MgMelodia, name: "Secuencia musical", emoji: "🎹" },
   { id: "pizza", comp: MgPizza, name: "Fracciones de pizza", emoji: "🍕" },
   { id: "globos", comp: MgGlobos, name: "Revienta globos", emoji: "🎈" },
